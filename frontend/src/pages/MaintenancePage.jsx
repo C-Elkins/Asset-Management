@@ -3,7 +3,7 @@ import { MaintenanceSchedule } from '../components/maintenance/MaintenanceSchedu
 
 export const MaintenancePage = () => (
   <section>
-    <h2>Maintenance</h2>
+    <h2 className="h2">Maintenance</h2>
     <MaintenanceSchedule />
   </section>
 );
