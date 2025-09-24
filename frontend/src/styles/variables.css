@@ -46,3 +46,40 @@
     --header-fg: #f8fafc;
   }
 }
+
+/* Explicit theme overrides (manual toggle) */
+html[data-theme="light"] {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --muted: #475569;
+  --border: #e2e8f0;
+
+  --primary: #6366f1;
+  --primary-600: #4f46e5;
+  --danger: #ef4444;
+  --danger-600: #dc2626;
+
+  --sidebar-bg: #0f172a;
+  --sidebar-hover: #1f2937;
+  --header-bg: var(--sidebar-bg);
+  --header-fg: #ffffff;
+}
+
+html[data-theme="dark"] {
+  --bg: #0b1220;
+  --surface: #0f172a;
+  --text: #e5e7eb;
+  --muted: #94a3b8;
+  --border: #1f2937;
+
+  --primary: #818cf8;
+  --primary-600: #6366f1;
+  --danger: #f87171;
+  --danger-600: #ef4444;
+
+  --sidebar-bg: #0b1220;
+  --sidebar-hover: #111827;
+  --header-bg: var(--sidebar-bg);
+  --header-fg: #f8fafc;
+}
