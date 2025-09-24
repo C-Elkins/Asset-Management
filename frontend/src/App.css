@@ -941,7 +941,7 @@ body {
 
 .current-assignments h4 {
   margin: 0 0 1rem 0;
-  color: #2d3748;
+  color: var(--text);
   font-size: 1rem;
 }
 
@@ -956,7 +956,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  background: #edf2f7;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 6px;
 }
 
@@ -967,26 +968,26 @@ body {
 
 .assigned-user-item .user-name {
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text);
   margin-bottom: 0.25rem;
 }
 
 .assigned-user-item .user-details {
   font-size: 0.875rem;
-  color: #718096;
+  color: var(--muted);
 }
 
 .assigned-user-item .user-department {
   font-size: 0.75rem;
-  color: #4a5568;
+  color: var(--muted);
   margin-top: 0.25rem;
 }
 
 .unassign-btn {
   padding: 0.5rem 1rem;
-  background: #fed7d7;
-  color: #c53030;
-  border: 1px solid #feb2b2;
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+  color: var(--danger-600);
+  border: 1px solid color-mix(in oklab, var(--danger) 30%, transparent);
   border-radius: 4px;
   font-size: 0.75rem;
   cursor: pointer;
@@ -994,8 +995,8 @@ body {
 }
 
 .unassign-btn:hover:not(:disabled) {
-  background: #feb2b2;
-  border-color: #fc8181;
+  background: color-mix(in oklab, var(--danger) 20%, transparent);
+  border-color: color-mix(in oklab, var(--danger) 40%, transparent);
 }
 
 .unassign-btn:disabled {
@@ -1005,27 +1006,27 @@ body {
 
 .user-selection h4 {
   margin: 0 0 1rem 0;
-  color: #2d3748;
+  color: var(--text);
   font-size: 1rem;
 }
 
 .loading-users {
   text-align: center;
   padding: 2rem;
-  color: #718096;
+  color: var(--muted);
 }
 
 .no-users {
   text-align: center;
   padding: 2rem;
-  color: #718096;
+  color: var(--muted);
   font-style: italic;
 }
 
 .users-list {
   max-height: 300px;
   overflow-y: auto;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 6px;
 }
 
@@ -1034,7 +1035,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -1044,16 +1045,16 @@ body {
 }
 
 .user-item:hover:not(.assigned) {
-  background: #f7fafc;
+  background: color-mix(in oklab, var(--surface) 90%, var(--bg));
 }
 
 .user-item.selected {
-  background: #ebf8ff;
-  border-color: #3182ce;
+  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
+  border-color: color-mix(in oklab, var(--primary) 40%, var(--border));
 }
 
 .user-item.assigned {
-  background: #f7fafc;
+  background: color-mix(in oklab, var(--surface) 90%, var(--bg));
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -1065,7 +1066,7 @@ body {
 
 .user-item .user-name {
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text);
   margin-bottom: 0.25rem;
 }
 
@@ -1076,26 +1077,26 @@ body {
 }
 
 .user-item .user-email {
-  color: #4a5568;
+  color: var(--muted);
 }
 
 .user-item .user-role {
-  color: #718096;
+  color: var(--muted);
 }
 
 .user-item .user-department {
-  color: #a0aec0;
+  color: var(--muted);
 }
 
 .already-assigned {
   font-size: 0.75rem;
-  color: #718096;
+  color: var(--muted);
   font-style: italic;
 }
 
 .selected-indicator {
   font-size: 0.875rem;
-  color: #3182ce;
+  color: var(--primary);
   font-weight: 600;
 }
 
