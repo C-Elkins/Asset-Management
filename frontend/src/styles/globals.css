@@ -28,3 +28,6 @@ body {
 	clip: rect(1px, 1px, 1px, 1px);
 	white-space: nowrap;
 }
+
+/* Layout utilities */
+.stack-sm { display: grid; gap: 0.5rem; }

@@ -57,3 +57,30 @@
 .sidebar { background: var(--sidebar-bg); color: #fff; }
 .nav-item.active { border-left-color: var(--primary); }
 .nav-item:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: -3px; }
+
+/* Dropdown (header) */
+.dropdown { position: relative; }
+.dropdown-menu {
+	position: absolute;
+	top: calc(100% + 0.25rem);
+	right: 0;
+	min-width: 180px;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	box-shadow: var(--shadow-md);
+	z-index: 20;
+}
+.dropdown-item {
+	display: block;
+	width: 100%;
+	padding: 0.5rem 0.75rem;
+	background: none;
+	border: none;
+	text-align: left;
+	color: var(--text);
+	cursor: pointer;
+}
+.dropdown-item:hover, .dropdown-item[aria-current="true"] {
+	background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
