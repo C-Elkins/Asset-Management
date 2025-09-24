@@ -43,6 +43,7 @@
 }
 
 .btn-primary:hover { background: var(--primary-600); }
+.btn-primary:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: 2px; }
 
 .btn-danger {
 	background: var(--danger);
@@ -50,7 +51,9 @@
 }
 
 .btn-danger:hover { background: var(--danger-600); }
+.btn-danger:focus-visible { outline: 3px solid color-mix(in srgb, var(--danger) 45%, transparent); outline-offset: 2px; }
 
 /* Sidebar (bridge existing App.css to tokens) */
 .sidebar { background: var(--sidebar-bg); color: #fff; }
 .nav-item.active { border-left-color: var(--primary); }
+.nav-item:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent); outline-offset: -3px; }

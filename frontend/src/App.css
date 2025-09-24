@@ -31,7 +31,7 @@ body {
 .login-form h2 {
   text-align: center;
   margin-bottom: 2rem;
-  color: #333;
+  color: var(--text);
 }
 
 .form-group {
@@ -48,7 +48,7 @@ body {
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border);
   border-radius: 5px;
   font-size: 1rem;
   box-sizing: border-box;
@@ -56,8 +56,8 @@ body {
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 .login-form button {
@@ -83,7 +83,7 @@ body {
 
 .error-message {
   background: #fee;
-  color: #c53030;
+  color: var(--danger-600);
   padding: 0.75rem;
   border-radius: 5px;
   margin-bottom: 1rem;
@@ -138,21 +138,21 @@ body {
 
 .page-header h1 {
   margin: 0 0 0.5rem 0;
-  color: #1a202c;
+  color: var(--text);
   font-size: 2rem;
 }
 
 .page-header p {
   margin: 0;
-  color: #718096;
+  color: var(--muted);
   font-size: 1rem;
 }
 
 /* Asset List Styles */
 .asset-list-container {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 }
 
@@ -161,7 +161,7 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .asset-list-header h2 {
@@ -170,27 +170,25 @@ body {
 }
 
 .btn-primary {
-  background: #667eea;
-  color: white;
+  background: var(--primary);
+  color: #fff;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.2s;
 }
 
-.btn-primary:hover {
-  background: #5a67d8;
-}
+.btn-primary:hover { background: var(--primary-600); }
 
 .asset-filters {
   display: flex;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
   flex-wrap: wrap;
 }
 
@@ -202,7 +200,7 @@ body {
 .search-input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.875rem;
   box-sizing: border-box;
@@ -210,8 +208,8 @@ body {
 
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .status-filter {
@@ -223,12 +221,12 @@ body {
 .status-filter label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--muted);
 }
 
 .status-select {
   padding: 0.75rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.875rem;
   background: white;
@@ -250,7 +248,7 @@ body {
 .link-button {
   background: none;
   border: none;
-  color: #667eea;
+  color: var(--primary);
   text-decoration: underline;
   cursor: pointer;
   font-size: inherit;
@@ -259,8 +257,8 @@ body {
 .retry-button {
   margin-left: 1rem;
   padding: 0.5rem 1rem;
-  background: #667eea;
-  color: white;
+  background: var(--primary);
+  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -278,16 +276,16 @@ body {
 
 .page-button {
   padding: 0.5rem 1rem;
-  border: 1px solid #cbd5e0;
-  background: white;
+  border: 1px solid var(--border);
+  background: var(--surface);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .page-button:hover:not(:disabled) {
-  background: #f7fafc;
-  border-color: #a0aec0;
+  background: var(--bg);
+  border-color: var(--muted);
 }
 
 .page-button:disabled {
@@ -302,16 +300,16 @@ body {
 
 /* Asset Card Styles */
 .asset-card {
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, transform 0.06s ease;
   position: relative;
 }
 
 .asset-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-md);
 }
 
 .asset-card-header {
@@ -319,20 +317,20 @@ body {
   justify-content: space-between;
   align-items: flex-start;
   padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
 }
 
 .asset-name {
   margin: 0 0 0.25rem 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text);
 }
 
 .asset-tag {
   margin: 0;
   font-size: 0.875rem;
-  color: #718096;
+  color: var(--muted);
   font-family: Monaco, monospace;
 }
 
@@ -360,10 +358,10 @@ body {
   position: absolute;
   top: 100%;
   right: 0;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
   z-index: 10;
   min-width: 160px;
 }
@@ -387,7 +385,7 @@ body {
 .action-menu hr {
   margin: 0;
   border: none;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--border);
 }
 
 .delete-action {
@@ -1823,9 +1821,9 @@ body {
 
 /* Asset Card Selection */
 .asset-card.selected {
-  border-color: #3182ce;
-  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
-  background: #ebf8ff;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
 }
 
 .asset-selection {
