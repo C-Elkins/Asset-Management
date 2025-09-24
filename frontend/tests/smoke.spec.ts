@@ -17,13 +17,14 @@ test('login happy path with demo creds', async ({ page }) => {
     .replace(/\//g, '_');
   const fakeToken = `eyJhbGciOiJIUzI1NiJ9.${payload}.signature`;
 
-  await page.route('**/api/auth/login', async (route) => {
+  // Match both dev and preview baseURLs by not hardcoding /api or /api/v1
+  await page.route('**/auth/login', async (route) => {
     const json = { token: fakeToken };
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(json) });
   });
 
   // Provide a small assets dataset so the dashboard can compute stats
-  await page.route('**/api/assets?*', async (route) => {
+  await page.route('**/assets*', async (route) => {
     const json = [
       { id: 1, status: 'AVAILABLE', purchasePrice: 1000, category: { name: 'Laptops' } },
       { id: 2, status: 'ASSIGNED', purchasePrice: 1200, category: { name: 'Laptops' } },
@@ -33,7 +34,7 @@ test('login happy path with demo creds', async ({ page }) => {
   });
 
   // Optional statistics endpoint
-  await page.route('**/api/assets/statistics', async (route) => {
+  await page.route('**/assets/statistics*', async (route) => {
     await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
   });
 
