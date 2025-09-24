@@ -9,28 +9,12 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const getStatusColor = (status) => {
-    const statusColors = {
-      'AVAILABLE': '#10b981',
-      'ASSIGNED': '#3b82f6', 
-      'IN_MAINTENANCE': '#f59e0b',
-      'RETIRED': '#6b7280',
-      'LOST': '#ef4444',
-      'DAMAGED': '#dc2626'
-    };
-    return statusColors[status] || '#6b7280';
-  };
+  // Map API enums to CSS-friendly class suffixes
+  const statusClass = (status) =>
+    (status || '').toLowerCase(); // e.g., AVAILABLE -> available, IN_MAINTENANCE -> in_maintenance
 
-  const getConditionColor = (condition) => {
-    const conditionColors = {
-      'EXCELLENT': '#10b981',
-      'GOOD': '#22c55e',
-      'FAIR': '#f59e0b', 
-      'POOR': '#f97316',
-      'BROKEN': '#ef4444'
-    };
-    return conditionColors[condition] || '#6b7280';
-  };
+  const conditionClass = (condition) =>
+    (condition || '').toLowerCase(); // e.g., EXCELLENT -> excellent
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
@@ -148,8 +132,7 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
           <div className="asset-field">
             <span className="field-label">Status:</span>
             <span 
-              className="status-badge"
-              style={{ backgroundColor: getStatusColor(asset.status) }}
+              className={`status-badge ${statusClass(asset.status)}`}
             >
               {asset.status?.replace('_', ' ')}
             </span>
@@ -158,8 +141,7 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
           <div className="asset-field">
             <span className="field-label">Condition:</span>
             <span 
-              className="condition-badge"
-              style={{ color: getConditionColor(asset.condition) }}
+              className={`condition-badge ${conditionClass(asset.condition)}`}
             >
               {asset.condition}
             </span>

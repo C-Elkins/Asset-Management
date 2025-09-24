@@ -429,12 +429,27 @@ body {
   letter-spacing: 0.025em;
 }
 
+/* Status badge variants (use tokens) */
+.status-badge.available { background: var(--status-available); }
+.status-badge.assigned { background: var(--status-assigned); }
+.status-badge.in_maintenance { background: var(--status-in_maintenance); }
+.status-badge.retired { background: var(--status-retired); }
+.status-badge.lost { background: var(--status-lost); }
+.status-badge.damaged { background: var(--status-damaged); }
+
 .condition-badge {
   font-weight: 600;
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.025em;
 }
+
+/* Condition badge variants (text color via tokens) */
+.condition-badge.excellent { color: var(--condition-excellent); }
+.condition-badge.good { color: var(--condition-good); }
+.condition-badge.fair { color: var(--condition-fair); }
+.condition-badge.poor { color: var(--condition-poor); }
+.condition-badge.broken { color: var(--condition-broken); }
 
 .serial-number {
   font-family: Monaco, monospace;
