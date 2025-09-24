@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report",
     "start:backend": "cd ../backend && mvn spring-boot:run",
     "start:both": "concurrently \"npm run start:backend\" \"npm run dev\"",
     "health:frontend": "node -e \"import('node:process').then(p=>p.exit()).catch(()=>{});\" && curl -sS --http1.1 -o /dev/null -w '%{http_code}\\n' http://localhost:3000/healthz",
@@ -21,6 +24,7 @@
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@playwright/test": "^1.48.2",
     "@vitejs/plugin-react": "^4.3.1",
     "concurrently": "^9.2.1",
     "vite": "^5.4.0"
