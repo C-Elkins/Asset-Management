@@ -153,7 +153,8 @@ body {
   background: var(--surface);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
-  overflow: hidden;
+  /* Allow inner overlays (e.g., action menus) to escape container bounds */
+  overflow: visible;
 }
 
 .asset-list-header {
@@ -303,7 +304,8 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  /* Don't clip dropdown menus that extend outside the card */
+  overflow: visible;
   transition: box-shadow 0.2s, transform 0.06s ease;
   position: relative;
 }
@@ -351,6 +353,8 @@ body {
   flex: 0 0 auto;
   display: flex;
   align-items: flex-start;
+  /* Isolate stacking so the menu can layer above neighbors reliably */
+  isolation: isolate;
 }
 
 .action-menu-btn {
@@ -372,14 +376,19 @@ body {
 
 .action-menu {
   position: absolute;
-  top: 100%;
+  /* Add a small gap from the trigger */
+  top: calc(100% + 4px);
   right: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
-  z-index: 10;
+  /* Raise above surrounding UI and any outlines */
+  z-index: 1000;
   min-width: 160px;
+  /* Constrain height and allow internal scrolling if the list is long */
+  max-height: min(50vh, 320px);
+  overflow-y: auto;
 }
 
 .action-menu button {
@@ -1887,6 +1896,14 @@ body {
 .asset-card:has(.asset-selection) .asset-card-header {
   /* Base 1rem padding + 2rem for checkbox + buffer */
   padding-left: calc(1rem + 2rem);
+}
+
+.asset-card:has(.asset-selection) .asset-card-header::before {
+  content: "";
+  display: block;
+  width: 2rem;
+  height: 1px; /* minimal height; acts as a spacer inline with padding-left */
+  flex: 0 0 0;
 }
 
 /* Ensure the left header block can shrink and allow ellipsis */
