@@ -918,19 +918,19 @@ body {
 }
 
 .asset-summary .status-badge.available {
-  background: #10b981;
+  background: var(--status-available);
 }
 
 .asset-summary .status-badge.assigned {
-  background: #3b82f6;
+  background: var(--status-assigned);
 }
 
 .asset-summary .status-badge.in_maintenance {
-  background: #f59e0b;
+  background: var(--status-in_maintenance);
 }
 
 .asset-summary .status-badge.retired {
-  background: #6b7280;
+  background: var(--status-retired);
 }
 
 .current-assignments {
