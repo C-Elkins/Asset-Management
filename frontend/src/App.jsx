@@ -5,6 +5,7 @@ import { Login } from './components/auth/Login.jsx';
 import { Dashboard } from './components/dashboard/Dashboard.jsx';
 import { AssetsPage } from './pages/AssetsPage.jsx';
 import { AssetDetails } from './pages/AssetDetails.jsx';
+import { AssetCreatePage } from './pages/AssetCreatePage.jsx';
 import { MaintenancePage } from './pages/MaintenancePage.jsx';
 import { ReportsPage } from './pages/ReportsPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
@@ -55,6 +56,7 @@ function App() {
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="assets" element={<AssetsPage />} />
+          <Route path="assets/new" element={<AssetCreatePage />} />
           <Route path="assets/:id" element={<AssetDetails />} />
           <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="reports" element={<ReportsPage />} />

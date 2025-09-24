@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
 import { exportService } from '../../services/exportService.js';
 import { KeyboardShortcuts, ShortcutsHelp } from '../../hooks/useKeyboardShortcuts.jsx';
@@ -6,6 +7,7 @@ import { AssetCard } from './AssetCard.jsx';
 import { AssetForm } from './AssetForm.jsx';
 
 export const AssetList = () => {
+  const navigate = useNavigate();
   const [assets, setAssets] = useState([]);
   const [allAssets, setAllAssets] = useState([]); // For export purposes
   const [loading, setLoading] = useState(true);
@@ -286,7 +288,7 @@ export const AssetList = () => {
           )}
         </div>
         
-        <div className="header-actions">
+  <div className="header-actions">
           {/* Export Buttons */}
           <div className="export-actions">
             <button 
@@ -327,11 +329,24 @@ export const AssetList = () => {
 
           <button 
             className="btn-primary" 
-            onClick={() => setShowCreateForm(true)}
+            onClick={() => navigate('/app/assets/new')}
           >
             ➕ Add New Asset
           </button>
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="asset-tabs">
+        {statusOptions.map(opt => (
+          <button
+            key={opt.value}
+            className={`asset-tab ${statusFilter === opt.value ? 'active' : ''}`}
+            onClick={() => handleStatusChange(opt.value)}
+          >
+            {opt.label}
+          </button>
+        ))}
       </div>
 
       {/* Filters */}

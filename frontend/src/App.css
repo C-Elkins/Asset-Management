@@ -453,6 +453,17 @@ body {
   min-width: 0; /* allows text-overflow to work in flex */
 }
 
+/* Badges should not stretch to fill the row */
+.asset-field .status-badge,
+.asset-field .condition-badge {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  overflow: visible;
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
 /* Truncate plain text values while keeping badges/lists intact */
 .asset-field span:not(.field-label):last-child {
   overflow: hidden;
@@ -1599,6 +1610,32 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+/* Assets tabs */
+.asset-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1rem 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.asset-tab {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0.375rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.asset-tab.active {
+  color: var(--text);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--primary) 20%, transparent);
 }
 
 .asset-tag {
