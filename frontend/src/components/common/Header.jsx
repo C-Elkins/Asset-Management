@@ -12,6 +12,7 @@ export const Header = ({ user, onLogout }) => {
   }, []);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const themeLabel = theme === THEMES.DARK ? 'Dark' : 'Light';
   const themeIcon = theme === THEMES.DARK ? '🌙' : '☀️';
 
@@ -31,11 +32,25 @@ export const Header = ({ user, onLogout }) => {
     setMenuOpen(false);
   };
 
+  const options = [
+    { label: '☀️ Light', value: THEMES.LIGHT },
+    { label: '🌙 Dark', value: THEMES.DARK },
+    { label: '🖥️ System', value: THEMES.SYSTEM },
+  ];
+
+  const onMenuKeyDown = (e) => {
+    if (!menuOpen) return;
+    if (e.key === 'Escape') { setMenuOpen(false); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex((i) => (i + 1) % options.length); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); setActiveIndex((i) => (i - 1 + options.length) % options.length); return; }
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); const opt = options[activeIndex]; if (opt) setThemePref(opt.value); return; }
+  };
+
   return (
     <header className="app-header">
       <h1 className="app-title">IT Asset Management</h1>
       <div className="header-actions">
-        <div className="dropdown">
+        <div className="dropdown" onKeyDown={onMenuKeyDown}>
           <button
             type="button"
             className="btn btn-primary"
@@ -43,22 +58,26 @@ export const Header = ({ user, onLogout }) => {
             aria-expanded={menuOpen}
             aria-label={`Theme: ${themeLabel}. Open to change.`}
             title={`Theme: ${themeLabel}`}
-            onClick={() => setMenuOpen(v => !v)}
+            onClick={() => { setMenuOpen(v => !v); setActiveIndex(0); }}
           >
             <span style={{ marginRight: '0.4rem' }}>{themeIcon}</span>
             Theme
           </button>
           {menuOpen && (
             <div className="dropdown-menu" role="menu">
-              <button className="dropdown-item" role="menuitem" onClick={() => setThemePref(THEMES.LIGHT)} aria-current={getSavedTheme() === THEMES.LIGHT}>
-                ☀️ Light
-              </button>
-              <button className="dropdown-item" role="menuitem" onClick={() => setThemePref(THEMES.DARK)} aria-current={getSavedTheme() === THEMES.DARK}>
-                🌙 Dark
-              </button>
-              <button className="dropdown-item" role="menuitem" onClick={() => setThemePref(THEMES.SYSTEM)} aria-current={getSavedTheme() === THEMES.SYSTEM}>
-                🖥️ System
-              </button>
+              {options.map((opt, idx) => (
+                <button
+                  key={opt.value}
+                  className="dropdown-item"
+                  role="menuitemradio"
+                  aria-checked={getSavedTheme() === opt.value}
+                  aria-current={getSavedTheme() === opt.value}
+                  tabIndex={idx === activeIndex ? 0 : -1}
+                  onClick={() => setThemePref(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
           )}
         </div>
