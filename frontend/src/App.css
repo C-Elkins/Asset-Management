@@ -1878,6 +1878,11 @@ body {
   z-index: 5;
 }
 
+/* Fallback: if checkbox markup sits just before header, add padding */
+.asset-selection + .asset-card-header {
+  padding-left: calc(1rem + 2rem);
+}
+
 /* Prevent asset name from overlapping with the selection checkbox */
 .asset-card:has(.asset-selection) .asset-card-header {
   /* Base 1rem padding + 2rem for checkbox + buffer */
