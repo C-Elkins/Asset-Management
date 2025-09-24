@@ -1,0 +1,71 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/asset_management}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+    
+  h2:
+    console:
+      enabled: false
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-stacktrace: never
+    include-message: never
+
+# Production JWT settings (use environment variables)
+jwt:
+  secret: ${JWT_SECRET:defaultProductionSecret12345678901234567890}
+  expiration: ${JWT_EXPIRATION:3600000} # 1 hour for production
+
+# Production CORS settings
+cors:
+  allowed-origins: ${ALLOWED_ORIGINS:https://yourdomain.com}
+
+# Production logging
+logging:
+  level:
+    com.chaseelkins.assetmanagement: INFO
+    org.springframework.security: WARN
+    org.springframework.web: WARN
+    org.hibernate: WARN
+  file:
+    name: logs/asset-management.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+
+# Production API Documentation
+springdoc:
+  swagger-ui:
+    enabled: false # Disable in production for security
+  api-docs:
+    enabled: true
+
+# Production Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized

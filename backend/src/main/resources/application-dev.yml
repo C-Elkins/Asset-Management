@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    # Use env vars if provided (Docker), otherwise fallback to H2 for local dev
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+
+# Development-specific JWT settings (weaker security for testing)
+jwt:
+  secret: "devSecretKey123456789012345678901234567890"
+  expiration: 86400000 # 24 hours
+
+logging:
+  level:
+    com.chaseelkins.assetmanagement: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# Development CORS settings
+cors:
+  allowed-origins: 
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+    - "http://localhost:5173" # Vite dev server
+  
+# Development API Documentation
+springdoc:
+  swagger-ui:
+    enabled: true
+    try-it-out-enabled: true
