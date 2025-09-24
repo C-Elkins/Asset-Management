@@ -45,7 +45,9 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
   };
 
   const handleAssignUser = () => {
-    setShowAssignModal(true);
+    if (asset?.id) {
+      navigate(`/app/assets/${asset.id}/assign`);
+    }
     setShowActions(false);
   };
 
@@ -231,13 +233,7 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
       </div>
 
       {/* User Assignment Modal */}
-      {showAssignModal && (
-        <UserAssignmentModal
-          asset={asset}
-          onClose={() => setShowAssignModal(false)}
-          onAssign={handleAssignmentComplete}
-        />
-      )}
+      {/* assignment modal handled by route now */}
 
       {/* Edit Asset Modal */}
       {showEditModal && (

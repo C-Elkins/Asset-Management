@@ -1612,6 +1612,31 @@ body {
   gap: 0.5rem;
 }
 
+/* Asset Details layout */
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.card-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.kv { display: grid; gap: 0.5rem; }
+.kv-row { display: grid; grid-template-columns: 140px 1fr; align-items: start; gap: 0.5rem; }
+.kv-label { color: var(--muted); font-weight: 500; }
+.kv-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
 /* Assets tabs */
 .asset-tabs {
   display: flex;

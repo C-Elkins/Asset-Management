@@ -58,6 +58,7 @@ function App() {
           <Route path="assets" element={<AssetsPage />} />
           <Route path="assets/new" element={<AssetCreatePage />} />
           <Route path="assets/:id" element={<AssetDetails />} />
+        <Route path="assets/:id/assign" element={<AssetAssignPage />} />
           <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
