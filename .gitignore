@@ -29,6 +29,8 @@ frontend/.env.production.local
 frontend/build/
 frontend/dist/
 frontend/.cache/
+frontend/test-results/
+frontend/playwright-report/
 
 # Docker
 .docker/
