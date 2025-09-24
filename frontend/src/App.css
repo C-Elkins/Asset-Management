@@ -690,9 +690,9 @@ body {
 
 .form-section h3 {
   margin: 0 0 1rem 0;
-  color: #2d3748;
+  color: var(--text);
   font-size: 1.125rem;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid var(--border);
   padding-bottom: 0.5rem;
 }
 
@@ -710,7 +710,7 @@ body {
 .form-field label {
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #4a5568;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -718,7 +718,7 @@ body {
 .form-field select,
 .form-field textarea {
   padding: 0.75rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 0.875rem;
   transition: all 0.2s;
@@ -728,18 +728,18 @@ body {
 .form-field select:focus,
 .form-field textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .form-field input.error,
 .form-field select.error {
-  border-color: #e53e3e;
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 20%, transparent);
 }
 
 .field-error {
-  color: #e53e3e;
+  color: var(--danger);
   font-size: 0.75rem;
   margin-top: 0.25rem;
 }
@@ -755,10 +755,10 @@ body {
 
 .generate-btn {
   padding: 0.75rem 1rem;
-  background: #edf2f7;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
-  color: #4a5568;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
   cursor: pointer;
   font-size: 0.75rem;
   font-weight: 500;
@@ -766,8 +766,8 @@ body {
 }
 
 .generate-btn:hover {
-  background: #e2e8f0;
-  border-color: #a0aec0;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border-color: var(--muted);
 }
 
 .form-actions {
@@ -775,16 +775,16 @@ body {
   justify-content: flex-end;
   gap: 1rem;
   padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .btn-secondary {
   padding: 0.75rem 1.5rem;
-  background: white;
-  color: #4a5568;
-  border: 1px solid #cbd5e0;
-  border-radius: 6px;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
@@ -792,13 +792,18 @@ body {
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #f7fafc;
-  border-color: #a0aec0;
+  background: var(--bg);
+  border-color: var(--muted);
 }
 
 .btn-secondary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.btn-secondary:focus-visible, .generate-btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent);
+  outline-offset: 2px;
 }
 
 /* Responsive form design */
