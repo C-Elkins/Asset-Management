@@ -415,7 +415,7 @@ body {
 
 .field-label {
   font-weight: 500;
-  color: #4a5568;
+  color: var(--muted);
   min-width: 80px;
 }
 
@@ -453,7 +453,8 @@ body {
 
 .serial-number {
   font-family: Monaco, monospace;
-  background: #f7fafc;
+  background: var(--surface);
+  border: 1px solid var(--border);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   font-size: 0.75rem;
@@ -461,11 +462,11 @@ body {
 
 .purchase-price {
   font-weight: 600;
-  color: #2d3748;
+  color: var(--text);
 }
 
 .expired {
-  color: #e53e3e;
+  color: var(--danger);
   font-weight: 500;
 }
 
@@ -476,8 +477,9 @@ body {
 }
 
 .user-badge {
-  background: #edf2f7;
-  color: #4a5568;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
   padding: 0.25rem 0.5rem;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -498,7 +500,7 @@ body {
 }
 
 .spinner {
-  color: #667eea;
+  color: var(--primary);
   font-size: 0.875rem;
   font-weight: 500;
 }
