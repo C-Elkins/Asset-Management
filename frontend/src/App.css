@@ -900,13 +900,13 @@ body {
 
 .asset-summary h3 {
   margin: 0;
-  color: #2d3748;
+  color: var(--text);
 }
 
 .asset-summary .asset-tag {
   margin: 0;
   font-family: Monaco, monospace;
-  color: #718096;
+  color: var(--muted);
   font-size: 0.875rem;
 }
 
@@ -1046,6 +1046,11 @@ body {
 
 .user-item:hover:not(.assigned) {
   background: color-mix(in oklab, var(--surface) 90%, var(--bg));
+}
+
+.user-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 .user-item.selected {

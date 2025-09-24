@@ -176,7 +176,18 @@ export const UserAssignmentModal = ({ asset, onClose, onAssign }) => {
                     <div 
                       key={user.id} 
                       className={`user-item ${selectedUser?.id === user.id ? 'selected' : ''} ${isUserAssigned(user) ? 'assigned' : ''}`}
+                      role="option"
+                      aria-selected={selectedUser?.id === user.id}
+                      aria-disabled={isUserAssigned(user)}
+                      tabIndex={isUserAssigned(user) ? -1 : 0}
                       onClick={() => !isUserAssigned(user) && setSelectedUser(user)}
+                      onKeyDown={(e) => {
+                        if (isUserAssigned(user)) return;
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedUser(user);
+                        }
+                      }}
                     >
                       <div className="user-info">
                         <div className="user-name">{user.firstName} {user.lastName}</div>
