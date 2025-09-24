@@ -5,6 +5,9 @@ import { Login } from './components/auth/Login.jsx';
 import { Dashboard } from './components/dashboard/Dashboard.jsx';
 import { AssetsPage } from './pages/AssetsPage.jsx';
 import { AssetDetails } from './pages/AssetDetails.jsx';
+import { MaintenancePage } from './pages/MaintenancePage.jsx';
+import { ReportsPage } from './pages/ReportsPage.jsx';
+import { SettingsPage } from './pages/SettingsPage.jsx';
 import { NotFound } from './pages/NotFound.jsx';
 import { authService } from './services/authService.js';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -53,9 +56,9 @@ function App() {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="assets" element={<AssetsPage />} />
           <Route path="assets/:id" element={<AssetDetails />} />
-          <Route path="maintenance" element={<div className="page-placeholder">Maintenance page coming soon...</div>} />
-          <Route path="reports" element={<div className="page-placeholder">Reports page coming soon...</div>} />
-          <Route path="settings" element={<div className="page-placeholder">Settings page coming soon...</div>} />
+          <Route path="maintenance" element={<MaintenancePage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* Default redirect based on auth */}

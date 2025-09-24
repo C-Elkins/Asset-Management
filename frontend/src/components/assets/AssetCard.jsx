@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
 import { UserAssignmentModal } from './UserAssignmentModal.jsx';
 import { AssetForm } from './AssetForm.jsx';
 
 export const AssetCard = ({ asset, onUpdate, selectable = false, selected = false, onSelect }) => {
+  const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -53,8 +55,9 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
   };
 
   const handleViewDetails = () => {
-    // TODO: Open asset details modal
-    alert('Asset details view coming soon!');
+    if (asset?.id) {
+      navigate(`/app/assets/${asset.id}`);
+    }
   };
 
   const handleEdit = () => {

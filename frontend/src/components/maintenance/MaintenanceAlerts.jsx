@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
 import { exportService } from '../../services/exportService.js';
 
@@ -6,6 +7,7 @@ export const MaintenanceAlerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadMaintenanceAlerts();
@@ -137,8 +139,9 @@ export const MaintenanceAlerts = () => {
   };
 
   const handleAssetAction = (asset) => {
-    // Navigate to asset or open action modal
-    alert(`Action for ${asset.name}: This would open the asset management interface`);
+    if (asset?.id) {
+      navigate(`/app/assets/${asset.id}`);
+    }
   };
 
   const handleExportAlerts = () => {
@@ -272,7 +275,7 @@ export const MaintenanceAlerts = () => {
                     View Asset
                   </button>
                   {alert.type === 'maintenance' && (
-                    <button className="action-btn secondary">
+                    <button className="action-btn secondary" onClick={() => navigate('/app/maintenance')}>
                       Schedule Maintenance
                     </button>
                   )}
