@@ -349,6 +349,8 @@ body {
   position: relative;
   /* Keep menu button from shrinking when header gets tight */
   flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
 }
 
 .action-menu-btn {
@@ -360,6 +362,7 @@ body {
   padding: 0.25rem;
   border-radius: 4px;
   transition: all 0.2s;
+  flex: 0 0 auto;
 }
 
 .action-menu-btn:hover {
@@ -1870,20 +1873,21 @@ body {
 
 .asset-selection {
   position: absolute;
-  top: 0.75rem;
+  top: 0.9rem;
   left: 0.75rem;
   z-index: 5;
 }
 
 /* Prevent asset name from overlapping with the selection checkbox */
 .asset-card:has(.asset-selection) .asset-card-header {
-  /* base 1rem padding + ~1.5rem space for checkbox and gap */
-  padding-left: calc(1rem + 1.5rem);
+  /* Base 1rem padding + 2rem for checkbox + buffer */
+  padding-left: calc(1rem + 2rem);
 }
 
 /* Ensure the left header block can shrink and allow ellipsis */
 .asset-card-header > div:first-child {
-  min-width: 0;
+  /* Allow the title block to shrink so ellipsis works */
+  min-width: 0 !important;
   flex: 1 1 auto;
 }
 
