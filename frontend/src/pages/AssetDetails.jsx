@@ -28,7 +28,7 @@ export const AssetDetails = () => {
 
   return (
     <div className="asset-details">
-      <h1>{asset.name} <span style={{ opacity: 0.6 }}>#{asset.assetTag}</span></h1>
+      <h1 className="h1">{asset.name} <span className="subtle">#{asset.assetTag}</span></h1>
       <div style={{ display: 'grid', gap: '0.5rem' }}>
         <div><strong>Status:</strong> {asset.status}</div>
         <div><strong>Condition:</strong> {asset.condition}</div>

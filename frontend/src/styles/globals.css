@@ -10,6 +10,10 @@ body {
 }
 
 /* Utilities */
+.h1 { font-size: 2rem; line-height: 1.2; font-weight: 700; margin: 0; }
+.h2 { font-size: 1.5rem; line-height: 1.25; font-weight: 600; margin: 0; }
+.subtle { color: var(--muted); }
+
 .container {
 	width: 100%;
 	max-width: 1200px;
