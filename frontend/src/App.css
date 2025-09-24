@@ -523,31 +523,33 @@ body {
 .main-content {
   display: flex;
   flex-direction: column;
+  background: var(--bg);
 }
 
 .page-content {
   flex: 1;
   overflow-y: auto;
+  background: var(--bg);
 }
 
 .page-placeholder {
   padding: 3rem;
   text-align: center;
-  color: #718096;
+  color: var(--muted);
   font-size: 1.125rem;
 }
 
 /* Sidebar Styles */
 .sidebar {
-  background: #1a202c;
-  color: white;
+  background: var(--sidebar-bg);
+  color: #fff;
   display: flex;
   flex-direction: column;
 }
 
 .sidebar-header {
   padding: 1.5rem;
-  border-bottom: 1px solid #2d3748;
+  border-bottom: 1px solid var(--border);
 }
 
 .sidebar-header h2 {
@@ -569,7 +571,7 @@ body {
   padding: 0.75rem 1.5rem;
   background: none;
   border: none;
-  color: #cbd5e0;
+  color: var(--muted);
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
@@ -577,14 +579,14 @@ body {
 }
 
 .nav-item:hover {
-  background: #2d3748;
-  color: white;
+  background: var(--sidebar-hover);
+  color: #fff;
 }
 
 .nav-item.active {
-  background: #2d3748;
-  color: white;
-  border-left-color: #667eea;
+  background: var(--sidebar-hover);
+  color: #fff;
+  border-left-color: var(--primary);
 }
 
 .nav-icon {
@@ -628,7 +630,7 @@ body {
 }
 
 .modal-content {
-  background: white;
+  background: var(--surface);
   border-radius: 8px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   max-width: 800px;
@@ -837,13 +839,13 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 }
 
 .modal-header h2 {
   margin: 0;
-  color: #2d3748;
+  color: var(--text);
   font-size: 1.25rem;
 }
 
