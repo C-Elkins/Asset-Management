@@ -30,7 +30,7 @@ FRONTEND_PID=$!
 
 echo "✅ Both servers started!"
 echo "📊 Backend: http://localhost:8080/api/v1"
-echo "🌐 Frontend: http://localhost:3000"
+echo "🌐 Frontend: http://localhost:3005"
 echo "Press Ctrl+C to stop both servers"
 
 # Wait for both processes

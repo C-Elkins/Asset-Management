@@ -243,8 +243,25 @@ export const AssetList = () => {
 
   if (loading) {
     return (
-      <div className="asset-list-container">
-        <div className="loading">Loading assets...</div>
+      <div className="asset-list-container" style={{ padding: '1rem' }}>
+        <div className="asset-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="asset-card">
+              <div className="asset-card-header">
+                <div style={{ width: '60%' }} className="skeleton" aria-hidden="true">&nbsp;</div>
+                <div style={{ width: 24, height: 24, borderRadius: 4 }} className="skeleton" aria-hidden="true" />
+              </div>
+              <div className="asset-info">
+                {Array.from({ length: 4 }).map((_, r) => (
+                  <div key={r} className="asset-field">
+                    <div style={{ width: 110 }} className="skeleton" aria-hidden="true">&nbsp;</div>
+                    <div className="skeleton" style={{ height: 14, width: '100%' }} aria-hidden="true">&nbsp;</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }

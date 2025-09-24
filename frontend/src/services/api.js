@@ -1,14 +1,22 @@
 import axios from 'axios';
 
-// Use proxy path in development, full URL in production
-const BASE_URL = import.meta.env.DEV ? '/api' : 'http://localhost:8080/api/v1';
+// Derive base URL. Prefer explicit env, then proxy path in dev, else absolute.
+const EXPLICIT = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = EXPLICIT || (import.meta.env.DEV ? '/api' : 'http://localhost:8080/api/v1');
+
+// Helper to detect likely proxy failure (e.g., 404 on /auth/login with relative path)
+const isNetworkOrProxyIssue = (error) => {
+  if (!error) return false;
+  if (error.code === 'ERR_NETWORK') return true;
+  if (error.response?.status === 404) return true;
+  return false;
+};
 
 // Create axios instance with backend configuration
 export const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
+  timeout: 10000,
 });
 
 // Add token to requests if available
@@ -20,27 +28,34 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Handle auth errors
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    // Optionally attempt a single retry with absolute URL if proxy-relative failed
+    if (isNetworkOrProxyIssue(error) && !error.config?._retried) {
+      const original = { ...error.config, _retried: true };
+      // Force absolute base
+      original.baseURL = 'http://localhost:8080/api/v1';
+      try {
+        return await axios.request(original);
+      } catch (e) {
+        // fall through to normal handling
+        error = e;
+      }
+    }
     const status = error.response?.status;
     if (status === 401) {
       const reqUrl = error.config?.url || '';
       const isAuthEndpoint = reqUrl.startsWith('/auth') || reqUrl.includes('/auth/');
       const isOnLoginPage = window.location.pathname.startsWith('/login');
-
-      // Only force redirect for unauthorized responses on protected endpoints.
-      // Allow /auth endpoints (like /auth/login) and the login page to handle errors inline.
       if (!isAuthEndpoint && !isOnLoginPage) {
         localStorage.removeItem('jwt_token');
         window.location.href = '/login';
-        return; // Stop further processing
+        return; 
       }
     }
     return Promise.reject(error);

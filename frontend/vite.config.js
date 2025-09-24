@@ -16,10 +16,11 @@ export default defineConfig({
     }
   ],
   server: {
-    port: 3000,
+    // Move dev server to 3005 to avoid clashes with other local apps & relax strictPort
+    port: 3005,
     host: true,
     open: false,
-    strictPort: true,
+    strictPort: false,
     proxy: {
       '/api': {
         target: 'http://localhost:8080/api/v1',

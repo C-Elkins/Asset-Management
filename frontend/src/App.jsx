@@ -6,13 +6,16 @@ import { Dashboard } from './components/dashboard/Dashboard.jsx';
 import { AssetsPage } from './pages/AssetsPage.jsx';
 import { AssetDetails } from './pages/AssetDetails.jsx';
 import { AssetCreatePage } from './pages/AssetCreatePage.jsx';
+import { AssetAssignPage } from './pages/AssetAssignPage.jsx';
 import { MaintenancePage } from './pages/MaintenancePage.jsx';
 import { ReportsPage } from './pages/ReportsPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
+import ComponentShowcase from './pages/ComponentShowcase.jsx';
 import { NotFound } from './pages/NotFound.jsx';
 import { authService } from './services/authService.js';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
+import { ExecutivePageLoader } from './components/common/ExecutiveLoader.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -38,7 +41,7 @@ function App() {
   };
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <ExecutivePageLoader message="Initializing Enterprise Portal..." />;
   }
 
   return (
@@ -62,6 +65,7 @@ function App() {
           <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="showcase" element={<ComponentShowcase />} />
           <Route path="*" element={<NotFound />} />
         </Route>
         {/* Default redirect based on auth */}

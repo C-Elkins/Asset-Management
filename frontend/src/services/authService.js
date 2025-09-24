@@ -37,10 +37,7 @@ function decodeJwt(token) {
 export const authService = {
   async login(username, password) {
     try {
-      const response = await api.post('/auth/login', {
-        username,
-        password
-      });
+      const response = await api.post('/auth/login', { username, password });
       
       const { token } = response.data;
       if (token) {
@@ -55,39 +52,31 @@ export const authService = {
       return { success: false, error: 'Invalid credentials' };
     } catch (error) {
       console.error('Login error:', error);
-      
-      // Handle different types of errors
-      if (error.response) {
-        const status = error.response.status;
-        const message = error.response?.data?.message;
-        
-        if (status === 401) {
-          return { 
-            success: false, 
-            error: message || 'Invalid username or password. Please check your credentials and try again.' 
-          };
-        } else if (status >= 500) {
-          return { 
-            success: false, 
-            error: 'Server error. Please try again later.' 
-          };
-        } else {
-          return { 
-            success: false, 
-            error: message || 'Login failed. Please try again.' 
-          };
-        }
-      } else if (error.request) {
-        return { 
-          success: false, 
-          error: 'Unable to connect to server. Please check your connection and try again.' 
-        };
-      } else {
-        return { 
-          success: false, 
-          error: 'Login failed. Please try again.' 
+      const network = error.code === 'ERR_NETWORK' || !error.response;
+      if (network) {
+        return {
+          success: false,
+          error: 'Cannot reach backend. Ensure Spring Boot is running on :8080 and no ad blocker/CORS issue.'
         };
       }
+      const status = error.response.status;
+      const message = error.response?.data?.message;
+      if (status === 401) {
+        return {
+          success: false,
+          error: message || 'Invalid username or password.'
+        };
+      }
+      if (status >= 500) {
+        return {
+          success: false,
+          error: 'Server error (500). Try again shortly.'
+        };
+      }
+      return {
+        success: false,
+        error: message || `Login failed (status ${status}).`
+      };
     }
   },
 

@@ -1,0 +1,462 @@
+/* $1M Apple-Grade Design System */
+
+:root {
+  /* Premium Color Palette - Apple Inspired */
+  --apple-bg-primary: #fafafa;
+  --apple-bg-secondary: #f5f5f7;
+  --apple-bg-tertiary: #f0f0f0;
+  
+  /* Glass Morphism System */
+  --apple-glass-ultra-light: rgba(255, 255, 255, 0.95);
+  --apple-glass-light: rgba(255, 255, 255, 0.85);
+  --apple-glass-medium: rgba(255, 255, 255, 0.75);
+  --apple-glass-strong: rgba(255, 255, 255, 0.65);
+  
+  /* Premium Text Hierarchy */
+  --apple-text-primary: #1d1d1f;
+  --apple-text-secondary: #86868b;
+  --apple-text-tertiary: #a1a1aa;
+  --apple-text-accent: #6e6e73;
+  
+  /* Interactive Colors */
+  --apple-blue-primary: #007AFF;
+  --apple-blue-hover: #0056b3;
+  --apple-blue-pressed: #004494;
+  --apple-blue-light: rgba(0, 122, 255, 0.1);
+  
+  --apple-red-primary: #FF3B30;
+  --apple-red-hover: #d70015;
+  --apple-red-pressed: #bf0711;
+  --apple-red-light: rgba(255, 59, 48, 0.1);
+  
+  --apple-green-primary: #30D158;
+  --apple-green-hover: #28cd4f;
+  --apple-green-pressed: #20c946;
+  --apple-green-light: rgba(48, 209, 88, 0.1);
+  
+  /* Premium Shadow System */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.08);
+  --shadow-2xl: 0 24px 60px rgba(0, 0, 0, 0.12);
+  --shadow-floating: 0 32px 80px rgba(0, 0, 0, 0.15);
+  
+  /* Colored Shadows */
+  --shadow-blue: 0 8px 24px rgba(0, 122, 255, 0.15);
+  --shadow-blue-lg: 0 16px 40px rgba(0, 122, 255, 0.20);
+  --shadow-red: 0 8px 24px rgba(255, 59, 48, 0.15);
+  --shadow-green: 0 8px 24px rgba(48, 209, 88, 0.15);
+  
+  /* Border System */
+  --border-ultra-light: rgba(0, 0, 0, 0.04);
+  --border-light: rgba(0, 0, 0, 0.06);
+  --border-medium: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.12);
+  
+  /* Premium Radius System */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* Advanced Blur System */
+  --blur-xs: blur(4px);
+  --blur-sm: blur(8px);
+  --blur-md: blur(16px);
+  --blur-lg: blur(24px);
+  --blur-xl: blur(40px);
+  
+  /* Premium Typography Scale */
+  --font-size-2xs: 0.625rem;    /* 10px */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-6xl: 3.75rem;     /* 60px */
+  --font-size-7xl: 4.5rem;      /* 72px */
+  
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+  
+  /* Letter Spacing */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  /* Spacing Scale */
+  --space-0: 0;
+  --space-px: 1px;
+  --space-0-5: 0.125rem;  /* 2px */
+  --space-1: 0.25rem;     /* 4px */
+  --space-1-5: 0.375rem;  /* 6px */
+  --space-2: 0.5rem;      /* 8px */
+  --space-2-5: 0.625rem;  /* 10px */
+  --space-3: 0.75rem;     /* 12px */
+  --space-3-5: 0.875rem;  /* 14px */
+  --space-4: 1rem;        /* 16px */
+  --space-5: 1.25rem;     /* 20px */
+  --space-6: 1.5rem;      /* 24px */
+  --space-7: 1.75rem;     /* 28px */
+  --space-8: 2rem;        /* 32px */
+  --space-9: 2.25rem;     /* 36px */
+  --space-10: 2.5rem;     /* 40px */
+  --space-12: 3rem;       /* 48px */
+  --space-16: 4rem;       /* 64px */
+  --space-20: 5rem;       /* 80px */
+  --space-24: 6rem;       /* 96px */
+  
+  /* Premium Timing Functions */
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-apple-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-apple-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-apple-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  /* Animation Durations */
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+  --duration-slowest: 1000ms;
+  
+  /* Premium Responsive Breakpoints */
+  --breakpoint-xs: 375px;   /* iPhone SE */
+  --breakpoint-sm: 640px;   /* Large phones */
+  --breakpoint-md: 768px;   /* Tablets */
+  --breakpoint-lg: 1024px;  /* Small laptops */
+  --breakpoint-xl: 1280px;  /* Desktops */
+  --breakpoint-2xl: 1536px; /* Large screens */
+  
+  /* Safe Area Insets for iOS */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+  
+  /* Z-Index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+}
+
+/* Apple-Grade Typography Classes */
+.text-display-2xl {
+  font-size: var(--font-size-7xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tighter);
+}
+
+.text-display-xl {
+  font-size: var(--font-size-6xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tighter);
+}
+
+.text-display-lg {
+  font-size: var(--font-size-5xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.text-heading-xl {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-snug);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.text-heading-lg {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.text-heading-md {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.text-heading-sm {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+.text-body-lg {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-relaxed);
+}
+
+.text-body-md {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+.text-body-sm {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+.text-caption {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--apple-text-secondary);
+}
+
+/* Premium Glass Morphism Utilities */
+.glass-ultra-light {
+  background: var(--apple-glass-ultra-light);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  border: 1px solid var(--border-ultra-light);
+}
+
+.glass-light {
+  background: var(--apple-glass-light);
+  backdrop-filter: var(--blur-lg);
+  -webkit-backdrop-filter: var(--blur-lg);
+  border: 1px solid var(--border-light);
+}
+
+.glass-medium {
+  background: var(--apple-glass-medium);
+  backdrop-filter: var(--blur-xl);
+  -webkit-backdrop-filter: var(--blur-xl);
+  border: 1px solid var(--border-medium);
+}
+
+/* Premium Animation Utilities */
+.animate-fade-in {
+  animation: fadeIn var(--duration-slow) var(--ease-apple) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp var(--duration-slow) var(--ease-apple) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal) var(--ease-apple-bounce) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(var(--space-4)); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+/* Premium Shadow Utilities */
+.shadow-blue-glow {
+  box-shadow: 
+    0 4px 14px 0 rgba(0, 122, 255, 0.39),
+    0 2px 4px 0 rgba(0, 122, 255, 0.1);
+}
+
+.shadow-red-glow {
+  box-shadow: 
+    0 4px 14px 0 rgba(255, 59, 48, 0.39),
+    0 2px 4px 0 rgba(255, 59, 48, 0.1);
+}
+
+.shadow-green-glow {
+  box-shadow: 
+    0 4px 14px 0 rgba(48, 209, 88, 0.39),
+    0 2px 4px 0 rgba(48, 209, 88, 0.1);
+}
+
+/* Animation Keyframes */
+@keyframes scaleIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Premium Responsive Design System */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  /* Mobile-first typography scaling */
+  .text-display-2xl { font-size: var(--font-size-5xl); }
+  .text-display-xl { font-size: var(--font-size-4xl); }
+  .text-display-lg { font-size: var(--font-size-3xl); }
+  
+  /* Mobile spacing adjustments */
+  .space-y-12 > * + * { margin-top: 2rem; }
+  .space-y-8 > * + * { margin-top: 1.5rem; }
+  .space-y-6 > * + * { margin-top: 1rem; }
+}
+
+/* iOS Safe Area Support */
+.safe-area-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.safe-area-left {
+  padding-left: var(--safe-area-inset-left);
+}
+
+.safe-area-right {
+  padding-right: var(--safe-area-inset-right);
+}
+
+/* Mobile-Optimized Components */
+@media (max-width: 768px) {
+  .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  /* Mobile modal adjustments */
+  .modal-content-mobile {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    width: calc(100vw - 2rem);
+  }
+  
+  /* Mobile button adjustments */
+  .button-mobile {
+    min-height: 44px; /* iOS touch target */
+    font-size: 1rem;
+  }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  .hover\:shadow-lg:hover {
+    box-shadow: inherit;
+  }
+  
+  /* Enhanced tap targets for mobile */
+  button, 
+  [role="button"], 
+  input, 
+  select, 
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* High-DPI Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .shadow-apple-1 {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+  
+  .border {
+    border-width: 0.5px;
+  }
+}
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --apple-bg: #000000;
+    --apple-text-primary: #ffffff;
+    --apple-text-secondary: rgba(255, 255, 255, 0.6);
+    --apple-text-tertiary: rgba(255, 255, 255, 0.4);
+    --apple-glass-light: rgba(255, 255, 255, 0.05);
+    --apple-glass-medium: rgba(255, 255, 255, 0.1);
+    --apple-glass-heavy: rgba(255, 255, 255, 0.15);
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-medium: rgba(255, 255, 255, 0.15);
+  }
+}

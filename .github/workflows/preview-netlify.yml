@@ -8,7 +8,6 @@ jobs:
   preview:
     name: Build and deploy preview
     runs-on: ubuntu-latest
-    if: ${{ secrets.NETLIFY_AUTH_TOKEN != '' && secrets.NETLIFY_SITE_ID != '' }}
     defaults:
       run:
         working-directory: frontend
@@ -33,6 +32,11 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
+          if [ -z "${NETLIFY_AUTH_TOKEN}" ] || [ -z "${NETLIFY_SITE_ID}" ]; then
+            echo "Netlify secrets not configured; skipping deploy."
+            echo "url=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           # Use Netlify CLI via npx without persisting as a dependency
           OUTPUT=$(npx --yes netlify-cli@17 deploy \
             --auth "$NETLIFY_AUTH_TOKEN" \
@@ -50,7 +54,8 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const url = core.getInput('url', { required: true });
+            const url = process.env.URL;
+            if (!url) { core.setFailed('No URL to comment'); return; }
             const body = `🚀 Netlify preview ready: ${url}`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
@@ -60,4 +65,4 @@ jobs:
             });
           result-encoding: string
         env:
-          url: ${{ steps.deploy.outputs.url }}
+          URL: ${{ steps.deploy.outputs.url }}
