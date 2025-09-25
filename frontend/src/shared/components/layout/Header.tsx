@@ -74,8 +74,6 @@ const Header: React.FC<HeaderProps> = ({
               variant="ghost"
               size="sm"
               icon={<Bell />}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
             >
               Notifications
             </Button>

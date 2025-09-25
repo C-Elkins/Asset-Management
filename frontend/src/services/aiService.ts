@@ -13,12 +13,13 @@ interface AIAction {
 }
 
 class AIService {
-  private apiKey: string | null = null;
-  private baseUrl = '/api/ai'; // Proxy to avoid CORS issues
+  // Reserved for future API integration
+  // private apiKey: string | null = null;
+  // private baseUrl = '/api/ai';
 
   constructor() {
     // In production, this would come from environment variables
-    this.apiKey = import.meta.env.VITE_OPENAI_API_KEY || null;
+    // this.apiKey = (import.meta as any).env?.VITE_OPENAI_API_KEY || null;
   }
 
   async query(message: string, context?: any): Promise<AIResponse> {
@@ -235,7 +236,7 @@ class AIService {
     };
   }
 
-  private async simulateAIResponse(message: string, context?: any): Promise<AIResponse> {
+  private async simulateAIResponse(message: string, _context?: any): Promise<AIResponse> {
     // Simulate AI thinking time
     await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -339,7 +340,7 @@ class AIService {
     };
   }
 
-  private suggestFieldsForCategory(category: string, assetData: any): Record<string, any> {
+  private suggestFieldsForCategory(category: string, _assetData: any): Record<string, any> {
     const suggestions: Record<string, any> = {};
     
     switch (category) {

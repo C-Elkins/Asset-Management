@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -33,7 +32,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     };
 
     return (
-      <motion.div
+      <div
         ref={ref}
         className={clsx(
           baseStyles,
@@ -41,14 +40,10 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
           paddings[padding],
           className
         )}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        whileHover={variant === 'interactive' ? { y: -2 } : undefined}
         {...props}
       >
         {children}
-      </motion.div>
+      </div>
     );
   }
 );

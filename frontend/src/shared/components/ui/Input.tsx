@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
@@ -24,7 +23,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ...props 
   }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
-    const [isFocused, setIsFocused] = React.useState(false);
 
     const isPassword = type === 'password';
     const inputType = isPassword && showPassword ? 'text' : type;
@@ -44,19 +42,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-2">
         {label && (
-          <motion.label
+          <label
             className={clsx(
               'block text-sm font-medium transition-colors duration-200',
               error ? 'text-error-700' : 'text-gray-700'
             )}
-            animate={{ 
-              color: isFocused 
-                ? error ? '#b91c1c' : '#2563eb'
-                : error ? '#b91c1c' : '#374151'
-            }}
           >
             {label}
-          </motion.label>
+          </label>
         )}
         
         <div className="relative">
@@ -66,15 +59,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             </div>
           )}
           
-          <motion.input
+          <input
             ref={ref}
             type={inputType}
             className={baseInputStyles}
             disabled={disabled}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            whileFocus={{ scale: 1.01 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
             {...props}
           />
           
@@ -97,11 +86,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </div>
         
         {(error || helperText) && (
-          <motion.div
+          <div
             className="flex items-start gap-1.5"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
           >
             {error && <AlertCircle className="h-4 w-4 text-error-500 mt-0.5 flex-shrink-0" />}
             <p className={clsx(
@@ -110,7 +96,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             )}>
               {error || helperText}
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
     );

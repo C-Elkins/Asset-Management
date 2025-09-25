@@ -1,5 +1,5 @@
 // Enhanced Local Database with Dexie (IndexedDB) - Advanced Features
-import Dexie, { Table, Transaction } from 'dexie';
+import Dexie, { Table } from 'dexie';
 
 // Database Interfaces
 export interface Asset {

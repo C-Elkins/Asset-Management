@@ -4,7 +4,7 @@ import './styles/globals.css';
 
 // Your Personal Branded SaaS Platform
 const ChaseElkinsBrandedPlatform: React.FC = () => {
-  const [selectedIndustry, setSelectedIndustry] = React.useState<string>('IT');
+  const [selectedIndustry] = React.useState<string>('IT');
   const [showCustomization, setShowCustomization] = React.useState(false);
   
   // Your personal brand colors

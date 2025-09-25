@@ -523,6 +523,7 @@ export const AssetForm: React.FC<AssetFormProps> = ({
             variant="primary"
             loading={submitting || loading}
             disabled={submitting || loading}
+            onClick={() => {}} // Handler is managed by form submission
           >
             {mode === 'edit' ? 'Update Asset' : 'Create Asset'}
           </ExecutiveButton>

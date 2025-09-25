@@ -1,3 +1,112 @@
+// Advanced SaaS-specific types for IT Asset Management
+import type { User, AssetStatus, AssetCondition } from './index'; // Import needed types
+
+// Missing type definitions that are referenced elsewhere
+export interface MaintenanceTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+  tasks: string[];
+  active: boolean;
+}
+
+export interface DepreciationInfo {
+  method: 'STRAIGHT_LINE' | 'DECLINING_BALANCE';
+  currentValue: number;
+  depreciationRate: number;
+  salvageValue: number;
+}
+
+export interface AssetImage {
+  id: string;
+  url: string;
+  filename: string;
+  description?: string;
+  isPrimary: boolean;
+}
+
+export interface AssetDocument {
+  id: string;
+  filename: string;
+  type: string;
+  url: string;
+  description?: string;
+  uploadedAt: string;
+}
+
+export interface WorkflowTemplate {
+  id: string;
+  name: string;
+  steps: string[];
+  active: boolean;
+}
+
+export interface ReportTemplate {
+  id: string;
+  name: string;
+  query: string;
+  parameters: Record<string, any>;
+}
+
+export interface DashboardLayout {
+  id: string;
+  name: string;
+  widgets: any[];
+  layout: any;
+}
+
+export interface ReportFilter {
+  field: string;
+  operator: string;
+  value: any;
+}
+
+export interface ReportSchedule {
+  frequency: string;
+  recipients: string[];
+  enabled: boolean;
+}
+
+export interface ReportJoin {
+  table: string;
+  condition: string;
+}
+
+export interface ReportField {
+  name: string;
+  alias?: string;
+  aggregation?: string;
+}
+
+export interface ReportOrder {
+  field: string;
+  direction: 'ASC' | 'DESC';
+}
+
+export interface MonthlyMetric {
+  month: string;
+  value: number;
+}
+
+export interface TrendData {
+  period: string;
+  value: number;
+}
+
+export interface RiskPrediction {
+  assetId: string;
+  riskScore: number;
+  factors: string[];
+}
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 // Core SaaS Platform Types
 export interface Organization {
   id: string;
@@ -359,7 +468,4 @@ export interface TenantApiResponse<T> {
 }
 
 // Previous types from the original system (keeping for backward compatibility)
-export { User, Asset, Category, MaintenanceRecord } from './index';
-
-// Export all enums and interfaces
-export * from './index';
+export type { User, Asset, Category, MaintenanceRecord } from './index';

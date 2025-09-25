@@ -8,8 +8,7 @@ import {
   TrendingUp, 
   AlertTriangle,
   CheckCircle,
-  Clock,
-  DollarSign
+  Clock
 } from 'lucide-react';
 import { DashboardStats } from '../../shared/types';
 
@@ -127,7 +126,7 @@ const Dashboard: React.FC = () => {
       opacity: 1,
       y: 0,
       transition: {
-        type: "spring",
+        type: "spring" as const,
         stiffness: 300,
         damping: 30
       }

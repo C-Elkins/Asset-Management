@@ -7,7 +7,7 @@ export const Toaster: React.FC<{
     duration?: number;
     style?: React.CSSProperties;
   };
-}> = ({ position, toastOptions }) => {
+}> = () => {
   return null; // This will be implemented later
 };
 

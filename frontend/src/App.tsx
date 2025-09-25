@@ -117,7 +117,7 @@ const AppShell: React.FC = () => {
           path="/app/*"
           element={
             <ProtectedRoute>
-              <AppLayout user={user} onLogout={logout}>
+              <AppLayout user={user || undefined} onLogout={logout}>
                 <React.Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route index element={<Navigate to="dashboard" replace />} />

@@ -8,9 +8,7 @@ import {
   Wrench,
   BarChart3,
   Settings,
-  Users,
-  Search,
-  Bell
+  Users
 } from 'lucide-react';
 import { NavItem } from '../../../shared/types';
 

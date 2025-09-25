@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Card, Button, Badge, LoadingSpinner } from '@/components/ui';
-import { Package, Plus, Filter, Search } from 'lucide-react';
+import { Card, Button, Badge } from '@/components/ui';
+import { Package, Plus } from 'lucide-react';
 
 const AssetsPage: React.FC = () => {
   return (
