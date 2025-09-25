@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { NavLink, useLocation } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { 
@@ -73,29 +72,23 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
   };
 
   return (
-    <motion.aside
+    <aside
       className={clsx(
         'fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-40 transition-all duration-300',
         isCollapsed ? 'w-16' : 'w-64'
       )}
-      initial={{ x: -100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <div className="h-full flex flex-col">
         {/* Logo */}
         <div className="h-16 flex items-center justify-center border-b border-gray-200">
-          <motion.div
-            className="flex items-center gap-3"
-            whileHover={{ scale: 1.05 }}
-          >
+          <div className="flex items-center gap-3">
             <div className="h-8 w-8 bg-primary-600 rounded-xl flex items-center justify-center">
               <Package size={20} className="text-white" />
             </div>
             {!isCollapsed && (
               <span className="font-semibold text-gray-900">Asset Manager</span>
             )}
-          </motion.div>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -104,7 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
             const isActive = location.pathname.startsWith(item.path);
             
             return (
-              <motion.div key={item.id} whileHover={{ x: 2 }} whileTap={{ scale: 0.98 }}>
+              <div key={item.id}>
                 <NavLink
                   to={item.path}
                   className={clsx(
@@ -115,14 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                   )}
                 >
                   {/* Active indicator */}
-                  {isActive && (
-                    <motion.div
-                      className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary-600 rounded-r-full"
-                      initial={{ scaleY: 0 }}
-                      animate={{ scaleY: 1 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    />
-                  )}
+                  {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary-600 rounded-r-full" />}
                   
                   <NavIcon iconName={item.icon} />
                   
@@ -130,12 +116,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed = false }) => {
                     <span className="truncate">{item.label}</span>
                   )}
                 </NavLink>
-              </motion.div>
+              </div>
             );
           })}
         </nav>
       </div>
-    </motion.aside>
+    </aside>
   );
 };
 

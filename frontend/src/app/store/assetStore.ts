@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Asset, FilterState, SortState } from '@/types';
+import { Asset, FilterState, SortState } from '../../shared/types';
 
 interface AssetState {
   assets: Asset[];

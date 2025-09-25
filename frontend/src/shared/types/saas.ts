@@ -1,5 +1,6 @@
 // Advanced SaaS-specific types for IT Asset Management
-import type { User, AssetStatus, AssetCondition } from './index'; // Import needed types
+// Import ONLY what is necessary to prevent circular/forward reference issues
+import type { User, AssetStatus, AssetCondition } from './index';
 
 // Base type definitions - defined first to avoid forward reference issues
 export interface MaintenanceTemplate {
@@ -470,4 +471,5 @@ export interface TenantApiResponse<T> {
 }
 
 // Previous types from the original system (keeping for backward compatibility)
-export type { User, Asset, Category, MaintenanceRecord } from './index';
+// Re-export core types explicitly (use `export type` for isolatedModules compliance)
+export type { User } from './index';

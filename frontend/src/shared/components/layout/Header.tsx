@@ -47,11 +47,10 @@ const Header: React.FC<HeaderProps> = ({
           {/* Search */}
           <div className="relative hidden md:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <motion.input
+            <input
               type="text"
               placeholder="Search assets, users, or maintenance..."
               className="w-64 lg:w-80 pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all duration-200"
-              whileFocus={{ scale: 1.02 }}
             />
           </div>
         </div>
@@ -91,11 +90,9 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* User menu */}
           <div className="relative">
-            <motion.button
+            <button
               onClick={() => setShowUserMenu(!showUserMenu)}
               className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors duration-200"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
             >
               <div className="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center">
                 <User size={16} className="text-primary-600" />
@@ -106,7 +103,7 @@ const Header: React.FC<HeaderProps> = ({
                 </p>
                 <p className="text-xs text-gray-500">{user?.role}</p>
               </div>
-            </motion.button>
+            </button>
 
             {/* Dropdown menu */}
             {showUserMenu && (

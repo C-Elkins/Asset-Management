@@ -110,28 +110,16 @@ const Dashboard: React.FC = () => {
     loadDashboardStats();
   }, []);
 
+  // Simplified motion variants typed with const assertions to avoid expansive Variant requirements
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+    visible: { opacity: 1, transition: { staggerChildren: 0.08 } }
+  } as const;
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring" as const,
-        stiffness: 300,
-        damping: 30
-      }
-    }
-  };
+    hidden: { opacity: 0, y: 16 },
+    visible: { opacity: 1, y: 0 }
+  } as const;
 
   return (
     <div className="space-y-6">

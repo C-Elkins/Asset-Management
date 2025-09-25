@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Notification } from '@/types';
+import { Notification } from '../../shared/types';
 
 interface NotificationState {
   notifications: Notification[];
