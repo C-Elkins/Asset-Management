@@ -1,6 +1,15 @@
 import { test, expect } from '@playwright/test';
+declare global {
+  interface Window {
+    __e2eLogin?: (token?: string, refreshToken?: string) => void;
+    __e2eLogout?: () => void;
+  }
+}
 
 test('login page renders', async ({ page }) => {
+  await page.route('**/actuator/health', async route => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'UP' }) });
+  });
   await page.goto('/login');
   // Wait for React hydration and heading to attach
   await page.waitForSelector('h1,h2');
@@ -15,6 +24,9 @@ test('login page renders', async ({ page }) => {
 });
 
 test('login happy path with demo creds', async ({ page }) => {
+  await page.route('**/actuator/health', async route => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'UP' }) });
+  });
   // Stub successful auth response with a simple JWT (header.payload.signature)
   const json = JSON.stringify({ sub: 'admin', username: 'admin', roles: ['ADMIN'] });
   const base64 = btoa(json);
@@ -25,6 +37,7 @@ test('login happy path with demo creds', async ({ page }) => {
   await page.route('**/auth/login', async (route) => {
     const json = { token: fakeToken };
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(json) });
+    await page.evaluate(() => localStorage.setItem('jwt_token', 'testAccess'));
   });
 
   // Provide a small assets dataset so the dashboard can compute stats
@@ -43,15 +56,8 @@ test('login happy path with demo creds', async ({ page }) => {
   });
 
   await page.goto('/login?e2e=1');
-  // Auto-login bypass should redirect automatically
-  await page.waitForTimeout(500);
-  // Fallback: if not redirected automatically, navigate manually simulating post-login redirect
-  if (!/\/app/.test(page.url())) {
-    await page.waitForTimeout(500); // brief wait for any pending navigation
-    if (!/\/app/.test(page.url())) {
-      await page.goto('/app');
-    }
-  }
+  await page.evaluate(() => (window).__e2eLogin && (window).__e2eLogin('testAccess'));
+  await page.goto('/app');
 
   await expect(page).toHaveURL(/\/app/);
   await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible();

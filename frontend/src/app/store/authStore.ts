@@ -52,6 +52,8 @@ const useAuthStore = create<AuthStore>()(
             throw new Error(result.error || 'Login failed');
         }
         const expiresAt = result.expiresIn ? Date.now() + result.expiresIn * 1000 : null;
+        // Mirror token into localStorage for axios interceptor compatibility
+        if (result.accessToken) localStorage.setItem('jwt_token', result.accessToken);
         set({
           user: result.user || null,
           accessToken: result.accessToken,
@@ -68,6 +70,7 @@ const useAuthStore = create<AuthStore>()(
         const { refreshToken, refreshTimerId } = get();
         if (refreshTimerId) clearTimeout(refreshTimerId);
         if (refreshToken) await authService.logout(refreshToken);
+        localStorage.removeItem('jwt_token');
         set({
           user: null,
           accessToken: null,
@@ -89,6 +92,7 @@ const useAuthStore = create<AuthStore>()(
           return false;
         }
         const expiresAt = result.expiresIn ? Date.now() + result.expiresIn * 1000 : null;
+        if (result.accessToken) localStorage.setItem('jwt_token', result.accessToken);
         set({
           accessToken: result.accessToken,
           refreshToken: result.refreshToken,

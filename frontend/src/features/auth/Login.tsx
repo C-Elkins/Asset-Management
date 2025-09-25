@@ -21,7 +21,6 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // Debug log to verify component mounts in Playwright environment
   React.useEffect(() => {
-    // eslint-disable-next-line no-console
     console.log('[Login] component mounted');
   }, []);
   const { login, isLoading, error } = useAuthStore();
@@ -46,7 +45,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   onLogin?.(data);
   // Redirect to app shell; dashboard route will further redirect to dashboard page
   navigate('/app', { replace: true });
-    } catch (err) {
+    } catch {
       // Error is handled by the store
     }
   };

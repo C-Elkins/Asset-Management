@@ -83,7 +83,7 @@ export const Sidebar = () => {
           animate="visible"
         >
           <AnimatePresence>
-            {menuItems.map((item, index) => {
+            {menuItems.map((item, _index) => {
               const IconComponent = item.icon;
               return (
                 <motion.li key={item.to} variants={itemVariants}>

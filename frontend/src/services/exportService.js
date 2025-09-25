@@ -51,7 +51,7 @@ export const exportService = {
   },
 
   // Export assets to PDF (simplified)
-  exportToPDF: (assets, filename = 'assets-export') => {
+  exportToPDF: (assets, _filename = 'assets-export') => {
     const printWindow = window.open('', '_blank');
     const htmlContent = generatePDFHTML(assets);
     

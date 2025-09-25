@@ -18,14 +18,14 @@ export const Header = ({ user, onLogout }) => {
     return map[code] || code.replace(/^ROLE_/, '').toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   };
 
-  const compactUser = (() => {
-    if (!user) return '';
-    const name = user.username || 'Signed in';
-    const roles = Array.isArray(user.roles) && user.roles.length > 0
-      ? user.roles.map(roleLabel).join(', ')
-      : '';
-    return roles ? `${name} · ${roles}` : name;
-  })();
+  // const compactUser = (() => {
+  //   if (!user) return '';
+  //   const name = user.username || 'Signed in';
+  //   const roles = Array.isArray(user.roles) && user.roles.length > 0
+  //     ? user.roles.map(roleLabel).join(', ')
+  //     : '';
+  //   return roles ? `${name} · ${roles}` : name;
+  // })();
 
   const location = useLocation();
   const [animating, setAnimating] = useState(false);

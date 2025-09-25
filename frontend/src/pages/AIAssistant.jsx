@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRateLimitStore, computeResetMs } from '../store/rateLimitStore.js';
-import { backendCategorize, backendInsights } from '../services/aiService.ts';
+import { useRateLimitStore } from '../store/rateLimitStore.js';
 import { useCategorizeMutation, useInsightsMutation } from '../hooks/useAIBackend.ts';
 import { AIHistoryService } from '../services/localDatabase.ts';
 
@@ -125,7 +124,7 @@ export function AIAssistant() {
   };
 
   const remainingCooldownMs = cooldownUntil ? cooldownUntil.getTime() - Date.now() : 0;
-  const windowResetMs = computeResetMs(reset);
+  const windowResetMs = typeof reset === 'number' && reset > 0 ? Math.max(0, reset * 1000 - Date.now()) : null;
   useEffect(() => {
     if (!cooldownUntil) return;
     const id = setInterval(() => {

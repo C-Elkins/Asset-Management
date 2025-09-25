@@ -9,11 +9,7 @@ export const MaintenanceAlerts = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    loadMaintenanceAlerts();
-  }, []);
-
-  const loadMaintenanceAlerts = async () => {
+  const loadMaintenanceAlerts = React.useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -30,7 +26,11 @@ export const MaintenanceAlerts = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadMaintenanceAlerts();
+  }, [loadMaintenanceAlerts]);
 
   const calculateMaintenanceAlerts = (assets) => {
     const alerts = [];

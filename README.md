@@ -7,7 +7,6 @@ Vite + React frontend.
 
 ## Features
 
-
 ## AI Assistant (Experimental)
 
 The application includes an experimental, deterministic AI Assistant available at
@@ -57,7 +56,7 @@ Frontend cooldown logic:
 
 1. On 429 the app reads `Retry-After` (or derives from `X-RateLimit-Reset`) and
    disables submission until that time.
-2. On success it could (future enhancement) surface remaining quota; currently
+2. On success, it could (future enhancement) surface remaining quota; currently
    it simply resets internal cooldown if any.
 3. Fallback: If headers are missing, a conservative 60s cooldown is applied.
 
@@ -93,7 +92,6 @@ time limiter named `aiExternalProvider` for future external AI integrations
 SpringDoc already exposes the OpenAPI doc at `/api/v1/api-docs` and Swagger UI
 at `/api/v1/swagger-ui.html`.
 Planned: add a frontend npm script to generate TypeScript types (e.g. using `openapi-typescript`).
-
 
 ## Project structure
 

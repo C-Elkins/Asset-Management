@@ -5,7 +5,8 @@ import { useRateLimitStore } from '../store/rateLimitStore';
 
 // Derive base URL. Prefer explicit env, then proxy path in dev, else absolute.
 const EXPLICIT = import.meta.env.VITE_API_BASE_URL;
-const BASE_URL = EXPLICIT || (import.meta.env.DEV ? '/api' : 'http://localhost:8080/api/v1');
+const isPlaywright = (typeof navigator !== 'undefined' && /Playwright/i.test(navigator.userAgent || ''));
+const BASE_URL = EXPLICIT || (isPlaywright ? '/api' : (import.meta.env.DEV ? '/api' : 'http://localhost:8080/api/v1'));
 
 // Helper to detect likely proxy failure (e.g., 404 on /auth/login with relative path)
 const isNetworkOrProxyIssue = (error) => {
@@ -78,6 +79,11 @@ api.interceptors.response.use(
       const original = error.config;
       const reqUrl = original?.url || '';
       const isAuthEndpoint = reqUrl.startsWith('/auth') || reqUrl.includes('/auth/');
+      // For auth endpoints (login/refresh/me), do not trigger global logout or redirects here.
+      // Let the caller handle the 401 to show inline validation messages.
+      if (isAuthEndpoint) {
+        return Promise.reject(error);
+      }
       if (!isAuthEndpoint && !original._retry) {
         original._retry = true;
         try {

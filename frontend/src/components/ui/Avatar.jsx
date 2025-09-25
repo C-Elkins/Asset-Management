@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import { User } from 'lucide-react';
-import Badge from './Badge';
 
 /**
  * Premium Avatar Component - $1M Apple-Grade Quality

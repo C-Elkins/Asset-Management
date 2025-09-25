@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
 import { exportService } from '../../services/exportService.js';
@@ -33,7 +33,7 @@ export const AssetList = () => {
     { value: 'DAMAGED', label: 'Damaged' }
   ];
 
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -86,7 +86,7 @@ export const AssetList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, statusFilter, searchTerm]);
 
   // Keyboard shortcuts configuration (defined after handlers to avoid TDZ issues)
   const shortcuts = React.useMemo(() => ([
@@ -143,12 +143,12 @@ export const AssetList = () => {
         else if (selectedAssets.size > 0) setSelectedAssets(new Set());
       }
     }
-  ]), [selectedAssets, showCreateForm, showShortcutsHelp]);
+  ]), [selectedAssets, showCreateForm, showShortcutsHelp, handleExportCSV, handleExportPDF, handleSelectAll, fetchAssets]);
 
   // Fetch assets when dependencies change
   useEffect(() => {
     fetchAssets();
-  }, [currentPage, statusFilter]);
+  }, [currentPage, statusFilter, fetchAssets]);
 
   // Handle search with debouncing
   useEffect(() => {
@@ -158,7 +158,7 @@ export const AssetList = () => {
     }, 500);
 
     return () => clearTimeout(debounceTimer);
-  }, [searchTerm]);
+  }, [searchTerm, fetchAssets]);
 
   const handleStatusChange = (newStatus) => {
     setStatusFilter(newStatus);
@@ -180,7 +180,7 @@ export const AssetList = () => {
     fetchAssets();
   };
 
-  const handleCreateAsset = (newAsset) => {
+  const handleCreateAsset = (_newAsset) => {
     // Close the form and refresh the list
     setShowCreateForm(false);
     fetchAssets();
@@ -191,15 +191,15 @@ export const AssetList = () => {
   };
 
   // Export handlers
-  const handleExportCSV = () => {
+  const handleExportCSV = useCallback(() => {
     const assetsToExport = searchTerm || statusFilter !== 'ALL' ? assets : allAssets;
     exportService.exportToCSV(assetsToExport, 'assets-export');
-  };
+  }, [searchTerm, statusFilter, assets, allAssets]);
 
-  const handleExportPDF = () => {
+  const handleExportPDF = useCallback(() => {
     const assetsToExport = searchTerm || statusFilter !== 'ALL' ? assets : allAssets;
     exportService.exportToPDF(assetsToExport, 'assets-report');
-  };
+  }, [searchTerm, statusFilter, assets, allAssets]);
 
   // Bulk action handlers
   const handleSelectAsset = (assetId, selected) => {
@@ -212,13 +212,13 @@ export const AssetList = () => {
     setSelectedAssets(newSelected);
   };
 
-  const handleSelectAll = (selected) => {
+  const handleSelectAll = useCallback((selected) => {
     if (selected) {
       setSelectedAssets(new Set(assets.map(a => a.id)));
     } else {
       setSelectedAssets(new Set());
     }
-  };
+  }, [assets]);
 
   const handleBulkStatusChange = async (newStatus) => {
     if (selectedAssets.size === 0) return;

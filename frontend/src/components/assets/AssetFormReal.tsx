@@ -85,7 +85,7 @@ export const AssetForm: React.FC<AssetFormProps> = ({
   };
 
   // AI-powered categorization
-  const handleAICategorizaton = async () => {
+  const handleAICategorizaton = React.useCallback(async () => {
     if (!formData.name && !formData.description && !formData.brand && !formData.model) {
       return;
     }
@@ -105,7 +105,7 @@ export const AssetForm: React.FC<AssetFormProps> = ({
     } catch (error) {
       console.warn('AI categorization failed:', error);
     }
-  };
+  }, [formData, categorizeAsset]);
 
   // Run AI categorization when relevant fields change
   useEffect(() => {
@@ -114,7 +114,7 @@ export const AssetForm: React.FC<AssetFormProps> = ({
     }, 1000);
 
     return () => clearTimeout(timeoutId);
-  }, [formData.name, formData.description, formData.brand, formData.model]);
+  }, [handleAICategorizaton]);
 
   // Form validation
   const validateForm = (): boolean => {
