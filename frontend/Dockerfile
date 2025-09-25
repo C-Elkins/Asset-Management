@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 ARG NODE_VERSION=20-alpine
 FROM node:${NODE_VERSION} AS build
 WORKDIR /app
