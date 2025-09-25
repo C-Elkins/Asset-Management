@@ -31,7 +31,24 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core in its own chunk
+          react: ['react', 'react-dom'],
+          // Router separated
+          router: ['react-router-dom'],
+          // Animation libs
+          motion: ['framer-motion'],
+          // Data / state libs
+          state: ['zustand', '@tanstack/react-query'],
+          // Utilities
+          utils: ['axios', 'uuid', 'clsx', 'date-fns', 'zod'],
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
   },
   base: '/'
 })
