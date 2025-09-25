@@ -1,7 +1,7 @@
 // Advanced SaaS-specific types for IT Asset Management
 import type { User, AssetStatus, AssetCondition } from './index'; // Import needed types
 
-// Missing type definitions that are referenced elsewhere
+// Base type definitions - defined first to avoid forward reference issues
 export interface MaintenanceTemplate {
   id: string;
   name: string;
@@ -106,6 +106,8 @@ export interface PaginationMeta {
   limit: number;
   totalPages: number;
 }
+
+// Now we can safely use these types in more complex interfaces
 
 // Core SaaS Platform Types
 export interface Organization {

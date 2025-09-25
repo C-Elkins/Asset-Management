@@ -29,7 +29,7 @@
       "@/components/*": ["src/shared/components/*"],
       "@/hooks/*": ["src/shared/hooks/*"],
       "@/utils/*": ["src/shared/utils/*"],
-      "@/types/*": ["src/shared/types/*"],
+      "@/types": ["src/types"],
       "@/features/*": ["src/features/*"],
       "@/app/*": ["src/app/*"]
     }
