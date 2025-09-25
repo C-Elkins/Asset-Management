@@ -1,5 +1,6 @@
 import React from 'react';
-import { AssetForm } from '../components/assets/AssetForm.jsx';
+// Use the new real implementation (TSX). Vite will resolve .tsx automatically.
+import AssetForm from '../components/assets/AssetFormReal';
 
 export const AssetCreatePage = () => {
   return (
@@ -9,7 +10,7 @@ export const AssetCreatePage = () => {
         <p className="subtle">Create a new asset and set its status, category, and details.</p>
       </div>
       <div className="asset-list-container" style={{ padding: '1rem' }}>
-        <AssetForm onSubmit={() => history.back()} onCancel={() => history.back()} />
+  <AssetForm onSubmit={() => history.back()} onCancel={() => history.back()} />
       </div>
     </div>
   );
