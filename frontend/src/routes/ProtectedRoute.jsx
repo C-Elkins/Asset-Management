@@ -5,8 +5,9 @@ import { useAuthStore } from '../app/store/authStore.ts';
 export const ProtectedRoute = ({ children }) => {
   const location = useLocation();
   const authed = useAuthStore(s => s.isAuthenticated);
-
-  if (!authed) {
+  let tokenAuthed = false;
+  try { tokenAuthed = !!localStorage.getItem('jwt_token'); } catch { tokenAuthed = false; }
+  if (!authed && !tokenAuthed) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 

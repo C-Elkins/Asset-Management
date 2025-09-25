@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
-import { UserAssignmentModal } from './UserAssignmentModal.jsx';
 import { AssetForm } from './AssetForm.jsx';
 
 export const AssetCard = ({ asset, onUpdate, selectable = false, selected = false, onSelect }) => {
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
   const [showActions, setShowActions] = useState(false);
-  const [showAssignModal, setShowAssignModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
   // Map API enums to CSS-friendly class suffixes
@@ -51,10 +49,6 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
     setShowActions(false);
   };
 
-  const handleAssignmentComplete = (user) => {
-    // Refresh the asset list to show updated assignments
-    onUpdate();
-  };
 
   const handleViewDetails = () => {
     if (asset?.id) {
@@ -67,7 +61,7 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
     setShowActions(false);
   };
 
-  const handleEditComplete = (updatedAsset) => {
+  const handleEditComplete = (_updatedAsset) => {
     setShowEditModal(false);
     onUpdate(); // Refresh the list
   };

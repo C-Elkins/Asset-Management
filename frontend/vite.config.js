@@ -7,7 +7,7 @@ export default defineConfig({
     {
       name: 'healthcheck',
       configureServer(server) {
-        server.middlewares.use('/healthz', (req, res, next) => {
+        server.middlewares.use('/healthz', (_req, res) => {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'text/plain');
           res.end('ok');

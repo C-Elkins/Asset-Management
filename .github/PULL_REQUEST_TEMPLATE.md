@@ -34,4 +34,3 @@ Low; changes are additive. Requires `npm install` for `uuid`.
 - [ ] AI endpoints return rate limit headers
 - [ ] Cooldown & quota display behave as expected
 - [ ] New metrics visible via Prometheus scrape
-

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { assetService } from '../../services/assetService.js';
 
 export const Dashboard = () => {
@@ -16,11 +16,7 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -36,9 +32,8 @@ export const Dashboard = () => {
       let backendStats = {};
       try {
         backendStats = await assetService.getStatistics();
-      } catch (statsError) {
-        console.log('Backend statistics endpoint not available, using calculated stats');
-        // This is fine - we'll use calculated stats instead
+      } catch {
+        // Backend statistics endpoint may not exist; fall back to calculated stats
       }
       
       // Merge backend stats with calculated stats (calculated stats as fallback)
@@ -81,7 +76,11 @@ export const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   const calculateStatistics = (assets) => {
     const totalAssets = assets.length;

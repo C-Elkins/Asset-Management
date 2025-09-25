@@ -57,10 +57,17 @@ function App() {
           <Route path="showcase" element={<ComponentShowcase />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-        {/* Default redirect based on auth */}
+        {/* Default redirect based on auth; allow E2E/test mode or token presence to land at /app */}
         <Route
           path="*"
-          element={<Navigate to={user ? '/app' : '/login'} replace />}
+          element={(() => {
+            let tokenAuthed = false;
+            try {
+              tokenAuthed = !!localStorage.getItem('jwt_token');
+            } catch {}
+            const dest = (user || tokenAuthed) ? '/app' : '/login';
+            return <Navigate to={dest} replace />;
+          })()}
         />
       </Routes>
     </BrowserRouter>

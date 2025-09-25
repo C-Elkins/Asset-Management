@@ -146,7 +146,7 @@ export const useIntersectionObserver = (options = {}) => {
 };
 
 // Debounced animation trigger for performance
-export const useDebouncedAnimation = (callback, delay = 16) => {
+export const useDebouncedAnimation = (callback, _delay = 16) => {
   const timeoutRef = React.useRef(null);
   
   return React.useCallback((...args) => {
@@ -157,7 +157,7 @@ export const useDebouncedAnimation = (callback, delay = 16) => {
     timeoutRef.current = requestAnimationFrame(() => {
       callback(...args);
     });
-  }, [callback, delay]);
+  }, [callback]);
 };
 
 // Memory-efficient component wrapper

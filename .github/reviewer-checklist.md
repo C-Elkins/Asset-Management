@@ -21,7 +21,7 @@
 
 ## Code Quality
 
-- [ ] No hardcoded 5m cooldown remains
+- [ ] No hardcoded 5 m cooldown remains
 - [ ] `rateLimitStore.js` updates only via interceptor, safe if headers missing
 - [ ] Axios interceptors guard absent header cases
 

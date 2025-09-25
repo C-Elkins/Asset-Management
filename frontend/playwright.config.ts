@@ -10,7 +10,8 @@ export default defineConfig({
     video: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run preview -- --port=4173 --strictPort',
+    // Use an E2E server that serves dist and mocks /api endpoints
+    command: 'npm run preview:e2e',
     port: 4173,
     reuseExistingServer: !process.env.CI,
   },

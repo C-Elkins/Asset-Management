@@ -51,9 +51,13 @@ export const AssetForm = ({ onSubmit, onCancel, initialData = null }) => {
         setCategories(categoriesData);
         
         // Set default category if available
-        if (categoriesData.length > 0 && !formData.categoryId) {
-          setFormData(prev => ({ ...prev, categoryId: categoriesData[0].id }));
-        }
+        // Set default category if not yet chosen
+        setFormData(prev => {
+          if (categoriesData.length > 0 && !prev.categoryId) {
+            return { ...prev, categoryId: categoriesData[0].id };
+          }
+          return prev;
+        });
       } catch (error) {
         console.error('Failed to load categories:', error);
       }

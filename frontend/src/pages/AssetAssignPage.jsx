@@ -15,7 +15,7 @@ export const AssetAssignPage = () => {
       try {
         const data = await assetService.getById(id);
         setAsset(data);
-      } catch (e) {
+      } catch {
         setError('Failed to load asset');
       } finally {
         setLoading(false);
