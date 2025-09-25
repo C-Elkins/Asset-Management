@@ -3,15 +3,20 @@ import { api } from '../../services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../../styles/status-indicator.css';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { authService } from '../../services/authService.js';
+import { useAuthStore } from '../../app/store/authStore.ts';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-export const Login = ({ onLogin }) => {
-  const [credentials, setCredentials] = useState({
-    username: '',
-    password: ''
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+const schema = z.object({
+  username: z.string().min(1, 'Username is required').max(64, 'Max 64 characters'),
+  password: z.string().min(1, 'Password is required').max(128, 'Max 128 characters')
+});
+
+export const Login = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [backendStatus, setBackendStatus] = useState({ state: 'checking', message: 'Checking…' });
   const lastHealthSuccessRef = useRef(null);
 
@@ -68,64 +73,40 @@ export const Login = ({ onLogin }) => {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/app';
 
-  // E2E auto-login bypass (activated with ?e2e=1)
-  useEffect(() => {
+  // (Removed) Previous E2E auto-login bypass using ?e2e=1 query param.
+
+  const login = useAuthStore(s => s.login);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setFocus,
+  } = useForm({
+    resolver: zodResolver(schema),
+    mode: 'onBlur',
+    reValidateMode: 'onChange',
+    defaultValues: { username: '', password: '' }
+  });
+
+  useEffect(() => { setFocus('username'); }, [setFocus]);
+
+  const onSubmit = async (data) => {
+    setFormError('');
+    setSubmitting(true);
     try {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get('e2e') === '1' && !localStorage.getItem('jwt_token')) {
-        const payload = { sub: 'admin', username: 'admin', roles: ['ADMIN'] };
-        const base64 = btoa(JSON.stringify(payload)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
-        const token = `eyJhbGciOiJIUzI1NiJ9.${base64}.signature`;
-        localStorage.setItem('jwt_token', token);
-        onLogin?.({ username: 'admin' });
-        navigate('/app', { replace: true });
-      }
-    } catch (e) {
-      // swallow auto-login errors in test mode
-    }
-  }, [navigate, onLogin]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    // Basic validation
-    if (!credentials.username.trim()) {
-      setError('Please enter a username');
-      setLoading(false);
-      return;
-    }
-
-    if (!credentials.password.trim()) {
-      setError('Please enter a password');
-      setLoading(false);
-      return;
-    }
-
-    const result = await authService.login(credentials.username, credentials.password);
-    
-    if (result.success) {
-      onLogin(result.user);
+      await login(data);
       navigate(from, { replace: true });
-    } else {
-      setError(result.error);
+    } catch (err) {
+      setFormError(err.message || 'Authentication failed');
+    } finally {
+      setSubmitting(false);
     }
-    
-    setLoading(false);
-  };
-
-  const handleChange = (e) => {
-    setCredentials({
-      ...credentials,
-      [e.target.name]: e.target.value
-    });
   };
 
   return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2 style={{ position: 'relative', paddingRight: '6rem' }}>IT Asset Management Login</h2>
+    <div className="login-container" aria-labelledby="login-heading">
+      <form onSubmit={handleSubmit(onSubmit)} className="login-form" noValidate>
+        <h2 id="login-heading" style={{ position: 'relative', paddingRight: '6rem' }}>IT Asset Management Login</h2>
         <div className="status-indicator-container">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -135,49 +116,76 @@ export const Login = ({ onLogin }) => {
               exit={{ opacity: 0, y: -4, scale: 0.9 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
               className={`status-chip status-${backendStatus.state}`}
+              role="status" aria-live="polite"
             >
               <span className="status-dot" />
               <span className="status-text">{backendStatus.message}</span>
             </motion.div>
           </AnimatePresence>
         </div>
-        
-        {error && <div className="error-message">{error}</div>}
-        
-        <div className="form-group">
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={credentials.username}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
-        </div>
-        
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={credentials.password}
-            onChange={handleChange}
-            required
-            disabled={loading}
-          />
-        </div>
-        
-        <button type="submit" disabled={loading || backendStatus.state === 'down'}>
-          {loading ? 'Authenticating…' : backendStatus.state === 'down' ? 'Backend Offline' : 'Login'}
+        {formError && (
+          <div className="error-message" role="alert" aria-live="assertive">{formError}</div>
+        )}
+
+        <fieldset style={{ border: 'none', padding: 0, margin: 0 }}>
+          <legend className="sr-only">Login credentials</legend>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              autoComplete="username"
+              aria-invalid={!!errors.username}
+              aria-describedby={errors.username ? 'username-error' : undefined}
+              disabled={submitting || backendStatus.state === 'down'}
+              {...register('username')}
+            />
+            {errors.username && (
+              <div id="username-error" className="field-error" role="alert">{errors.username.message}</div>
+            )}
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                disabled={submitting || backendStatus.state === 'down'}
+                {...register('password')}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(s => !s)}
+                className="password-toggle"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)' }}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+            {errors.password && (
+              <div id="password-error" className="field-error" role="alert">{errors.password.message}</div>
+            )}
+          </div>
+        </fieldset>
+
+        <button
+          type="submit"
+          disabled={isSubmitting || submitting || backendStatus.state === 'down'}
+          className="primary-btn"
+          aria-disabled={isSubmitting || submitting || backendStatus.state === 'down'}
+        >
+          { (isSubmitting || submitting) ? 'Authenticating…' : backendStatus.state === 'down' ? 'Backend Offline' : 'Login' }
         </button>
-        
-        <div className="demo-credentials">
-          <p>Demo credentials:</p>
-          <p>Username: <code>admin</code> | Password: <code>admin123</code></p>
-        </div>
+
+        <details style={{ marginTop: '1rem' }}>
+          <summary>Demo credentials</summary>
+          <p><strong>Username:</strong> <code>admin</code></p>
+          <p><strong>Password:</strong> <code>admin123</code></p>
+        </details>
       </form>
     </div>
   );

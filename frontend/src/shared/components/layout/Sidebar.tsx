@@ -37,6 +37,12 @@ const navigationItems: NavItem[] = [
     path: '/app/reports'
   },
   {
+    id: 'ai',
+    label: 'AI Assistant',
+    icon: 'LayoutDashboard',
+    path: '/app/ai'
+  },
+  {
     id: 'users',
     label: 'Users',
     icon: 'Users',

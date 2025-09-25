@@ -1,0 +1,14 @@
+resilience4j:
+  circuitbreaker:
+    instances:
+      aiExternalProvider:
+        registerHealthIndicator: true
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+  timelimiter:
+    instances:
+      aiExternalProvider:
+        timeoutDuration: 3s

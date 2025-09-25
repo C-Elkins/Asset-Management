@@ -375,6 +375,37 @@ class AIService {
 
 export const aiService = new AIService();
 
+// ================= Backend Deterministic Endpoints Integration =================
+// These minimal wrappers call the Spring Boot /ai endpoints. They are intentionally
+// kept isolated from the simulation / heuristic layer above so that future real
+// model integrations (OpenAI, Azure OpenAI, local LLM, etc.) can coexist without
+// creating circular imports or bundling unused logic. Tree-shaking friendly.
+import { api } from './api.js';
+
+export interface BackendCategorizeResponse {
+  category: string;
+  confidence: number;
+  tags: string[];
+  latencyMs: number;
+  timestamp: string;
+}
+
+export interface BackendInsightsResponse {
+  insights: { key: string; value: string; score: number }[];
+  latencyMs: number;
+  timestamp: string;
+}
+
+export async function backendCategorize(text: string): Promise<BackendCategorizeResponse> {
+  const { data } = await api.post('/ai/categorize', { text });
+  return data as BackendCategorizeResponse;
+}
+
+export async function backendInsights(content: string): Promise<BackendInsightsResponse> {
+  const { data } = await api.post('/ai/insights', { content });
+  return data as BackendInsightsResponse;
+}
+
 // AI Hook for React components
 import { useState, useCallback } from 'react';
 

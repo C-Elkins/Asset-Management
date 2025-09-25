@@ -1,5 +1,7 @@
 import { api } from './api.js';
 
+// TODO: When backend moves refresh token to HttpOnly cookie, remove storing refresh token client-side.
+
 function base64UrlDecode(str) {
   try {
     // Replace URL-safe chars and pad
@@ -37,74 +39,85 @@ function decodeJwt(token) {
 export const authService = {
   async login(username, password) {
     try {
-      const response = await api.post('/auth/login', { username, password });
-      
-      const { token } = response.data;
-      if (token) {
-        localStorage.setItem('jwt_token', token);
-        return {
-          success: true,
-          token,
-          user: { username }
-        };
-      }
-      
-      return { success: false, error: 'Invalid credentials' };
+      const { data } = await api.post('/auth/login', { username, password });
+      const { accessToken, refreshToken, user, expiresIn, token } = data;
+      const finalAccess = accessToken || token; // fallback to legacy field
+      if (!finalAccess) return { success: false, error: 'No access token returned' };
+      return {
+        success: true,
+        accessToken: finalAccess,
+        refreshToken: refreshToken || null,
+        user: user || inferUserFromToken(finalAccess),
+        expiresIn: expiresIn || 0
+      };
     } catch (error) {
-      console.error('Login error:', error);
       const network = error.code === 'ERR_NETWORK' || !error.response;
       if (network) {
-        return {
-          success: false,
-          error: 'Cannot reach backend. Ensure Spring Boot is running on :8080 and no ad blocker/CORS issue.'
-        };
+        return { success: false, error: 'Cannot reach backend. Ensure backend is running.' };
       }
-      const status = error.response.status;
+      const status = error.response?.status;
       const message = error.response?.data?.message;
-      if (status === 401) {
-        return {
-          success: false,
-          error: message || 'Invalid username or password.'
-        };
-      }
-      if (status >= 500) {
-        return {
-          success: false,
-          error: 'Server error (500). Try again shortly.'
-        };
-      }
-      return {
-        success: false,
-        error: message || `Login failed (status ${status}).`
-      };
+      if (status === 401) return { success: false, error: message || 'Invalid username or password.' };
+      if (status >= 500) return { success: false, error: 'Server error. Try again.' };
+      return { success: false, error: message || 'Login failed.' };
     }
   },
 
-  async logout() {
-    localStorage.removeItem('jwt_token');
-    window.location.href = '/login';
+  async refresh(refreshToken) {
+    if (!refreshToken) return { success: false, error: 'Missing refresh token' };
+    try {
+      const { data } = await api.post('/auth/refresh', null, {
+        headers: { 'X-Refresh-Token': refreshToken }
+      });
+      const { accessToken, refreshToken: newRefresh, user, expiresIn, token } = data;
+      const finalAccess = accessToken || token;
+      if (!finalAccess) return { success: false, error: 'No access token on refresh' };
+      return {
+        success: true,
+        accessToken: finalAccess,
+        refreshToken: newRefresh || refreshToken,
+        user: user || inferUserFromToken(finalAccess),
+        expiresIn: expiresIn || 0
+      };
+    } catch (error) {
+      return { success: false, error: 'Refresh failed' };
+    }
   },
 
-  isAuthenticated() {
-    return !!localStorage.getItem('jwt_token');
+  async me(accessToken) {
+    try {
+      const { data } = await api.get('/auth/me', {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+      });
+      return { success: true, user: data };
+    } catch {
+      return { success: false };
+    }
   },
 
-  getToken() {
-    return localStorage.getItem('jwt_token');
-  },
-
-  getUser() {
-    const token = localStorage.getItem('jwt_token');
-    const payload = decodeJwt(token);
-    if (!payload) return null;
-    // Try common claim names
-    const username = payload.username || payload.sub || payload.user_name || null;
-    const roles = payload.roles || payload.authorities || payload.scopes || payload.scope || [];
-    const rolesArr = Array.isArray(roles)
-      ? roles
-      : typeof roles === 'string'
-        ? roles.split(' ') // space-separated scopes
-        : [];
-    return { username, roles: rolesArr, payload };
+  async logout(refreshToken) {
+    try {
+      if (refreshToken) {
+        await api.post('/auth/logout', null, { headers: { 'X-Refresh-Token': refreshToken } });
+      }
+    } catch {
+      // Swallow logout errors
+    }
   }
 };
+
+function inferUserFromToken(token) {
+  const payload = decodeJwt(token);
+  if (!payload) return null;
+  return {
+    id: payload.sub || 'unknown',
+    username: payload.sub || payload.username || 'unknown',
+    email: payload.email || '',
+    firstName: payload.firstName || '',
+    lastName: payload.lastName || '',
+    role: payload.roles ? (Array.isArray(payload.roles) ? payload.roles[0] : payload.roles.split(',')[0]) : 'USER',
+    active: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+}

@@ -76,6 +76,21 @@ export interface AuditLog {
   timestamp: string;
 }
 
+// AI Query history
+export interface AIQueryRecord {
+  id?: number;
+  mode: 'categorize' | 'insights';
+  input: string;
+  // For categorize
+  category?: string;
+  tags?: string[];
+  confidence?: number;
+  // For insights
+  insights?: { key: string; value: string; score: number }[];
+  latencyMs: number;
+  createdAt: string; // timestamp the query executed
+}
+
 // Advanced database operations interface
 export interface BulkOperationResult<T> {
   inserted: T[];
@@ -90,6 +105,7 @@ export class AssetDatabase extends Dexie {
   maintenanceRecords!: Table<MaintenanceRecord>;
   categories!: Table<Category>;
   auditLogs!: Table<AuditLog>;
+  ai_queries!: Table<AIQueryRecord>;
 
   constructor() {
     super('AssetManagementDB');
@@ -126,6 +142,16 @@ export class AssetDatabase extends Dexie {
       maintenanceRecords: '++id, assetId, maintenanceDate, status, priority, createdAt, syncStatus, [assetId+status]',
       categories: '++id, name, active, createdAt, syncStatus',
       auditLogs: '++id, entityType, entityId, action, changes, userId, timestamp'
+    });
+
+    // Version 4: AI query history table
+    this.version(4).stores({
+      assets: '++id, name, assetTag, category, status, condition, assignedTo, location, createdAt, syncStatus, [name+assetTag], [category+status]',
+      users: '++id, username, email, role, department, active, createdAt, syncStatus, [firstName+lastName]',
+      maintenanceRecords: '++id, assetId, maintenanceDate, status, priority, createdAt, syncStatus, [assetId+status]',
+      categories: '++id, name, active, createdAt, syncStatus',
+      auditLogs: '++id, entityType, entityId, action, changes, userId, timestamp',
+      ai_queries: '++id, mode, category, createdAt'
     });
 
     // Auto-populate timestamps
@@ -566,6 +592,25 @@ export class DatabaseService {
       await db.auditLogs.bulkDelete(idsToDelete);
     }
 
+    // Cleanup AI query history older than 30 days keeping last 500 recent overall
+    const totalAIQueries = await db.ai_queries.count();
+    if (totalAIQueries > 600) { // threshold with buffer
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 30);
+      const oldQueries = await db.ai_queries
+        .toArray();
+      const toDelete = oldQueries.filter((q: AIQueryRecord) => new Date(q.createdAt) < cutoff);
+      if (toDelete.length) {
+        await db.ai_queries.bulkDelete(toDelete.map(q => q.id!).filter(Boolean));
+      }
+      // Hard cap still if still large
+      const remaining = await db.ai_queries.count();
+      if (remaining > 500) {
+        const excess = await db.ai_queries.orderBy('createdAt').limit(remaining - 500).toArray();
+        await db.ai_queries.bulkDelete(excess.map(e => e.id!));
+      }
+    }
+
     // Cleanup completed maintenance records older than 2 years
     const twoYearsAgo = new Date();
     twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
@@ -693,6 +738,7 @@ export class DatabaseService {
         db.maintenanceRecords.count(),
         db.auditLogs.count()
       ]);
+      const aiQueryCount = await db.ai_queries.count();
 
       const totalRecords = assetCount + userCount + categoryCount + maintenanceCount + auditCount;
 
@@ -720,7 +766,8 @@ export class DatabaseService {
             users: userCount,
             categories: categoryCount,
             maintenanceRecords: maintenanceCount,
-            auditLogs: auditCount
+            auditLogs: auditCount,
+            aiQueries: aiQueryCount
           },
           warnings
         }
@@ -737,6 +784,19 @@ export class DatabaseService {
     }
   }
 }
+
+// AI Query history helper functions
+export const AIHistoryService = {
+  async recordQuery(record: Omit<AIQueryRecord, 'id' | 'createdAt'> & { createdAt?: string }) {
+    const createdAt = record.createdAt || new Date().toISOString();
+    await db.ai_queries.add({ ...record, createdAt });
+  },
+  async recent(limit = 25): Promise<AIQueryRecord[]> {
+    return db.ai_queries.orderBy('createdAt').reverse().limit(limit).toArray();
+  },
+  async clear() { await db.ai_queries.clear(); },
+  async delete(id: number) { await db.ai_queries.delete(id); }
+};
 
 // Seed initial data
 export const seedDatabase = async (): Promise<void> => {

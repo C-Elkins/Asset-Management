@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { useAuthStore } from '../app/store/authStore';
+import { v4 as uuidv4 } from 'uuid';
+import { useRateLimitStore } from '../store/rateLimitStore';
 
 // Derive base URL. Prefer explicit env, then proxy path in dev, else absolute.
 const EXPLICIT = import.meta.env.VITE_API_BASE_URL;
@@ -19,13 +22,20 @@ export const api = axios.create({
   timeout: 10000,
 });
 
+// Correlation ID (persist for session lifespan)
+const CORR_KEY = 'corr_id';
+let corrId = sessionStorage.getItem(CORR_KEY);
+if (!corrId) {
+  corrId = uuidv4();
+  sessionStorage.setItem(CORR_KEY, corrId);
+}
+
 // Add token to requests if available
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('jwt_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    config.headers['X-Correlation-Id'] = corrId;
     return config;
   },
   (error) => Promise.reject(error)
@@ -33,8 +43,24 @@ api.interceptors.request.use(
 
 // Handle auth errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Capture rate limit headers if present
+    try {
+      const headers = response.headers || {};
+      if (headers['x-ratelimit-limit'] || headers['x-ratelimit-remaining']) {
+        useRateLimitStore.getState().setFromHeaders(headers);
+      }
+    } catch {/* noop */}
+    return response;
+  },
   async (error) => {
+    // Also capture on error (e.g., 429)
+    try {
+      const headers = error?.response?.headers || {};
+      if (headers['x-ratelimit-limit'] || headers['x-ratelimit-remaining']) {
+        useRateLimitStore.getState().setFromHeaders(headers);
+      }
+    } catch {/* noop */}
     // Optionally attempt a single retry with absolute URL if proxy-relative failed
     if (isNetworkOrProxyIssue(error) && !error.config?._retried) {
       const original = { ...error.config, _retried: true };
@@ -49,14 +75,30 @@ api.interceptors.response.use(
     }
     const status = error.response?.status;
     if (status === 401) {
-      const reqUrl = error.config?.url || '';
+      const original = error.config;
+      const reqUrl = original?.url || '';
       const isAuthEndpoint = reqUrl.startsWith('/auth') || reqUrl.includes('/auth/');
-      const isOnLoginPage = window.location.pathname.startsWith('/login');
-      if (!isAuthEndpoint && !isOnLoginPage) {
-        localStorage.removeItem('jwt_token');
-        window.location.href = '/login';
-        return; 
+      if (!isAuthEndpoint && !original._retry) {
+        original._retry = true;
+        try {
+          const ok = await useAuthStore.getState().refreshAuth();
+          if (ok) {
+            const { accessToken } = useAuthStore.getState();
+            if (accessToken) {
+              original.headers = { ...(original.headers || {}), Authorization: `Bearer ${accessToken}` };
+            }
+            return await axios.request(original);
+          }
+        } catch {
+          // fall through
+        }
       }
+      // If still unauthorized, force logout
+      await useAuthStore.getState().logout();
+      if (!window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      return; 
     }
     return Promise.reject(error);
   }

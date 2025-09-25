@@ -17,19 +17,21 @@ import java.util.stream.Collectors;
 public class JwtTokenProvider {
 
     private final SecretKey secretKey;
-    private final long expirationMillis;
+    private final long accessExpirationMillis;
+    // legacy expiration kept only for backward compatibility logic in constructor
 
     public JwtTokenProvider(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration}") long expirationMillis) {
+            @Value("${jwt.access-expiration:-1}") long accessExpiration,
+            @Value("${jwt.expiration:0}") long legacyExpiration) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        this.expirationMillis = expirationMillis;
+        this.accessExpirationMillis = accessExpiration > 0 ? accessExpiration : legacyExpiration; // prefer new property
     }
 
     public String generateToken(UserDetails userDetails) {
         long now = System.currentTimeMillis();
         Date issuedAt = new Date(now);
-        Date expiry = new Date(now + expirationMillis);
+    Date expiry = new Date(now + accessExpirationMillis);
 
         String roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -60,5 +62,9 @@ public class JwtTokenProvider {
         } catch (io.jsonwebtoken.JwtException | IllegalArgumentException ex) {
             return false;
         }
+    }
+
+    public long getAccessExpirationMillis() {
+        return accessExpirationMillis;
     }
 }

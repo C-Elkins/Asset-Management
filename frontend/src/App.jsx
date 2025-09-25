@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { HomePage } from './pages/HomePage.jsx';
 import { Login } from './components/auth/Login.jsx';
@@ -10,44 +10,32 @@ import { AssetAssignPage } from './pages/AssetAssignPage.jsx';
 import { MaintenancePage } from './pages/MaintenancePage.jsx';
 import { ReportsPage } from './pages/ReportsPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
+import { AIAssistant } from './pages/AIAssistant.jsx';
 import ComponentShowcase from './pages/ComponentShowcase.jsx';
 import { NotFound } from './pages/NotFound.jsx';
-import { authService } from './services/authService.js';
+import { useAuthStore } from './app/store/authStore.ts';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { ExecutivePageLoader } from './components/common/ExecutiveLoader.jsx';
 
 function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const user = useAuthStore(s => s.user);
+  const isLoading = useAuthStore(s => s.isLoading);
+  const initSession = useAuthStore(s => s.initSession);
+  const logout = useAuthStore(s => s.logout);
 
-  useEffect(() => {
-    // On load, check if a token exists
-    if (authService.isAuthenticated()) {
-      const info = authService.getUser();
-      setUser(info || { authenticated: true });
-    }
-    setLoading(false);
-  }, []);
+  useEffect(() => { initSession(); }, [initSession]);
 
-  const handleLogin = (userData) => {
-    const info = authService.getUser();
-    setUser(info || userData || { authenticated: true });
-  };
+  const handleLogout = () => { logout(); };
 
-  const handleLogout = () => {
-    authService.logout();
-    setUser(null);
-  };
-
-  if (loading) {
+  if (isLoading && !user) {
     return <ExecutivePageLoader message="Initializing Enterprise Portal..." />;
   }
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+  <Route path="/login" element={<Login />} />
         <Route
           path="/app"
           element={
@@ -65,6 +53,7 @@ function App() {
           <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="reports" element={<ReportsPage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="ai" element={<AIAssistant />} />
           <Route path="showcase" element={<ComponentShowcase />} />
           <Route path="*" element={<NotFound />} />
         </Route>
