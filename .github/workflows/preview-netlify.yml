@@ -11,6 +11,8 @@ jobs:
   preview:
     name: Build and deploy preview
     runs-on: ubuntu-latest
+    # Add environment condition to ensure secrets are available
+    if: github.event.pull_request.head.repo.full_name == github.repository
     defaults:
       run:
         working-directory: frontend
@@ -31,12 +33,13 @@ jobs:
 
       - name: Deploy preview to Netlify
         id: deploy
+        if: github.event.pull_request.head.repo.full_name == github.repository
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN || '' }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID || '' }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
           if [ -z "${NETLIFY_AUTH_TOKEN}" ] || [ -z "${NETLIFY_SITE_ID}" ]; then
-            echo "Netlify secrets not configured; skipping deploy."
+            echo "::warning::Netlify secrets (NETLIFY_AUTH_TOKEN and/or NETLIFY_SITE_ID) not configured in repository settings; skipping deploy."
             echo "url=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
