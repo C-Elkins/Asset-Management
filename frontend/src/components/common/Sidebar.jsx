@@ -178,7 +178,7 @@ export const Sidebar = () => {
       </nav>
 
       <motion.div 
-        className="absolute bottom-8 left-6 right-6"
+        className="absolute bottom-6 left-6 right-6 pb-4"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.8 }}

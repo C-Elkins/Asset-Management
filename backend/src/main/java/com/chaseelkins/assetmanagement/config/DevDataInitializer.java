@@ -40,8 +40,20 @@ public class DevDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (users.count() == 0) {
-            users.save(new User("admin", "admin@example.com", encoder.encode("admin123"), "Alice", "Admin", "IT", "IT Admin", "555-1000", User.Role.SUPER_ADMIN, true));
+        // Ensure demo admin credentials work regardless of SQL seed order
+        users.findByUsername("admin").ifPresentOrElse(u -> {
+            u.setPassword(encoder.encode("admin123"));
+            u.setRole(User.Role.SUPER_ADMIN);
+            u.setActive(true);
+            if (u.getEmail() == null || u.getEmail().isBlank()) u.setEmail("admin@example.com");
+            if (u.getFirstName() == null || u.getFirstName().isBlank()) u.setFirstName("System");
+            if (u.getLastName() == null || u.getLastName().isBlank()) u.setLastName("Administrator");
+            users.save(u);
+        }, () -> {
+            users.save(new User("admin", "admin@example.com", encoder.encode("admin123"), "System", "Administrator", "IT", "System Administrator", "555-0001", User.Role.SUPER_ADMIN, true));
+        });
+
+        if (users.count() <= 1) {
             users.save(new User("manager", "manager@example.com", encoder.encode("manager123"), "Bob", "Manager", "Ops", "Manager", "555-2000", User.Role.MANAGER, true));
             users.save(new User("user", "user@example.com", encoder.encode("user123"), "Carol", "User", "Sales", "Sales Rep", "555-3000", User.Role.USER, true));
         }

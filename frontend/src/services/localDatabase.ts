@@ -18,17 +18,7 @@ export interface Asset {
   brand?: string;
   model?: string;
   serialNumber?: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-  syncStatus: 'synced' | 'pending' | 'conflict';
-}
-
-export interface User {
-  id?: number;
-  username: string;
-  email: string;
-  firstName: string;
+        // Demo admin user removed for production
   lastName: string;
   department?: string;
   jobTitle?: string;

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '../../shared/types';
 import { authService } from '../../services/authService.js';
+// authDebug removed
 
 interface TokenMeta {
   expiresAt: number | null; // epoch ms
@@ -45,28 +46,59 @@ const useAuthStore = create<AuthStore>()(
 
       // Actions
       login: async (credentials) => {
+        console.log('[AuthStore] Login initiated');
+  // authDebug removed
         set({ isLoading: true, error: null });
-        const result = await authService.login(credentials.username, credentials.password);
-        if (!result.success) {
+        
+        try {
+          console.log('[AuthStore] Calling authService.login');
+          const result = await authService.login(credentials.username, credentials.password);
+          console.log('[AuthStore] AuthService login result:', { success: result.success, hasUser: !!result.user, hasToken: !!result.accessToken });
+          // authDebug removed
+          
+          if (!result.success) {
+            console.error('[AuthStore] Login failed:', result.error);
             set({ isLoading: false, error: result.error || 'Login failed' });
+            // authDebug removed
             throw new Error(result.error || 'Login failed');
+          }
+          
+          const expiresAt = result.expiresIn ? Date.now() + result.expiresIn * 1000 : null;
+          console.log('[AuthStore] Setting tokens and user data, expiresAt:', expiresAt);
+          // authDebug removed
+          
+          // Mirror token into localStorage for axios interceptor compatibility
+          if (result.accessToken) {
+            localStorage.setItem('jwt_token', result.accessToken);
+            console.log('[AuthStore] Token saved to localStorage');
+            // authDebug removed
+          }
+          
+          set({
+            user: result.user || null,
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+            expiresAt,
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+          });
+          
+          console.log('[AuthStore] Auth state updated successfully');
+          // authDebug removed
+          get().scheduleRefresh();
+          // authDebug removed
+        } catch (error: unknown) {
+          console.error('[AuthStore] Login error caught:', error);
+          const message = error instanceof Error ? error.message : 'Login failed';
+          set({ isLoading: false, error: message });
+          // authDebug removed
+          throw error;
         }
-        const expiresAt = result.expiresIn ? Date.now() + result.expiresIn * 1000 : null;
-        // Mirror token into localStorage for axios interceptor compatibility
-        if (result.accessToken) localStorage.setItem('jwt_token', result.accessToken);
-        set({
-          user: result.user || null,
-          accessToken: result.accessToken,
-          refreshToken: result.refreshToken,
-          expiresAt,
-          isAuthenticated: true,
-          isLoading: false,
-          error: null,
-        });
-        get().scheduleRefresh();
       },
 
       logout: async () => {
+  // authDebug removed
         const { refreshToken, refreshTimerId } = get();
         if (refreshTimerId) clearTimeout(refreshTimerId);
         if (refreshToken) await authService.logout(refreshToken);
@@ -81,14 +113,17 @@ const useAuthStore = create<AuthStore>()(
           error: null,
         });
         localStorage.removeItem('auth-store');
+  // authDebug removed
       },
 
       refreshAuth: async () => {
+  // authDebug removed
         const { refreshToken } = get();
         if (!refreshToken) return false;
         const result = await authService.refresh(refreshToken);
         if (!result.success) {
           await get().logout();
+          // authDebug removed
           return false;
         }
         const expiresAt = result.expiresIn ? Date.now() + result.expiresIn * 1000 : null;
@@ -101,6 +136,7 @@ const useAuthStore = create<AuthStore>()(
           isAuthenticated: true,
         });
         get().scheduleRefresh();
+  // authDebug removed
         return true;
       },
 
@@ -131,9 +167,11 @@ const useAuthStore = create<AuthStore>()(
         const skew = 30_000; // refresh 30s before expiry
         const delay = Math.max(1000, expiresAt - now - skew);
         const id = window.setTimeout(() => {
+          // authDebug removed
           get().refreshAuth();
         }, delay);
         set({ refreshTimerId: id });
+  // authDebug removed
       },
 
       setUser: (user) => { set({ user }); },
