@@ -10,7 +10,7 @@
 
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} [%thread] %-5level %logger{36} trace=%X{traceId:-} span=%X{spanId:-} corr=%X{correlationId:-} %msg%n" />
 
-    <!-- JSON appender -->
+    <!-- JSON appender (Logstash providers; avoid pattern JSON parsing issues) -->
     <appender name="JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>logs/application.json</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -22,9 +22,14 @@
                 <timestamp>
                     <timeZone>UTC</timeZone>
                 </timestamp>
-                <pattern>
-                    <pattern>{"level":"%level","logger":"%logger{36}","thread":"%thread","message":%jsonMessage,"corr":"%X{correlationId}","trace":"%X{traceId}","span":"%X{spanId}","app":"${APP_NAME}"}</pattern>
-                </pattern>
+                <level/>
+                <loggerName/>
+                <threadName/>
+                <message/>
+                <mdc/>
+                <provider class="net.logstash.logback.composite.GlobalCustomFieldsJsonProvider">
+                    <customFields>{"app":"${APP_NAME}"}</customFields>
+                </provider>
                 <arguments/>
                 <stackTrace/>
             </providers>

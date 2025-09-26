@@ -88,62 +88,7 @@ export const AssetList = () => {
     }
   }, [currentPage, statusFilter, searchTerm]);
 
-  // Keyboard shortcuts configuration (defined after handlers to avoid TDZ issues)
-  const shortcuts = React.useMemo(() => ([
-    {
-      key: 'n',
-      ctrl: true,
-      description: 'Create new asset',
-      action: () => setShowCreateForm(true)
-    },
-    {
-      key: 'e',
-      ctrl: true,
-      description: 'Export to CSV',
-      action: () => handleExportCSV()
-    },
-    {
-      key: 'p',
-      ctrl: true,
-      description: 'Export to PDF',
-      action: () => handleExportPDF()
-    },
-    {
-      key: 'a',
-      ctrl: true,
-      description: 'Select all assets',
-      action: () => handleSelectAll(selectedAssets.size === 0)
-    },
-    {
-      key: 'f',
-      ctrl: true,
-      description: 'Focus search',
-      action: () => {
-        const searchInput = document.querySelector('.search-input');
-        if (searchInput) searchInput.focus();
-      }
-    },
-    {
-      key: 'r',
-      ctrl: true,
-      description: 'Refresh assets',
-      action: () => fetchAssets()
-    },
-    {
-      key: '?',
-      description: 'Show keyboard shortcuts',
-      action: () => setShowShortcutsHelp(!showShortcutsHelp)
-    },
-    {
-      key: 'Escape',
-      description: 'Close modals/Clear selection',
-      action: () => {
-        if (showCreateForm) setShowCreateForm(false);
-        else if (showShortcutsHelp) setShowShortcutsHelp(false);
-        else if (selectedAssets.size > 0) setSelectedAssets(new Set());
-      }
-    }
-  ]), [selectedAssets, showCreateForm, showShortcutsHelp, handleExportCSV, handleExportPDF, handleSelectAll, fetchAssets]);
+
 
   // Fetch assets when dependencies change
   useEffect(() => {
@@ -241,6 +186,63 @@ export const AssetList = () => {
     }
   };
 
+  // Keyboard shortcuts configuration (defined after handlers to avoid TDZ issues)
+  const shortcuts = React.useMemo(() => ([
+    {
+      key: 'n',
+      ctrl: true,
+      description: 'Create new asset',
+      action: () => setShowCreateForm(true)
+    },
+    {
+      key: 'e',
+      ctrl: true,
+      description: 'Export to CSV',
+      action: () => handleExportCSV()
+    },
+    {
+      key: 'p',
+      ctrl: true,
+      description: 'Export to PDF',
+      action: () => handleExportPDF()
+    },
+    {
+      key: 'a',
+      ctrl: true,
+      description: 'Select all assets',
+      action: () => handleSelectAll(selectedAssets.size === 0)
+    },
+    {
+      key: 'f',
+      ctrl: true,
+      description: 'Focus search',
+      action: () => {
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) searchInput.focus();
+      }
+    },
+    {
+      key: 'r',
+      ctrl: true,
+      description: 'Refresh assets',
+      action: () => fetchAssets()
+    },
+    {
+      key: '?',
+      description: 'Show keyboard shortcuts',
+      action: () => setShowShortcutsHelp(!showShortcutsHelp)
+    },
+    {
+      key: 'Escape',
+      description: 'Close modals/Clear selection',
+      action: () => {
+        if (showCreateForm) setShowCreateForm(false);
+        else if (showShortcutsHelp) setShowShortcutsHelp(false);
+        else if (selectedAssets.size > 0) setSelectedAssets(new Set());
+      }
+    }
+  ]), [selectedAssets, showCreateForm, showShortcutsHelp, handleExportCSV, handleExportPDF, handleSelectAll, fetchAssets]);
+
   if (loading) {
     return (
       <div className="asset-list-container" style={{ padding: '1rem' }}>
@@ -305,7 +307,7 @@ export const AssetList = () => {
           )}
         </div>
         
-  <div className="header-actions">
+        <div className="header-actions">
           {/* Export Buttons */}
           <div className="export-actions">
             <button 
@@ -321,6 +323,26 @@ export const AssetList = () => {
               title="Export to PDF"
             >
               📄 Export PDF
+            </button>
+            <button 
+              className="btn-outline"
+              onClick={async () => {
+                try {
+                  console.log('Testing backend API...');
+                  const response = await fetch('http://localhost:8080/api/v1/assets');
+                  if (response.ok) {
+                    const data = await response.json();
+                    alert(`✅ Backend Connected! Found ${data.length || 0} assets in database.`);
+                  } else {
+                    alert('⚠️ Backend responding but returned error: ' + response.status);
+                  }
+                } catch (error) {
+                  alert('❌ Backend connection failed. Make sure Spring Boot is running on port 8080.');
+                }
+              }}
+              title="Test Backend Connection"
+            >
+              🔌 Test API
             </button>
           </div>
 

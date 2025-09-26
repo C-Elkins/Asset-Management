@@ -40,7 +40,7 @@ test('auth: invalid credentials stay on login and show error', async ({ page }) 
   await page.goto('/login');
   await page.getByLabel(/username/i).waitFor({ state: 'visible' });
   await page.getByLabel(/username/i).fill('admin');
-  await page.getByLabel(/password/i).fill('wrongpass');
+  await page.getByRole('textbox', { name: /password/i }).fill('wrongpass');
   await Promise.all([
     page.waitForResponse(resp => resp.url().includes('/auth/login') && resp.status() === 401),
     page.getByRole('button', { name: /login/i }).click()

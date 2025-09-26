@@ -16,11 +16,7 @@ INSERT INTO categories (name, description, color_code, icon, active, sort_order,
 
 -- Insert Users
 INSERT INTO users (username, email, password, first_name, last_name, department, job_title, phone_number, role, active, created_at, updated_at) VALUES
--- Super Admin
-('admin', 'admin@company.com', '$2a$10$V6Jd8Oq1LqPXm5u4GXnzQeLLqNvZvGvJ9QJk6dN8E5Xb7Zz4N5p2K', 'System', 'Administrator', 'IT', 'System Administrator', '555-0001', 'SUPER_ADMIN', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-
--- IT Admins
-('jdoe', 'john.doe@company.com', '$2a$10$V6Jd8Oq1LqPXm5u4GXnzQeLLqNvZvGvJ9QJk6dN8E5Xb7Zz4N5p2K', 'John', 'Doe', 'IT', 'IT Manager', '555-0101', 'IT_ADMIN', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+-- Demo/sample users removed for production
 ('sjohnson', 'sarah.johnson@company.com', '$2a$10$V6Jd8Oq1LqPXm5u4GXnzQeLLqNvZvGvJ9QJk6dN8E5Xb7Zz4N5p2K', 'Sarah', 'Johnson', 'IT', 'Network Administrator', '555-0102', 'IT_ADMIN', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
 -- Managers
