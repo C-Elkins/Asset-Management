@@ -10,6 +10,7 @@ const AssetAssignPage = lazy(() => import('./pages/AssetAssignPage.jsx').then(m 
 const MaintenancePage = lazy(() => import('./pages/MaintenancePage.jsx').then(m => ({ default: m.MaintenancePage })));
 const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx').then(m => ({ default: m.ReportsPage })));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx').then(m => ({ default: m.SettingsPage })));
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx').then(m => ({ default: m.default })));
 const AIAssistant = lazy(() => import('./pages/AIAssistant.jsx').then(m => ({ default: m.AIAssistant })));
 
 const NotFound = lazy(() => import('./pages/NotFound.jsx').then(m => ({ default: m.NotFound })));
@@ -53,6 +54,7 @@ function App() {
           <Route path="maintenance" element={<Suspense fallback={<ExecutivePageLoader message="Loading maintenance..." />}><MaintenancePage /></Suspense>} />
           <Route path="reports" element={<Suspense fallback={<ExecutivePageLoader message="Loading reports..." />}><ReportsPage /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ExecutivePageLoader message="Loading settings..." />}><SettingsPage /></Suspense>} />
+          <Route path="admin" element={<Suspense fallback={<ExecutivePageLoader message="Loading admin panel..." />}><AdminPage /></Suspense>} />
           <Route path="ai" element={<Suspense fallback={<ExecutivePageLoader message="Booting AI Assistant..." />}><AIAssistant /></Suspense>} />
           <Route path="showcase" element={<Suspense fallback={<ExecutivePageLoader message="Loading showcase..." />}><div style={{padding: '2rem', textAlign: 'center'}}><h2>Component Showcase</h2><p>Coming Soon - UI Components Demo</p></div></Suspense>} />
           <Route path="*" element={<Suspense fallback={<ExecutivePageLoader message="Loading..." />}><NotFound /></Suspense>} />

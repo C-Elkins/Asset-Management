@@ -3,6 +3,7 @@ import { api } from '../../services/api.js';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../../styles/status-indicator.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import FirstLoginPasswordChange from './FirstLoginPasswordChange.jsx';
 import { useAuthStore } from '../../app/store/authStore';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -16,6 +17,8 @@ const schema = z.object({
 export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
+  const [mustChangePassword, setMustChangePassword] = useState(false);
+  const [pendingUsername, setPendingUsername] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [backendStatus, setBackendStatus] = useState({ state: 'checking', message: 'Checking…' });
   const lastHealthSuccessRef = useRef(null);
@@ -112,40 +115,32 @@ export const Login = () => {
     
     setFormError('');
     setSubmitting(true);
-  // authDebug removed
+    setMustChangePassword(false);
+    // authDebug removed
     
     try {
       console.log('Attempting login with credentials:', { username: data.username, password: '[HIDDEN]' });
-  await login(data);
-  // authDebug removed
-
-  // Mark the moment of successful login to let guards/interceptors grace initial requests
-  try { sessionStorage.setItem('JUST_LOGGED_IN', String(Date.now())); } catch {}
-
-      // Post-login stabilization: ensure token persistence before routing
-      // This avoids edge cases where a guard reads before localStorage updates.
-      const startWait = performance.now();
-      let token = null;
-      try { token = localStorage.getItem('jwt_token'); } catch {}
-      if (!token) {
-        for (let i = 0; i < 8; i++) { // up to ~160ms
-          await new Promise(r => setTimeout(r, 20));
-          try { token = localStorage.getItem('jwt_token'); } catch {}
-          if (token) break;
-        }
-      }
-
-  console.log('Login successful, navigating to:', from, 'after wait(ms)=', Math.round(performance.now() - startWait));
+      await login(data);
+      console.log('Login successful, navigating to:', from);
       navigate(from, { replace: true });
-  // authDebug removed
     } catch (err) {
       console.error('Login failed:', err);
-      setFormError(err.message || 'Authentication failed');
-  // authDebug removed
+      // Detect must-change-password (403)
+      if (err?.message?.toLowerCase().includes('password change required')) {
+        setMustChangePassword(true);
+        setPendingUsername(data.username);
+        setFormError('');
+      } else {
+        setFormError(err.message || 'Authentication failed');
+      }
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (mustChangePassword) {
+    return <FirstLoginPasswordChange username={pendingUsername} onSuccess={() => { setMustChangePassword(false); setFormError('Password changed. Please log in.'); }} />;
+  }
 
   return (
     <div className="login-container" aria-labelledby="login-heading">

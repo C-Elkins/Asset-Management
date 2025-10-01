@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public class UserDTO {
+    private Long id;
     
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
@@ -38,12 +39,14 @@ public class UserDTO {
     private User.Role role;
     
     private Boolean active;
+    private Boolean mustChangePassword;
     
     // Constructors
     public UserDTO() {}
-    
-    public UserDTO(String username, String email, String password, String firstName, String lastName,
-                   String department, String jobTitle, String phoneNumber, User.Role role, Boolean active) {
+
+    public UserDTO(Long id, String username, String email, String password, String firstName, String lastName,
+                   String department, String jobTitle, String phoneNumber, User.Role role, Boolean active, Boolean mustChangePassword) {
+        this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
@@ -54,9 +57,18 @@ public class UserDTO {
         this.phoneNumber = phoneNumber;
         this.role = role;
         this.active = active;
+        this.mustChangePassword = mustChangePassword;
     }
     
     // Getters and Setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -140,6 +152,7 @@ public class UserDTO {
     // Helper method to create DTO from entity
     public static UserDTO fromEntity(User user) {
         return new UserDTO(
+            user.getId(),
             user.getUsername(),
             user.getEmail(),
             null, // Don't expose password
@@ -149,7 +162,15 @@ public class UserDTO {
             user.getJobTitle(),
             user.getPhoneNumber(),
             user.getRole(),
-            user.getActive()
+            user.getActive(),
+            user.getMustChangePassword()
         );
+    }
+    public Boolean getMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(Boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
     }
 }

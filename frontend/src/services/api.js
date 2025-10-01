@@ -46,21 +46,10 @@ api.interceptors.response.use(
         useRateLimitStore.getState().setFromHeaders(headers);
       }
     } catch {/* noop */}
-    try {
-      // Mark session stabilized after first successful protected API call (not auth/health)
-      const url = response.config?.url || '';
-      const isAuthEndpoint = url.startsWith('/auth') || url.includes('/auth/');
-      const isHealthEndpoint = url.includes('/actuator/health');
-      if (!isAuthEndpoint && !isHealthEndpoint && response.status >= 200 && response.status < 300) {
-        sessionStorage.setItem('AUTH_STABILIZED', '1');
-  // authDebug removed
-      }
-    } catch { /* noop */ }
-  // authDebug removed
     return response;
   },
   async (error) => {
-    // Also capture on error (e.g., 429)
+    // Also capture rate limit headers on error
     try {
       const headers = error?.response?.headers || {};
       if (headers['x-ratelimit-limit'] || headers['x-ratelimit-remaining']) {
@@ -75,66 +64,40 @@ api.interceptors.response.use(
       const isAuthEndpoint = reqUrl.startsWith('/auth') || reqUrl.includes('/auth/');
       const isHealthEndpoint = reqUrl.includes('/actuator/health');
       const onLoginRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/login');
-      // Immediate post-login grace: if within 5s after login, don't force logout or retries; let caller/guard handle
-      let inPostLoginGrace = false;
-      try {
-        const ts = Number(sessionStorage.getItem('JUST_LOGGED_IN') || 0);
-        inPostLoginGrace = !!ts && (Date.now() - ts < 5000);
-      } catch { /* noop */ }
-      // Extra stabilization: until one successful protected call, defer global handling up to 10s
-      let inStabilization = false;
-      try {
-        const stabilized = sessionStorage.getItem('AUTH_STABILIZED') === '1';
-        const ts = Number(sessionStorage.getItem('JUST_LOGGED_IN') || 0);
-        const within10s = !!ts && (Date.now() - ts < 10000);
-        inStabilization = !stabilized && within10s;
-      } catch { /* noop */ }
-      // For auth endpoints (login/refresh/me), do not trigger global logout or redirects here.
+      
+      // For auth endpoints (login/refresh/me), do not trigger global logout or redirects.
       // Let the caller handle the 401 to show inline validation messages.
-      if (isAuthEndpoint) {
-  // authDebug removed
-        return Promise.reject(error);
-      }
-      // Avoid forcing redirects on health checks or while on the login route to prevent reload loops
-      if (isHealthEndpoint || onLoginRoute || inPostLoginGrace || inStabilization) {
+      if (isAuthEndpoint || isHealthEndpoint || onLoginRoute) {
         if (import.meta && import.meta.env && import.meta.env.MODE === 'development') {
-          // Debug: Show why we skipped global 401 handling
-          console.debug('[API 401] Skipping global handling', { isHealthEndpoint, onLoginRoute, inPostLoginGrace, inStabilization, url: reqUrl });
+          console.debug('[API 401] Skipping global handling', { isAuthEndpoint, isHealthEndpoint, onLoginRoute, url: reqUrl });
         }
-  // authDebug removed
         return Promise.reject(error);
       }
+      
       const { refreshToken } = useAuthStore.getState();
       // Only attempt a refresh if we actually have a refresh token
-      if (!isAuthEndpoint && refreshToken && !original._retry) {
+      if (refreshToken && !original._retry) {
         original._retry = true;
         try {
-          // authDebug removed
           const ok = await useAuthStore.getState().refreshAuth();
           if (ok) {
             const { accessToken } = useAuthStore.getState();
             if (accessToken) {
               original.headers = { ...(original.headers || {}), Authorization: `Bearer ${accessToken}` };
             }
-            // authDebug removed
             return await axios.request(original);
           }
         } catch {
-          // fall through
-          // authDebug removed
+          // fall through to logout
         }
       }
-      // If still unauthorized:
-      // - If we had a refresh token and refresh failed, log out (unless already on /login).
-      // - If we don't have a refresh token, just reject and let the caller handle (avoid bouncing the user).
+      
+      // If we had a refresh token and refresh failed, log out
       if (refreshToken) {
-        // Soft logout: update auth state so ProtectedRoute navigates without full reload.
         await useAuthStore.getState().logout();
-  // authDebug removed
-        return Promise.reject(error);
       }
+      
       return Promise.reject(error);
-      // fallthrough handled by above branches
     }
     return Promise.reject(error);
   }

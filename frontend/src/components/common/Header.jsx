@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, User, Bell, Search, Settings, ChevronDown, X, Check, AlertCircle, Info } from 'lucide-react';
-import { systemAPI, testConnection } from '../../utils/api';
 
 export const Header = ({ user, onLogout }) => {
 
@@ -61,70 +60,16 @@ export const Header = ({ user, onLogout }) => {
   const unreadCount = notifications.filter(n => !n.read).length;
   
   const handleSearch = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
-    
-    // Demo search functionality
-    if (query.length > 2) {
-      console.log('Searching for:', query);
-      // In a real app, this would trigger an API call
-      // searchAPI.search(query).then(results => setSearchResults(results));
-    }
-    
-    // Show search suggestions for demo
-    if (query.toLowerCase().includes('laptop')) {
-      console.log('Found laptop assets: MacBook Pro LT001, Dell Laptop DL002');
-    } else if (query.toLowerCase().includes('maintenance')) {
-      console.log('Found maintenance tasks: Server maintenance, Network upgrade');
-    }
+    setSearchQuery(e.target.value);
+    // Add search functionality here
   };
   
   const settingsItems = [
-    { 
-      label: 'Profile Settings', 
-      action: () => {
-        // Navigate to profile settings page or open modal
-        console.log('Opening Profile Settings...');
-        alert('✓ Profile Settings - Configure user profile and preferences');
-      }
-    },
-    { 
-      label: 'Security Settings', 
-      action: () => {
-        console.log('Opening Security Settings...');
-        alert('🔒 Security Settings - Manage passwords, 2FA, and access controls');
-      }
-    },
-    { 
-      label: 'Backup & Restore', 
-      action: () => {
-        console.log('Opening Backup & Restore...');
-        alert('💾 Backup & Restore - System backup scheduled for tonight');
-      }
-    },
-    { 
-      label: 'API Settings', 
-      action: () => {
-        console.log('Opening API Settings...');
-        alert('🔌 API Settings - 1 connection available, 5 keys assigned');
-      }
-    },
-    { 
-      label: 'Test Connection', 
-      action: async () => {
-        console.log('Testing backend connection...');
-        try {
-          const result = await testConnection();
-          if (result.connected) {
-            alert('✅ Backend Connected - API responding normally');
-          } else {
-            alert('⚠️ Connection Failed - ' + result.message);
-          }
-        } catch (error) {
-          alert('❌ Connection Error - Please check if backend is running on port 8080');
-        }
-      }
-    }
+    { label: 'Profile Settings', action: () => alert('Profile Settings clicked') },
+    { label: 'System Preferences', action: () => alert('System Preferences clicked') },
+    { label: 'Security Settings', action: () => alert('Security Settings clicked') },
+    { label: 'Backup & Restore', action: () => alert('Backup & Restore clicked') },
+    { label: 'API Settings', action: () => alert('API Settings clicked') }
   ];
 
   // Map backend role codes to friendly labels
