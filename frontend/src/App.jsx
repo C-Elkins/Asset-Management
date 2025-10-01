@@ -19,6 +19,16 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { ExecutivePageLoader } from './components/common/ExecutiveLoader.jsx';
 
+// Stable component to prevent recreation on every render
+const DefaultRedirect = ({ user }) => {
+  let tokenAuthed = false;
+  try {
+    tokenAuthed = !!localStorage.getItem('jwt_token');
+  } catch {}
+  const dest = (user || tokenAuthed) ? '/app' : '/login';
+  return <Navigate to={dest} replace />;
+};
+
 function App() {
   const user = useAuthStore(s => s.user);
   const isLoading = useAuthStore(s => s.isLoading);
@@ -62,14 +72,7 @@ function App() {
         {/* Default redirect based on auth; allow E2E/test mode or token presence to land at /app */}
         <Route
           path="*"
-          element={(() => {
-            let tokenAuthed = false;
-            try {
-              tokenAuthed = !!localStorage.getItem('jwt_token');
-            } catch {}
-            const dest = (user || tokenAuthed) ? '/app' : '/login';
-            return <Navigate to={dest} replace />;
-          })()}
+          element={<DefaultRedirect user={user} />}
         />
       </Routes>
   {/* AuthDebugPanel removed */}

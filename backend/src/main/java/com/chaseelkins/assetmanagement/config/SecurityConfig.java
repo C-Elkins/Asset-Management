@@ -37,14 +37,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
         http
             .cors(Customizer.withDefaults())
-            // Re-enable CSRF protection; only ignore explicitly allowed unauthenticated endpoints
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers(
-                    "/auth/**", // Authentication endpoints use stateless JWT
-                    "/actuator/**", // Operational endpoints (if desired to exclude)
-                    "/h2-console/**" // H2 console (DEV only)
-                )
-            )
+            // Stateless API with JWT — disable CSRF entirely (no cookies used)
+            .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/**", "/health", "/h2-console/**", "/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/api-docs/**").permitAll()
