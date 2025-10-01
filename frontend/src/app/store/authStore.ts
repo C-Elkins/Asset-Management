@@ -141,22 +141,32 @@ const useAuthStore = create<AuthStore>()(
       },
 
       initSession: async () => {
-        const { accessToken, user, expiresAt } = get();
+        const { accessToken, user, expiresAt, refreshToken } = get();
+        
+        // If we have both token and user, check if expired
         if (accessToken && user) {
-          // Validate expiration
           if (expiresAt && Date.now() > expiresAt) {
-            await get().refreshAuth();
-            return;
+            // Token expired, try refresh
+            if (refreshToken) {
+              await get().refreshAuth();
+              return;
+            } else {
+              // No refresh token, clear session
+              await get().logout();
+              return;
+            }
           }
-          // Optionally fetch fresh profile
-          const me = await authService.me(accessToken);
-          if (me.success && me.user) set({ user: me.user });
+          
+          // Token still valid, set authenticated state and schedule refresh
+          set({ isAuthenticated: true });
           get().scheduleRefresh();
           return;
         }
-        // Attempt silent refresh if we only have refresh token persisted
-        const stored = get().refreshToken;
-        if (stored) await get().refreshAuth();
+        
+        // No stored user/token, try refresh if we have refresh token
+        if (refreshToken) {
+          await get().refreshAuth();
+        }
       },
 
       scheduleRefresh: () => {

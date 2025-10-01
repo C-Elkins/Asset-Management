@@ -63,8 +63,13 @@ public class User {
     @Column(nullable = false)
     private Role role = Role.USER;
     
+
     @Column(nullable = false)
     private Boolean active = true;
+
+    // Require user to change password on next login (first login or after admin reset)
+    @Column(name = "must_change_password", nullable = false)
+    private Boolean mustChangePassword = false;
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -82,8 +87,9 @@ public class User {
     // Constructors
     public User() {}
     
+
     public User(String username, String email, String password, String firstName, String lastName,
-                String department, String jobTitle, String phoneNumber, Role role, Boolean active) {
+                String department, String jobTitle, String phoneNumber, Role role, Boolean active, Boolean mustChangePassword) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -94,6 +100,14 @@ public class User {
         this.phoneNumber = phoneNumber;
         this.role = role != null ? role : Role.USER;
         this.active = active != null ? active : true;
+        this.mustChangePassword = mustChangePassword != null ? mustChangePassword : false;
+    }
+    public Boolean getMustChangePassword() {
+        return mustChangePassword;
+    }
+
+    public void setMustChangePassword(Boolean mustChangePassword) {
+        this.mustChangePassword = mustChangePassword;
     }
     
     // Getters and Setters

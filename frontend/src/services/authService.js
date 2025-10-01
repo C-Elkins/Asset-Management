@@ -112,6 +112,17 @@ export const authService = {
     }
   },
 
+  async changePassword({ username, newPassword }) {
+    // Assumes backend exposes /users/{username}/change-password or similar endpoint
+    try {
+      // You may need to adjust endpoint and payload to match backend
+      await api.post(`/users/${encodeURIComponent(username)}/change-password`, { newPassword });
+      return true;
+    } catch (err) {
+      throw new Error(err?.response?.data?.message || 'Failed to change password');
+    }
+  },
+
   async logout(refreshToken) {
     try {
       if (refreshToken) {

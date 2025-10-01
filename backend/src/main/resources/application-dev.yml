@@ -15,6 +15,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  # Disable Flyway in development since we use Hibernate DDL auto-generation
+  flyway:
+    enabled: false
     
   h2:
     console:
@@ -25,12 +29,6 @@ spring:
   jackson:
     serialization:
       fail-on-empty-beans: false
-
-  # Load tailored office/printers demo dataset at startup
-  sql:
-    init:
-      mode: always
-      data-locations: classpath:sample-data-office-printers.sql
 
 # Development-specific JWT settings (weaker security for testing)
 jwt:
