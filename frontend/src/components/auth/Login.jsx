@@ -93,7 +93,7 @@ export const Login = () => {
   }, [performHealthCheck, isE2E]);
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/app';
+  const from = location.state?.from?.pathname || '/app/dashboard';
 
   // E2E auto-login removed for production
   const {
@@ -116,15 +116,15 @@ export const Login = () => {
     setFormError('');
     setSubmitting(true);
     setMustChangePassword(false);
-    // authDebug removed
     
     try {
-      console.log('Attempting login with credentials:', { username: data.username, password: '[HIDDEN]' });
+      console.log('🔐 [Login] Starting login process, navigating to:', from);
       await login(data);
-      console.log('Login successful, navigating to:', from);
+      console.log('✅ [Login] Login successful, about to navigate to:', from);
       navigate(from, { replace: true });
+      console.log('🚀 [Login] Navigation called with replace=true');
     } catch (err) {
-      console.error('Login failed:', err);
+      console.error('❌ [Login] Login failed:', err);
       // Detect must-change-password (403)
       if (err?.message?.toLowerCase().includes('password change required')) {
         setMustChangePassword(true);

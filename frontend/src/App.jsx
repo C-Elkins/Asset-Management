@@ -25,7 +25,8 @@ const DefaultRedirect = ({ user }) => {
   try {
     tokenAuthed = !!localStorage.getItem('jwt_token');
   } catch {}
-  const dest = (user || tokenAuthed) ? '/app' : '/login';
+  const dest = (user || tokenAuthed) ? '/app/dashboard' : '/login';
+  console.log('🔄 [DefaultRedirect] Redirecting to:', dest, { hasUser: !!user, hasToken: tokenAuthed });
   return <Navigate to={dest} replace />;
 };
 
@@ -34,6 +35,11 @@ function App() {
   const isLoading = useAuthStore(s => s.isLoading);
   const initSession = useAuthStore(s => s.initSession);
   const logout = useAuthStore(s => s.logout);
+
+  // Debug auth state changes
+  useEffect(() => {
+    console.log('👤 [App] Auth state changed:', { hasUser: !!user, isLoading, username: user?.username });
+  }, [user, isLoading]);
 
   useEffect(() => { initSession(); }, [initSession]);
 
