@@ -2,19 +2,12 @@ import axios from 'axios';
 import { useAuthStore } from '../app/store/authStore';
 import { v4 as uuidv4 } from 'uuid';
 import { useRateLimitStore } from '../store/rateLimitStore';
+// authDebug removed
 
 // Derive base URL. Prefer explicit env, then proxy path in dev, else absolute.
 const EXPLICIT = import.meta.env.VITE_API_BASE_URL;
-const isPlaywright = (typeof navigator !== 'undefined' && /Playwright/i.test(navigator.userAgent || ''));
-const BASE_URL = EXPLICIT || (isPlaywright ? '/api' : (import.meta.env.DEV ? '/api' : 'http://localhost:8080/api/v1'));
-
-// Helper to detect likely proxy failure (e.g., 404 on /auth/login with relative path)
-const isNetworkOrProxyIssue = (error) => {
-  if (!error) return false;
-  if (error.code === 'ERR_NETWORK') return true;
-  if (error.response?.status === 404) return true;
-  return false;
-};
+// Fix: Use correct backend API path consistently
+const BASE_URL = EXPLICIT || 'http://localhost:8080/api/v1';
 
 // Create axios instance with backend configuration
 export const api = axios.create({
@@ -37,6 +30,7 @@ api.interceptors.request.use(
     const token = localStorage.getItem('jwt_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     config.headers['X-Correlation-Id'] = corrId;
+  // authDebug removed
     return config;
   },
   (error) => Promise.reject(error)
@@ -55,36 +49,34 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    // Also capture on error (e.g., 429)
+    // Also capture rate limit headers on error
     try {
       const headers = error?.response?.headers || {};
       if (headers['x-ratelimit-limit'] || headers['x-ratelimit-remaining']) {
         useRateLimitStore.getState().setFromHeaders(headers);
       }
     } catch {/* noop */}
-    // Optionally attempt a single retry with absolute URL if proxy-relative failed
-    if (isNetworkOrProxyIssue(error) && !error.config?._retried) {
-      const original = { ...error.config, _retried: true };
-      // Force absolute base
-      original.baseURL = 'http://localhost:8080/api/v1';
-      try {
-        return await axios.request(original);
-      } catch (e) {
-        // fall through to normal handling
-        error = e;
-      }
-    }
+    
     const status = error.response?.status;
     if (status === 401) {
-      const original = error.config;
-      const reqUrl = original?.url || '';
+      const original = error.config || {};
+      const reqUrl = original.url || '';
       const isAuthEndpoint = reqUrl.startsWith('/auth') || reqUrl.includes('/auth/');
-      // For auth endpoints (login/refresh/me), do not trigger global logout or redirects here.
+      const isHealthEndpoint = reqUrl.includes('/actuator/health');
+      const onLoginRoute = typeof window !== 'undefined' && window.location.pathname.startsWith('/login');
+      
+      // For auth endpoints (login/refresh/me), do not trigger global logout or redirects.
       // Let the caller handle the 401 to show inline validation messages.
-      if (isAuthEndpoint) {
+      if (isAuthEndpoint || isHealthEndpoint || onLoginRoute) {
+        if (import.meta && import.meta.env && import.meta.env.MODE === 'development') {
+          console.debug('[API 401] Skipping global handling', { isAuthEndpoint, isHealthEndpoint, onLoginRoute, url: reqUrl });
+        }
         return Promise.reject(error);
       }
-      if (!isAuthEndpoint && !original._retry) {
+      
+      const { refreshToken } = useAuthStore.getState();
+      // Only attempt a refresh if we actually have a refresh token
+      if (refreshToken && !original._retry) {
         original._retry = true;
         try {
           const ok = await useAuthStore.getState().refreshAuth();
@@ -96,15 +88,16 @@ api.interceptors.response.use(
             return await axios.request(original);
           }
         } catch {
-          // fall through
+          // fall through to logout
         }
       }
-      // If still unauthorized, force logout
-      await useAuthStore.getState().logout();
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.href = '/login';
+      
+      // If we had a refresh token and refresh failed, log out
+      if (refreshToken) {
+        await useAuthStore.getState().logout();
       }
-      return; 
+      
+      return Promise.reject(error);
     }
     return Promise.reject(error);
   }

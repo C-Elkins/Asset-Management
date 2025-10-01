@@ -10,15 +10,25 @@ spring:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
+    # Ensure Hibernate creates schema before running data scripts
+    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
+
+  # Disable Flyway in development since we use Hibernate DDL auto-generation
+  flyway:
+    enabled: false
     
   h2:
     console:
       enabled: true
       settings:
         web-allow-others: true
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
 
 # Development-specific JWT settings (weaker security for testing)
 jwt:

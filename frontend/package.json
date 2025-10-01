@@ -8,6 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "preview:e2e": "node ./scripts/e2e-server.mjs",
+    "test:e2e:dev": "playwright test -c playwright.dev.config.ts",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint . --ext ts,tsx --fix",
     "type-check": "tsc --noEmit",
@@ -15,7 +16,7 @@
     "test:e2e": "playwright test",
     "start:backend": "cd ../backend && mvn spring-boot:run",
     "start:both": "concurrently \"npm run start:backend\" \"npm run dev\"",
-    "health:frontend": "curl -sS --http1.1 -o /dev/null -w '%{http_code}\\n' http://localhost:3005",
+    "health:frontend": "curl -sS --http1.1 -o /dev/null -w '%{http_code}\\n' http://localhost:3001",
     "health:backend": "curl -sS --http1.1 -o /dev/null -w '%{http_code}\\n' http://localhost:8080/api/v1/actuator/health",
     "gen:api": "openapi-typescript http://localhost:8080/api/v1/api-docs --output src/generated/api-types.ts"
   },
@@ -36,7 +37,8 @@
     "react-router-dom": "^7.9.1",
     "uuid": "^9.0.1",
     "zod": "^3.23.8",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.2",
+    "express-rate-limit": "^8.1.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.2",

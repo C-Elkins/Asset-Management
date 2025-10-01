@@ -1,19 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import './App.css';
 import { HomePage } from './pages/HomePage.jsx';
 import { Login } from './components/auth/Login.jsx';
-import { Dashboard } from './components/dashboard/Dashboard.jsx';
-import { AssetsPage } from './pages/AssetsPage.jsx';
-import { AssetDetails } from './pages/AssetDetails.jsx';
-import { AssetCreatePage } from './pages/AssetCreatePage.jsx';
-import { AssetAssignPage } from './pages/AssetAssignPage.jsx';
-import { MaintenancePage } from './pages/MaintenancePage.jsx';
-import { ReportsPage } from './pages/ReportsPage.jsx';
-import { SettingsPage } from './pages/SettingsPage.jsx';
-import { AIAssistant } from './pages/AIAssistant.jsx';
-import ComponentShowcase from './pages/ComponentShowcase.jsx';
-import { NotFound } from './pages/NotFound.jsx';
-import { useAuthStore } from './app/store/authStore.ts';
+const Dashboard = lazy(() => import('./components/dashboard/Dashboard.jsx').then(m => ({ default: m.Dashboard })));
+const AssetsPage = lazy(() => import('./pages/AssetsPage.jsx').then(m => ({ default: m.AssetsPage })));
+const AssetDetails = lazy(() => import('./pages/AssetDetails.jsx').then(m => ({ default: m.AssetDetails })));
+const AssetCreatePage = lazy(() => import('./pages/AssetCreatePage.jsx').then(m => ({ default: m.AssetCreatePage })));
+const AssetAssignPage = lazy(() => import('./pages/AssetAssignPage.jsx').then(m => ({ default: m.AssetAssignPage })));
+const MaintenancePage = lazy(() => import('./pages/MaintenancePage.jsx').then(m => ({ default: m.MaintenancePage })));
+const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx').then(m => ({ default: m.ReportsPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx').then(m => ({ default: m.SettingsPage })));
+const AdminPage = lazy(() => import('./pages/AdminPage.jsx').then(m => ({ default: m.default })));
+const AIAssistant = lazy(() => import('./pages/AIAssistant.jsx').then(m => ({ default: m.AIAssistant })));
+
+const NotFound = lazy(() => import('./pages/NotFound.jsx').then(m => ({ default: m.NotFound })));
+import { useAuthStore } from './app/store/authStore';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { ExecutivePageLoader } from './components/common/ExecutiveLoader.jsx';
@@ -45,17 +46,18 @@ function App() {
           }
         >
           <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="assets" element={<AssetsPage />} />
-          <Route path="assets/new" element={<AssetCreatePage />} />
-          <Route path="assets/:id" element={<AssetDetails />} />
-        <Route path="assets/:id/assign" element={<AssetAssignPage />} />
-          <Route path="maintenance" element={<MaintenancePage />} />
-          <Route path="reports" element={<ReportsPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="ai" element={<AIAssistant />} />
-          <Route path="showcase" element={<ComponentShowcase />} />
-          <Route path="*" element={<NotFound />} />
+          <Route path="dashboard" element={<Suspense fallback={<ExecutivePageLoader message="Loading dashboard..." />}><Dashboard /></Suspense>} />
+          <Route path="assets" element={<Suspense fallback={<ExecutivePageLoader message="Loading assets..." />}><AssetsPage /></Suspense>} />
+          <Route path="assets/new" element={<Suspense fallback={<ExecutivePageLoader message="Loading form..." />}><AssetCreatePage /></Suspense>} />
+          <Route path="assets/:id" element={<Suspense fallback={<ExecutivePageLoader message="Loading asset..." />}><AssetDetails /></Suspense>} />
+          <Route path="assets/:id/assign" element={<Suspense fallback={<ExecutivePageLoader message="Loading assignment..." />}><AssetAssignPage /></Suspense>} />
+          <Route path="maintenance" element={<Suspense fallback={<ExecutivePageLoader message="Loading maintenance..." />}><MaintenancePage /></Suspense>} />
+          <Route path="reports" element={<Suspense fallback={<ExecutivePageLoader message="Loading reports..." />}><ReportsPage /></Suspense>} />
+          <Route path="settings" element={<Suspense fallback={<ExecutivePageLoader message="Loading settings..." />}><SettingsPage /></Suspense>} />
+          <Route path="admin" element={<Suspense fallback={<ExecutivePageLoader message="Loading admin panel..." />}><AdminPage /></Suspense>} />
+          <Route path="ai" element={<Suspense fallback={<ExecutivePageLoader message="Booting AI Assistant..." />}><AIAssistant /></Suspense>} />
+          <Route path="showcase" element={<Suspense fallback={<ExecutivePageLoader message="Loading showcase..." />}><div style={{padding: '2rem', textAlign: 'center'}}><h2>Component Showcase</h2><p>Coming Soon - UI Components Demo</p></div></Suspense>} />
+          <Route path="*" element={<Suspense fallback={<ExecutivePageLoader message="Loading..." />}><NotFound /></Suspense>} />
         </Route>
         {/* Default redirect based on auth; allow E2E/test mode or token presence to land at /app */}
         <Route
@@ -70,6 +72,7 @@ function App() {
           })()}
         />
       </Routes>
+  {/* AuthDebugPanel removed */}
     </BrowserRouter>
   );
 }

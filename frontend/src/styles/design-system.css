@@ -20,7 +20,8 @@
   
   /* Interactive Colors */
   --apple-blue-primary: #007AFF;
-  --apple-blue-hover: #0056b3;
+  /* Slightly deepened for better hover contrast */
+  --apple-blue-hover: #0050a8;
   --apple-blue-pressed: #004494;
   --apple-blue-light: rgba(0, 122, 255, 0.1);
   

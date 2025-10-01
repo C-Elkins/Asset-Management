@@ -161,9 +161,18 @@
 }
 
 .btn-primary:active {
-  transform: translateY(0) scale(1.002);
-  transition: all 0.08s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+  transform: translateY(0) scale(0.995);
+  transition: transform 120ms var(--ease-apple), box-shadow 120ms var(--ease-apple);
+  box-shadow: 0 6px 18px rgba(0,122,255,0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  .btn-primary:hover,
+  .btn-primary:active {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* Secondary Button - Glass */
@@ -184,9 +193,9 @@
 }
 
 .btn-secondary:active {
-  transform: translateY(0) scale(1.002);
-  transition: all 0.08s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(0) scale(0.995);
+  transition: transform 120ms var(--ease-apple), box-shadow 120ms var(--ease-apple);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
 /* Danger Button - Red with subtle glow */
@@ -203,9 +212,21 @@
 }
 
 .btn-danger:active {
-  transform: translateY(0) scale(1.002);
-  transition: all 0.08s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 8px rgba(255,59,48,0.3);
+  transform: translateY(0) scale(0.995);
+  transition: transform 120ms var(--ease-apple), box-shadow 120ms var(--ease-apple);
+  box-shadow: 0 6px 18px rgba(255,59,48,0.22);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-secondary,
+  .btn-secondary:hover,
+  .btn-secondary:active,
+  .btn-danger,
+  .btn-danger:hover,
+  .btn-danger:active {
+    transition: none;
+    transform: none;
+  }
 }
 
 /* Invisible focus states - visible but not intrusive */

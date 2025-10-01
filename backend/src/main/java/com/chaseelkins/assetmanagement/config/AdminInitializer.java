@@ -45,18 +45,19 @@ public class AdminInitializer implements CommandLineRunner {
         String email = "admin@local";
         String tempPassword = generateStrongPassword();
 
-        User user = new User(
-                username,
-                email,
-                encoder.encode(tempPassword),
-                "System",
-                "Administrator",
-                "IT",
-                "Platform Admin",
-                null,
-                User.Role.SUPER_ADMIN,
-                true
-        );
+       User user = new User(
+    username,
+    email,
+    encoder.encode(tempPassword),
+    "System",
+    "Administrator",
+    "IT",
+    "Platform Admin",
+    null,
+    User.Role.SUPER_ADMIN,
+    true,  // active
+    true   // mustChangePassword: force admin to change password on first login
+);
         userRepository.save(user);
 
         log.warn("================ INITIAL ADMIN CREATED ================");

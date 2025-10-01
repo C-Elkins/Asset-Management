@@ -38,11 +38,25 @@ function decodeJwt(token) {
 
 export const authService = {
   async login(username, password) {
+    console.log('[AuthService] Starting login attempt for:', username);
     try {
+      console.log('[AuthService] Making API request to /auth/login');
       const { data } = await api.post('/auth/login', { username, password });
+      console.log('[AuthService] Login API response received:', {
+        hasAccessToken: !!data.accessToken,
+        hasRefreshToken: !!data.refreshToken,
+        hasUser: !!data.user,
+        expiresIn: data.expiresIn
+      });
+      
       const { accessToken, refreshToken, user, expiresIn, token } = data;
       const finalAccess = accessToken || token; // fallback to legacy field
-      if (!finalAccess) return { success: false, error: 'No access token returned' };
+      if (!finalAccess) {
+        console.error('[AuthService] No access token in response');
+        return { success: false, error: 'No access token returned' };
+      }
+      
+      console.log('[AuthService] Login successful');
       return {
         success: true,
         accessToken: finalAccess,
@@ -51,26 +65,10 @@ export const authService = {
         expiresIn: expiresIn || 0
       };
     } catch (error) {
+      console.error('[AuthService] Login error:', error);
       const network = error.code === 'ERR_NETWORK' || !error.response;
       // E2E/CI fallback: if backend is unreachable and demo creds are used, synthesize a valid login
-      try {
-        const isE2E =
-          (typeof navigator !== 'undefined' && (/Playwright/i.test(navigator.userAgent || '') || navigator.webdriver === true)) ||
-          (typeof window !== 'undefined' && window?.location && /[?&](e2e|e2eAuto)=1/.test(window.location.search)) ||
-          (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('E2E') === '1') ||
-          (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_E2E === '1');
-        if (network && isE2E && username === 'admin' && password === 'admin123') {
-          const fakeAccess = 'e2e.fake.token';
-          const fakeRefresh = 'e2e.fake.refresh';
-          return {
-            success: true,
-            accessToken: fakeAccess,
-            refreshToken: fakeRefresh,
-            user: inferUserFromToken(fakeAccess) || { username: 'admin', role: 'SUPER_ADMIN' },
-            expiresIn: 15 * 60, // 15 minutes
-          };
-        }
-      } catch { /* ignore fallback issues */ }
+      // Demo credential fallback removed for production
       if (network) {
         return { success: false, error: 'Cannot reach backend. Ensure backend is running.' };
       }
@@ -111,6 +109,17 @@ export const authService = {
       return { success: true, user: data };
     } catch {
       return { success: false };
+    }
+  },
+
+  async changePassword({ username, newPassword }) {
+    // Assumes backend exposes /users/{username}/change-password or similar endpoint
+    try {
+      // You may need to adjust endpoint and payload to match backend
+      await api.post(`/users/${encodeURIComponent(username)}/change-password`, { newPassword });
+      return true;
+    } catch (err) {
+      throw new Error(err?.response?.data?.message || 'Failed to change password');
     }
   },
 

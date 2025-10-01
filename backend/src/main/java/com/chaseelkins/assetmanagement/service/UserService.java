@@ -43,23 +43,24 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists: " + userDTO.getEmail());
         }
         
-        // Create user entity
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setDepartment(userDTO.getDepartment());
-        user.setJobTitle(userDTO.getJobTitle());
-        user.setPhoneNumber(userDTO.getPhoneNumber());
-        user.setRole(userDTO.getRole() != null ? userDTO.getRole() : User.Role.USER);
-        user.setActive(true);
-        
-        User savedUser = userRepository.save(user);
-        log.info("Successfully created user: {} with ID: {}", savedUser.getUsername(), savedUser.getId());
-        
-        return savedUser;
+    // Create user entity
+    User user = new User();
+    user.setUsername(userDTO.getUsername());
+    user.setEmail(userDTO.getEmail());
+    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    user.setFirstName(userDTO.getFirstName());
+    user.setLastName(userDTO.getLastName());
+    user.setDepartment(userDTO.getDepartment());
+    user.setJobTitle(userDTO.getJobTitle());
+    user.setPhoneNumber(userDTO.getPhoneNumber());
+    user.setRole(userDTO.getRole() != null ? userDTO.getRole() : User.Role.USER);
+    user.setActive(true);
+    user.setMustChangePassword(true); // Require password change on first login
+
+    User savedUser = userRepository.save(user);
+    log.info("Successfully created user: {} with ID: {}", savedUser.getUsername(), savedUser.getId());
+
+    return savedUser;
     }
     
     /**
@@ -240,10 +241,11 @@ public class UserService {
             throw new IllegalArgumentException("New password must be at least 6 characters long");
         }
         
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-        
-        log.info("Successfully changed password for user: {}", user.getUsername());
+    user.setPassword(passwordEncoder.encode(newPassword));
+    user.setMustChangePassword(false); // Password changed, no longer required
+    userRepository.save(user);
+
+    log.info("Successfully changed password for user: {}", user.getUsername());
     }
     
     /**
@@ -256,11 +258,12 @@ public class UserService {
         
         // Generate temporary password
         String tempPassword = generateTemporaryPassword();
-        user.setPassword(passwordEncoder.encode(tempPassword));
-        userRepository.save(user);
-        
-        log.info("Successfully reset password for user: {}", user.getUsername());
-        return tempPassword;
+    user.setPassword(passwordEncoder.encode(tempPassword));
+    user.setMustChangePassword(true); // Require password change on next login
+    userRepository.save(user);
+
+    log.info("Successfully reset password for user: {}", user.getUsername());
+    return tempPassword;
     }
     
     /**
@@ -331,6 +334,13 @@ public class UserService {
     private String generateTemporaryPassword() {
         // Simple temporary password generation
         return "TempPass" + System.currentTimeMillis() % 10000;
+    }
+
+    /**
+     * Save user directly (for admin operations)
+     */
+    public User updateUserDirect(User user) {
+        return userRepository.save(user);
     }
     
     /**

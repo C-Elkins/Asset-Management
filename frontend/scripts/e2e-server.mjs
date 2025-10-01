@@ -3,6 +3,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import rateLimit from 'express-rate-limit';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -70,8 +71,16 @@ if (!fs.existsSync(distDir)) {
   process.exit(1);
 }
 
-app.use(express.static(distDir));
-app.get('*', (_req, res) => {
+// Rate limiter: max 100 requests per 15 minutes per IP
+const frontendLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(frontendLimiter, express.static(distDir));
+app.get('*', frontendLimiter, (_req, res) => {
   res.sendFile(path.join(distDir, 'index.html'));
 });
 
