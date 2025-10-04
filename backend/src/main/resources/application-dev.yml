@@ -52,8 +52,8 @@ jwt:
 
 # Stripe API Keys for Development/Testing
 stripe:
-  api-key: "sk_test_51SE1M7RnSgrmRk1TxkwctZ6e5Xpun0pkOA8TdvUeKiqT1aTNwKwbwQWQMq6o11nzo8xTS8FhODhSLCJnkUXWXt6J00L2AjI7bm"
-  publishable-key: "pk_test_51SE1M7RnSgrmRk1TXlB3HyFWd0jPCj0ffgk4nLZlKhguHybdx7QblMdxZ4ve8Qn1gNt7eiMfbDn6eOK3zrKgnNJC00BXa2ya6q"
+  api-key: "${STRIPE_SECRET_KEY:your_stripe_test_key_here}"
+  publishable-key: "${STRIPE_PUBLISHABLE_KEY:your_publishable_key_here}"
   webhook-secret: "${STRIPE_WEBHOOK_SECRET:whsec_test_webhook_secret_here}"
   # Note: You'll need to set up webhook secret after configuring webhooks in Stripe Dashboard
   
