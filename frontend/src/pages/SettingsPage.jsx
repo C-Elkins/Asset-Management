@@ -1,35 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { User, Shield, Server, Bell, Palette, Globe, Save, RefreshCw } from 'lucide-react';
+import { User, Shield, Server, Bell, Save, RefreshCw } from 'lucide-react';
+import { getSettings, updateSettings, getDefaultSettings } from '../services/settingsService';
+import { useToast } from '../components/common/Toast.jsx';
 
 export const SettingsPage = () => {
+  const navigate = useNavigate();
+  const { addToast } = useToast();
   const [activeSection, setActiveSection] = useState('profile');
-  const [settings, setSettings] = useState({
-    profile: {
-      name: 'John Doe',
-      email: 'john.doe@company.com',
-      role: 'IT Administrator',
-      department: 'Information Technology'
-    },
-    security: {
-      twoFactorAuth: true,
-      sessionTimeout: 30,
-      passwordStrength: 'Strong',
-      lastPasswordChange: '2024-01-15'
-    },
-    system: {
-      backupEnabled: true,
-      maintenanceWindow: '02:00 - 04:00',
-      logLevel: 'INFO',
-      maxUsers: 50
-    },
-    notifications: {
-      emailNotifications: true,
-      pushNotifications: false,
-      maintenanceAlerts: true,
-      weeklyReports: true
-    }
-  });
+  const [settings, setSettings] = useState(getDefaultSettings());
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await getSettings();
+        if (mounted) setSettings(data);
+      } catch {
+        if (mounted) setError('Failed to load settings. Using last known values.');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const sections = [
     {
@@ -58,13 +56,25 @@ export const SettingsPage = () => {
     }
   ];
 
-  const handleSave = () => {
-    alert('Settings saved successfully!');
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    try {
+  const updated = await updateSettings(settings);
+      setSettings(updated);
+  addToast({ type: 'success', title: 'Settings saved', message: 'Your changes have been applied.' });
+    } catch {
+      setError('Failed to save settings. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleReset = () => {
     if (confirm('Reset all settings to default values?')) {
-      alert('Settings reset to defaults!');
+      const defaults = getDefaultSettings();
+      setSettings(defaults);
+      addToast({ type: 'info', title: 'Settings reset', message: 'Defaults loaded (not yet saved).' });
     }
   };
 
@@ -83,6 +93,29 @@ export const SettingsPage = () => {
 
   return (
     <div className="p-8 space-y-8">
+      {/* Quick Tiles */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[
+          { id: 'profile', title: 'Profile Settings', desc: 'Name, email, avatar' },
+          { id: 'system', title: 'System Preferences', desc: 'Theme, locale, density' },
+          { id: 'security', title: 'Security', desc: 'Password, MFA' },
+          { id: 'notifications', title: 'Notifications', desc: 'Alerts preferences' },
+          { id: 'privacy', title: 'Privacy & Data', desc: 'Consent, My Data, Deletion' },
+          { id: 'billing', title: 'Billing', desc: 'Subscription, invoices, payment methods' },
+        ].map(tile => (
+          <button
+            key={tile.id}
+            onClick={() => (tile.id === 'privacy') ? navigate('/app/privacy') : (tile.id === 'billing') ? navigate('/app/billing') : setActiveSection(tile.id)}
+            className={`text-left p-4 rounded-xl border transition ${activeSection===tile.id?'border-blue-300 bg-blue-50':'border-slate-200 hover:border-slate-300 bg-white'}`}
+          >
+            <p className="font-semibold text-slate-900">{tile.title}</p>
+            <p className="text-sm text-slate-600">{tile.desc}</p>
+          </button>
+        ))}
+      </div>
+      {loading && (
+        <div className="p-4 text-sm text-slate-600 bg-slate-50 border border-slate-200 rounded-lg">Loading settings…</div>
+      )}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -137,6 +170,9 @@ export const SettingsPage = () => {
           transition={{ duration: 0.4 }}
         >
           <div className="bg-white rounded-xl border border-slate-200 p-8">
+            {error && (
+              <div className="mb-4 p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded">{error}</div>
+            )}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <activeInfo.icon className="w-6 h-6 text-blue-600" strokeWidth={2} />
@@ -157,12 +193,13 @@ export const SettingsPage = () => {
                 </motion.button>
                 <motion.button 
                   onClick={handleSave}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-60"
+                  disabled={saving}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <Save className="w-4 h-4" />
-                  Save Changes
+                  {saving ? 'Saving…' : 'Save Changes'}
                 </motion.button>
               </div>
             </div>

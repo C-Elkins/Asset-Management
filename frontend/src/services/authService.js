@@ -40,14 +40,8 @@ export const authService = {
   async login(username, password) {
     console.log('[AuthService] Starting login attempt for:', username);
     try {
-      console.log('[AuthService] Making API request to /auth/login');
-      const { data } = await api.post('/auth/login', { username, password });
-      console.log('[AuthService] Login API response received:', {
-        hasAccessToken: !!data.accessToken,
-        hasRefreshToken: !!data.refreshToken,
-        hasUser: !!data.user,
-        expiresIn: data.expiresIn
-      });
+      // Backend expects 'email' field, but form uses 'username' input
+      const { data } = await api.post('/auth/login', { email: username, password });
       
       const { accessToken, refreshToken, user, expiresIn, token } = data;
       const finalAccess = accessToken || token; // fallback to legacy field
@@ -56,7 +50,6 @@ export const authService = {
         return { success: false, error: 'No access token returned' };
       }
       
-      console.log('[AuthService] Login successful');
       return {
         success: true,
         accessToken: finalAccess,
@@ -74,9 +67,55 @@ export const authService = {
       }
       const status = error.response?.status;
       const message = error.response?.data?.message;
-      if (status === 401) return { success: false, error: message || 'Invalid username or password.' };
+      if (status === 401) return { success: false, error: message || 'Invalid email or password.' };
       if (status >= 500) return { success: false, error: 'Server error. Try again.' };
       return { success: false, error: message || 'Login failed.' };
+    }
+  },
+
+  async register({ username, email, password }) {
+    try {
+      await api.post('/auth/register', { username, email, password });
+      return true;
+    } catch (e) {
+      throw new Error(e?.response?.data?.message || 'Registration failed');
+    }
+  },
+
+  async forgotPassword(email) {
+    try {
+      await api.post('/auth/forgot-password', { email });
+      return true;
+    } catch {
+      // fallback: always succeed for security (do not reveal accounts)
+      return true;
+    }
+  },
+
+  async resetPassword({ token, newPassword }) {
+    try {
+      await api.post('/auth/reset-password', { token, newPassword });
+      return true;
+    } catch (e) {
+      throw new Error(e?.response?.data?.message || 'Reset failed');
+    }
+  },
+
+  async enrollTotp() {
+    try {
+      const { data } = await api.post('/auth/mfa/totp/enroll');
+      return data; // { secret, qrCodeDataUri }
+    } catch (e) {
+      throw new Error(e?.response?.data?.message || 'Failed to start TOTP enrollment');
+    }
+  },
+
+  async verifyTotp({ code }) {
+    try {
+      await api.post('/auth/mfa/totp/verify', { code });
+      return true;
+    } catch (e) {
+      throw new Error(e?.response?.data?.message || 'Invalid code');
     }
   },
 

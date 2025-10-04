@@ -34,3 +34,6 @@ frontend/playwright-report/
 
 # Docker
 .docker/
+
+# Private notes (not committed)
+private-notes/

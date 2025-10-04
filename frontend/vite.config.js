@@ -3,7 +3,13 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      // Explicitly configure for React 19
+      jsxRuntime: 'automatic',
+      babel: {
+        plugins: []
+      }
+    }),
     {
       name: 'healthcheck',
       configureServer(server) {
@@ -23,10 +29,10 @@ export default defineConfig({
     strictPort: false,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080/api/v1',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: (path) => path.replace(/^\/api/, '/api/v1')
       }
     }
   },

@@ -4,6 +4,7 @@ import com.chaseelkins.assetmanagement.dto.AssetDTO;
 import com.chaseelkins.assetmanagement.model.Asset;
 import com.chaseelkins.assetmanagement.model.Category;
 import com.chaseelkins.assetmanagement.model.User;
+import com.chaseelkins.assetmanagement.model.Webhook.WebhookEvent;
 import com.chaseelkins.assetmanagement.repository.AssetRepository;
 import com.chaseelkins.assetmanagement.repository.CategoryRepository;
 import com.chaseelkins.assetmanagement.repository.UserRepository;
@@ -28,11 +29,17 @@ public class AssetService {
     private final AssetRepository assetRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final WebhookService webhookService;
+    private final SlackService slackService;
+    private final EmailService emailService;
     
-    public AssetService(AssetRepository assetRepository, CategoryRepository categoryRepository, UserRepository userRepository) {
+    public AssetService(AssetRepository assetRepository, CategoryRepository categoryRepository, UserRepository userRepository, WebhookService webhookService, SlackService slackService, EmailService emailService) {
         this.assetRepository = assetRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.webhookService = webhookService;
+        this.slackService = slackService;
+        this.emailService = emailService;
     }
     
     /**
@@ -71,6 +78,12 @@ public class AssetService {
         
         Asset savedAsset = assetRepository.save(asset);
         log.info("Successfully created asset: {} with ID: {}", savedAsset.getAssetTag(), savedAsset.getId());
+        
+        // Trigger webhook
+        webhookService.triggerWebhooks(WebhookEvent.ASSET_CREATED, AssetDTO.fromEntity(savedAsset));
+        
+        // Send Slack notification
+        slackService.sendAssetCreatedNotification(savedAsset);
         
         return savedAsset;
     }
@@ -114,6 +127,12 @@ public class AssetService {
         
         Asset updatedAsset = assetRepository.save(existingAsset);
         log.info("Successfully updated asset: {}", updatedAsset.getAssetTag());
+        
+        // Trigger webhook
+        webhookService.triggerWebhooks(WebhookEvent.ASSET_UPDATED, AssetDTO.fromEntity(updatedAsset));
+        
+        // Send Slack notification
+        slackService.sendAssetUpdatedNotification(updatedAsset);
         
         return updatedAsset;
     }
@@ -217,6 +236,9 @@ public class AssetService {
         
         Asset updatedAsset = assetRepository.save(asset);
         log.info("Successfully assigned asset {} to user {}", asset.getAssetTag(), user.getFullName());
+        
+        // Send email notification
+        emailService.sendAssetAssignedEmail(updatedAsset, user);
         
         return updatedAsset;
     }
@@ -359,7 +381,11 @@ public class AssetService {
      */
     public void deleteAsset(Long assetId) {
         log.info("Soft deleting asset with ID: {}", assetId);
+        Asset asset = getAssetById(assetId);
         changeAssetStatus(assetId, Asset.AssetStatus.RETIRED);
+        
+        // Trigger webhook
+        webhookService.triggerWebhooks(WebhookEvent.ASSET_DELETED, AssetDTO.fromEntity(asset));
     }
     
     /**

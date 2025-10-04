@@ -5,6 +5,14 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
+    # Security headers (adjust CSP to your app if enabling)
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+    # HSTS is only honored over HTTPS; safe to send, has no effect over HTTP
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+
     # Health endpoint
     location = /healthz {
         add_header Content-Type text/plain;
@@ -28,6 +36,22 @@ server {
 
     # SPA fallback
     location / {
+        # Cache immutable assets aggressively; keep index.html short to allow rapid deploys
+        location ~* \.(?:js|mjs|css|png|jpg|jpeg|gif|svg|ico|webp|woff2?)$ {
+            expires 1y;
+            add_header Cache-Control "public, immutable";
+            try_files $uri =404;
+        }
+
+        # Default: serve index.html for SPA routes; avoid caching HTML
+        add_header Cache-Control "no-store";
         try_files $uri /index.html;
     }
+
+    # Compression (optional but recommended)
+    gzip on;
+    gzip_comp_level 5;
+    gzip_min_length 256;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss image/svg+xml;
 }

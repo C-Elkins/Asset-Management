@@ -1,0 +1,26 @@
+filebeat.inputs:
+  - type: filestream
+    id: backend-json-logs
+    enabled: true
+    paths:
+      - /hostlogs/backend/*.json
+    parsers:
+      - ndjson:
+          overwrite_keys: true
+          add_error_key: true
+
+  - type: filestream
+    id: root-logs
+    enabled: true
+    paths:
+      - /hostlogs/root/*.log
+
+processors:
+  - add_fields:
+      target: app
+      fields:
+        name: it-asset-management
+        env: dev
+
+output.logstash:
+  hosts: ["logstash:5044"]

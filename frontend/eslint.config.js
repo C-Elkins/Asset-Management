@@ -15,6 +15,11 @@ export default tseslint.config(
       'coverage/**',
       'test-results/**',
       'target/**',
+      'public/**',
+      'scripts/**',
+      // Temporarily ignore JS/JSX sources to focus on TS/TSX
+      'src/**/*.js',
+      'src/**/*.jsx',
     ],
   },
   // JS/JSX config

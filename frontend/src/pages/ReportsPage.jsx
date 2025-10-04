@@ -1,61 +1,15 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FileText, Download, TrendingUp, Users, Server, AlertTriangle } from 'lucide-react';
+import { FileText, TrendingUp, Users, Server, AlertTriangle, UploadCloud, Sparkles } from 'lucide-react';
 
 export const ReportsPage = () => {
   const [activeReport, setActiveReport] = useState('overview');
-  
   const reports = [
-    {
-      id: 'overview',
-      title: 'System Overview',
-      icon: TrendingUp,
-      description: 'Complete system analytics and insights',
-      data: {
-        totalAssets: 127,
-        activeUsers: 24,
-        pendingMaintenance: 8,
-        systemHealth: 98.5
-      }
-    },
-    {
-      id: 'assets',
-      title: 'Asset Reports', 
-      icon: Server,
-      description: 'Detailed asset utilization and lifecycle reports',
-      data: {
-        totalValue: '$284,500',
-        avgAge: '2.3 years',
-        utilizationRate: '87%',
-        replacementNeeded: 12
-      }
-    },
-    {
-      id: 'users',
-      title: 'User Activity',
-      icon: Users, 
-      description: 'User engagement and access patterns',
-      data: {
-        dailyActiveUsers: 18,
-        weeklyLogins: 142,
-        topUser: 'John Doe',
-        avgSessionTime: '45 min'
-      }
-    },
-    {
-      id: 'maintenance',
-      title: 'Maintenance Reports',
-      icon: AlertTriangle,
-      description: 'Service schedules and completion metrics', 
-      data: {
-        completedTasks: 34,
-        upcomingTasks: 12,
-        avgResponseTime: '4.2 hours',
-        satisfactionRate: '96%'
-      }
-    }
+    { id: 'overview', title: 'System Overview', icon: TrendingUp, description: 'Complete system analytics and insights' },
+    { id: 'assets', title: 'Asset Reports', icon: Server, description: 'Detailed asset utilization and lifecycle reports' },
+    { id: 'users', title: 'User Activity', icon: Users, description: 'User engagement and access patterns' },
+    { id: 'maintenance', title: 'Maintenance Reports', icon: AlertTriangle, description: 'Service schedules and completion metrics' }
   ];
-  
   const activeReportData = reports.find(r => r.id === activeReport);
   
   return (
@@ -116,48 +70,47 @@ export const ReportsPage = () => {
               <p className="text-slate-600 text-sm">{activeReportData.description}</p>
             </div>
           </div>
-          <motion.button 
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => alert(`Downloading ${activeReportData.title} report...`)}
-          >
-            <Download className="w-4 h-4" />
-            Download
-          </motion.button>
-        </div>
-        
-        {/* Report Data Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {Object.entries(activeReportData.data).map(([key, value], index) => (
-            <motion.div
-              key={key}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className="bg-slate-50 rounded-lg p-4 text-center"
+          <div className="flex items-center gap-3">
+            <motion.button 
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-800 rounded-lg hover:bg-slate-200 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => document.getElementById('reportImportInput')?.click()}
             >
-              <p className="text-2xl font-bold text-slate-900 mb-1">{value}</p>
-              <p className="text-sm text-slate-600 capitalize">
-                {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
-              </p>
-            </motion.div>
-          ))}
+              <UploadCloud className="w-4 h-4" />
+              Import Data
+            </motion.button>
+            <input id="reportImportInput" type="file" accept="application/json" className="hidden" onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                try {
+                  const json = JSON.parse(String(reader.result || '{}'));
+                  console.log('Imported report data (placeholder)', json);
+                  alert('Data imported. AI analysis will be available shortly.');
+                } catch {
+                  alert('Invalid JSON file.');
+                }
+              };
+              reader.readAsText(file);
+            }} />
+            <motion.button 
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => alert('AI insights coming soon: we will summarize your imported data and suggest actions.')}
+            >
+              <Sparkles className="w-4 h-4" />
+              AI Insights
+            </motion.button>
+          </div>
         </div>
-        
-        {/* Mock Chart Area */}
-        <div className="mt-8 p-6 bg-slate-50 rounded-lg">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-slate-600" />
-            <h3 className="font-semibold text-slate-900">Trend Analysis</h3>
-          </div>
-          <div className="h-48 bg-white rounded border-2 border-dashed border-slate-300 flex items-center justify-center">
-            <div className="text-center text-slate-500">
-              <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p className="font-medium">Interactive Chart</p>
-              <p className="text-sm">Data visualization would appear here</p>
-            </div>
-          </div>
+        {/* Empty state / placeholder until data is imported */}
+        <div className="mt-6 p-6 bg-slate-50 rounded-lg text-center text-slate-600">
+          <FileText className="w-10 h-10 mx-auto mb-2 opacity-50" />
+          <p className="font-medium">No data loaded yet</p>
+          <p className="text-sm">Import a JSON export or connect your data source to generate reports.</p>
         </div>
       </motion.div>
     </div>

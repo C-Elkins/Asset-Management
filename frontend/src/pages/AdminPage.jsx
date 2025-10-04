@@ -61,6 +61,9 @@ const AdminPage = () => {
         <div className="px-6 py-4">
           <h1 className="text-2xl font-bold text-gray-900">System Administration</h1>
           <p className="text-gray-600 mt-1">Manage users, roles, and system settings</p>
+          <div className="mt-3 text-sm">
+            <InviteUserInline onInvited={loadUsers} />
+          </div>
         </div>
       </motion.div>
 
@@ -622,3 +625,69 @@ const CreateUserForm = ({ onClose, onSuccess }) => {
 };
 
 export default AdminPage;
+
+// Inline Invite User component
+const InviteUserInline = ({ onInvited }) => {
+  const [email, setEmail] = React.useState('');
+  const [role, setRole] = React.useState('USER');
+  const [sending, setSending] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+
+  const submit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    setMessage('');
+    try {
+      const res = await fetch('/api/v1/admin/invitations', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, role })
+      });
+      if (res.ok) {
+        setMessage('Invitation sent');
+        setEmail('');
+        setRole('USER');
+        onInvited?.();
+      } else {
+        const text = await res.text();
+        setMessage(text || 'Failed to send invite');
+      }
+    } catch {
+      setMessage('Failed to send invite');
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <form onSubmit={submit} className="flex items-end gap-2">
+      <div>
+        <label className="block text-gray-700">Invite user by email</label>
+        <input
+          type="email"
+          required
+          placeholder="name@company.com"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+      <div>
+        <label className="block text-gray-700">Role</label>
+        <select value={role} onChange={e => setRole(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-md">
+          <option value="USER">User</option>
+          <option value="MANAGER">Manager</option>
+          <option value="IT_ADMIN">IT Admin</option>
+          <option value="SUPER_ADMIN">Super Admin</option>
+        </select>
+      </div>
+      <button type="submit" disabled={sending} className="h-10 px-4 bg-blue-600 text-white rounded-md">
+        {sending ? 'Sending…' : 'Send invite'}
+      </button>
+      {message && <span className="text-sm text-gray-600 ml-2">{message}</span>}
+    </form>
+  );
+};

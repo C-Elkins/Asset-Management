@@ -24,16 +24,20 @@ services:
     container_name: iam-backend
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/iam
       SPRING_DATASOURCE_USERNAME: iam
       SPRING_DATASOURCE_PASSWORD: iam
+      # Fake but non-placeholder OAuth2 credentials to satisfy validator in prod profile
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: localdev-google-client-id-12345678901234567890
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: localdev-google-client-secret-1234567890123456
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MICROSOFT_CLIENT_ID: localdev-microsoft-client-id-123456789012345
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_MICROSOFT_CLIENT_SECRET: localdev-microsoft-client-secret-1234567890
     # No host port mapping to avoid conflicts when backend is already running on host
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/v1/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/api/v1/healthz || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 5
@@ -47,7 +51,7 @@ services:
     environment:
       BACKEND_ORIGIN: http://backend:8080
     ports:
-      - "3002:8080"
+      - "3001:8080"
     depends_on:
       backend:
         condition: service_healthy

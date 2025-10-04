@@ -392,8 +392,8 @@ p {
   font-weight: 400;
 }
 
-/* Executive Button Styles - Login Form */
-.login-form button {
+/* Executive Button Styles - Login Form - Primary Submit Button Only */
+.login-form button[type="submit"]:not(.w-full.flex) {
   width: 100%;
   padding: 0.875rem 1.25rem;
   background: var(--apple-blue-primary);
@@ -412,7 +412,7 @@ p {
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
 }
 
-.login-form button:hover:not(:disabled) {
+.login-form button[type="submit"]:not(.w-full.flex):hover:not(:disabled) {
   transform: translateY(-1px) scale(1.005);
   /* Use a darker hover tone for stronger text contrast */
   background: var(--apple-blue-pressed);
@@ -423,22 +423,22 @@ p {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-.login-form button:active:not(:disabled) {
+.login-form button[type="submit"]:not(.w-full.flex):active:not(:disabled) {
   transform: translateY(0) scale(0.995);
   transition-duration: 120ms;
   box-shadow: 0 6px 18px rgba(0,122,255,0.18);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-form button,
-  .login-form button:hover:not(:disabled),
-  .login-form button:active:not(:disabled) {
+  .login-form button[type="submit"]:not(.w-full.flex),
+  .login-form button[type="submit"]:not(.w-full.flex):hover:not(:disabled),
+  .login-form button[type="submit"]:not(.w-full.flex):active:not(:disabled) {
     transition: none;
     transform: none;
   }
 }
 
-.login-form button:disabled {
+.login-form button[type="submit"]:not(.w-full.flex):disabled {
   opacity: 0.5;
   cursor: not-allowed;
   transform: none;

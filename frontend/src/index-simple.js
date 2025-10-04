@@ -5,7 +5,7 @@ console.log('JavaScript is loading...');
 const App = () => {
   return React.createElement('div', 
     { style: { padding: '20px', fontFamily: 'Arial' } },
-    React.createElement('h1', null, 'IT Asset Management System'),
+  React.createElement('h1', null, 'Asset Management by Krubles'),
     React.createElement('p', null, 'Basic React app is working!'),
     React.createElement('button', 
       { onClick: () => alert('Button clicked!') }, 

@@ -18,9 +18,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "assets")
+@Table(name = "assets", indexes = {
+    @Index(name = "idx_assets_tenant", columnList = "tenant_id"),
+    @Index(name = "idx_assets_asset_tag", columnList = "asset_tag"),
+    @Index(name = "idx_assets_status", columnList = "status")
+})
 @EntityListeners(AuditingEntityListener.class)
-public class Asset {
+public class Asset extends TenantAwareEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +72,7 @@ public class Asset {
     private AssetStatus status = AssetStatus.AVAILABLE;
     
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "condition_rating", nullable = false)
     private AssetCondition condition = AssetCondition.GOOD;
     
     @Column(name = "warranty_expiry")

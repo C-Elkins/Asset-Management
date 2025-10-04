@@ -94,6 +94,9 @@ public interface AssetRepository extends JpaRepository<Asset, Long> {
     // Count assets by status
     long countByStatus(Asset.AssetStatus status);
     
+    // Count assets by tenant
+    long countByTenantId(Long tenantId);
+    
     // Count assets by category
     long countByCategory(Category category);
     

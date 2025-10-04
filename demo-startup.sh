@@ -1,9 +1,9 @@
 #!/bin/bash
-# 🚀 IT Asset Management System - Demo Startup Script
+# 🚀 Asset Management System - Demo Startup Script
 # Run this script to start your demo
 
 clear
-echo "🚀 Starting IT Asset Management System Demo"
+echo "🚀 Starting Asset Management System Demo"
 echo "==========================================="
 echo ""
 
@@ -23,7 +23,7 @@ cd backend
 echo "🔄 Starting Spring Boot application..."
 echo "⏰ This will take about 30-60 seconds..."
 echo ""
-echo "💡 When you see '🚀 IT Asset Management System Started Successfully!' your demo is ready!"
+echo "💡 When you see '🚀 Asset Management System Started Successfully!' your demo is ready!"
 echo ""
 echo "🌐 Demo URLs will be available at:"
 echo "   📊 API Documentation: http://localhost:8080/api/v1/swagger-ui.html"

@@ -5,11 +5,13 @@ import com.chaseelkins.assetmanagement.dto.CategorySummaryDTO;
 import com.chaseelkins.assetmanagement.model.Category;
 import com.chaseelkins.assetmanagement.service.CategoryService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/categories")
+@Validated
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173"})
 public class CategoryController {
 
@@ -59,7 +62,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getById(@PathVariable Long id) {
+    public ResponseEntity<Category> getById(@PathVariable @Min(1) Long id) {
         try {
             return ResponseEntity.ok(categoryService.getCategoryById(id));
         } catch (RuntimeException e) {
@@ -76,7 +79,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('IT_ADMIN','MANAGER','SUPER_ADMIN')")
-    public ResponseEntity<Category> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO dto) {
+    public ResponseEntity<Category> update(@PathVariable @Min(1) Long id, @Valid @RequestBody CategoryDTO dto) {
         try {
             return ResponseEntity.ok(categoryService.updateCategory(id, dto));
         } catch (RuntimeException e) {
@@ -86,7 +89,7 @@ public class CategoryController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('IT_ADMIN','SUPER_ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable @Min(1) Long id) {
         try {
             categoryService.deleteCategory(id);
             return ResponseEntity.noContent().build();

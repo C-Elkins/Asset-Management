@@ -1,10 +1,19 @@
 spring:
+  config:
+    import: optional:application-sentry.yml
   profiles:
     active: dev
   
   application:
-    name: IT Asset Management System
+    name: Asset Management System
     version: 1.0.0
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      file-size-threshold: 2KB
 
   jpa:
     hibernate:
@@ -28,16 +37,71 @@ spring:
       path: /h2-console
 
   security:
-    cors:
-      allowed-origins: "http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3006,http://127.0.0.1:3006"
-      allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
-      allowed-headers: "*"
-      allow-credentials: true
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: "${GOOGLE_CLIENT_ID}"
+            client-secret: "${GOOGLE_CLIENT_SECRET}"
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/google"
+            authorization-grant-type: authorization_code
+          microsoft:
+            client-id: ${MICROSOFT_CLIENT_ID}
+            client-secret: ${MICROSOFT_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+              - User.Read
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/microsoft"
+            client-name: Microsoft
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          microsoft:
+            authorization-uri: https://login.microsoftonline.com/${MICROSOFT_TENANT_ID:common}/oauth2/v2.0/authorize
+            token-uri: https://login.microsoftonline.com/${MICROSOFT_TENANT_ID:common}/oauth2/v2.0/token
+            user-info-uri: https://graph.microsoft.com/v1.0/me
+            user-name-attribute: id
 
 server:
   port: 8080
   servlet:
     context-path: /api/v1
+  
+  # Request size limits
+  max-http-header-size: 8KB
+
+# Stripe Configuration
+# REQUIRED: Set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET environment variables
+stripe:
+  api-key: ${STRIPE_SECRET_KEY}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  price-ids:
+    free: ${STRIPE_FREE_PRICE_ID:price_free}
+    professional-monthly: ${STRIPE_PRO_MONTHLY_PRICE_ID:price_pro_monthly}
+    professional-annual: ${STRIPE_PRO_ANNUAL_PRICE_ID:price_pro_annual}
+    enterprise-monthly: ${STRIPE_ENTERPRISE_MONTHLY_PRICE_ID:price_enterprise_monthly}
+    enterprise-annual: ${STRIPE_ENTERPRISE_ANNUAL_PRICE_ID:price_enterprise_annual}
+    metered-assets: ${STRIPE_METERED_ASSETS_PRICE_ID:price_metered_assets}
+  plans:
+    free:
+      asset-limit: 50
+      user-limit: 3
+    professional:
+      asset-limit: 500
+      user-limit: 25
+    enterprise:
+      asset-limit: -1  # Unlimited
+      user-limit: -1    # Unlimited
 
 management:
   endpoints:
@@ -65,8 +129,9 @@ logging:
 
 # JWT Configuration
 jwt:
-  # In production supply via environment: export JWT_SECRET=... (length >= 32 chars)
-  secret: "${JWT_SECRET:mySecretKey123456789012345678901234567890}"
+  # REQUIRED: Set JWT_SECRET environment variable (minimum 32 characters)
+  # Generate with: openssl rand -base64 64
+  secret: "${JWT_SECRET}"
   # Legacy property (will be superseded by access-expiration if present)
   expiration: 86400000 # 24 hours in milliseconds (fallback)
   # New granular expirations
@@ -82,8 +147,8 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
   info:
-    title: IT Asset Management System API
-    description: RESTful API for managing IT assets, users, and maintenance records
+    title: Asset Management System API
+    description: RESTful API for managing assets, users, and maintenance records
     version: 1.0.0
     contact:
       name: Chase Elkins
@@ -91,9 +156,66 @@ springdoc:
 
 # Custom Application Properties
 app:
-  name: IT Asset Management System
-  description: Full-stack application for IT asset tracking
+  name: Asset Management System
+  description: Full-stack application for asset tracking
   version: 1.0.0
+  url: "${APP_URL:http://localhost:3001}"  # Frontend URL for email links
   contact:
     name: Chase Elkins
     email: chase@example.com
+  
+  # CORS Configuration - Override in production with environment variable
+  cors:
+    allowed-origins: "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3005,http://127.0.0.1:3005,http://localhost:3006,http://127.0.0.1:3006"
+  
+  # Request Size Limits
+  upload:
+    max-file-size: 10485760  # 10 MB in bytes
+  request:
+    max-body-size: 10485760  # 10 MB in bytes
+    max-header-size: 8192     # 8 KB in bytes
+
+# Slack Integration (Admin Dashboard Feature - Not Visible on Marketing Pages)
+slack:
+  webhook:
+    url: "${SLACK_WEBHOOK_URL:}"  # Set via environment variable
+  notifications:
+    enabled: "${SLACK_NOTIFICATIONS_ENABLED:false}"  # Set to true when webhook is configured
+
+# Microsoft Teams Integration (Admin Dashboard Feature)
+teams:
+  webhook:
+    url: "${TEAMS_WEBHOOK_URL:}"  # Set via environment variable
+  notifications:
+    enabled: "${TEAMS_NOTIFICATIONS_ENABLED:false}"  # Set to true when webhook is configured
+
+# Email Notifications
+email:
+  notifications:
+    enabled: "${EMAIL_NOTIFICATIONS_ENABLED:false}"  # Set to true when SMTP is configured
+  from: "${EMAIL_FROM:noreply@krubles.com}"
+
+spring.mail:
+  host: "${SMTP_HOST:localhost}"
+  port: "${SMTP_PORT:587}"
+  username: "${SMTP_USERNAME:}"
+  password: "${SMTP_PASSWORD:}"
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+
+# Scheduled Task Configuration
+scheduling:
+  maintenance-check:
+    cron: "0 0 8 * * *"  # Run daily at 8:00 AM
+  warranty-check:
+    cron: "0 30 8 * * *"  # Run daily at 8:30 AM
+  rate-limit-cleanup:
+    cron: "0 0 * * * *"  # Run every hour

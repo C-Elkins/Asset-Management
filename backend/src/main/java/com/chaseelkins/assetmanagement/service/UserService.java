@@ -3,6 +3,7 @@ package com.chaseelkins.assetmanagement.service;
 import com.chaseelkins.assetmanagement.dto.UserDTO;
 import com.chaseelkins.assetmanagement.model.User;
 import com.chaseelkins.assetmanagement.repository.UserRepository;
+import com.chaseelkins.assetmanagement.validation.PasswordStrengthValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -22,10 +23,17 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private final PasswordStrengthValidator passwordValidator;
     
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, 
+                      PasswordEncoder passwordEncoder, 
+                      EmailService emailService,
+                      PasswordStrengthValidator passwordValidator) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
+        this.passwordValidator = passwordValidator;
     }
     
     /**
@@ -43,6 +51,9 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists: " + userDTO.getEmail());
         }
         
+        // Validate password strength
+        passwordValidator.validatePasswordOrThrow(userDTO.getPassword());
+        
     // Create user entity
     User user = new User();
     user.setUsername(userDTO.getUsername());
@@ -59,6 +70,9 @@ public class UserService {
 
     User savedUser = userRepository.save(user);
     log.info("Successfully created user: {} with ID: {}", savedUser.getUsername(), savedUser.getId());
+
+    // Send welcome email
+    emailService.sendWelcomeEmail(savedUser);
 
     return savedUser;
     }
@@ -236,10 +250,8 @@ public class UserService {
             throw new IllegalArgumentException("Current password is incorrect");
         }
         
-        // Validate new password
-        if (newPassword == null || newPassword.length() < 6) {
-            throw new IllegalArgumentException("New password must be at least 6 characters long");
-        }
+        // Validate new password strength
+        passwordValidator.validatePasswordOrThrow(newPassword);
         
     user.setPassword(passwordEncoder.encode(newPassword));
     user.setMustChangePassword(false); // Password changed, no longer required

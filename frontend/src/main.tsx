@@ -6,6 +6,31 @@ import './styles/globals.css';
 import './styles/components.css';
 import './index.css';
 
+// ---- Boot Diagnostics (temporary) ----
+// These logs help trace a blank screen issue by confirming progressive milestones.
+// Remove after issue is resolved.
+const bootMark = (label: string, data?: any) => {
+	try {
+		console.log(`🟢 BOOT:${label}`, data ?? '');
+	} catch {}
+};
+bootMark('script-loaded', { ts: Date.now(), location: window.location.href });
+
+// Capture uncaught errors & promise rejections to surface silent failures.
+declare global {
+	interface Window { __HAS_GLOBAL_ERROR_HANDLERS__?: boolean }
+}
+if (!(window as any).__HAS_GLOBAL_ERROR_HANDLERS__) {
+	(window as any).__HAS_GLOBAL_ERROR_HANDLERS__ = true;
+	window.addEventListener('error', (e) => {
+		console.error('🔴 GlobalError', e.error || e.message, e.filename, e.lineno, e.colno);
+	});
+	window.addEventListener('unhandledrejection', (e) => {
+		console.error('🔴 UnhandledPromiseRejection', e.reason);
+	});
+	bootMark('global-handlers-registered');
+}
+
 const container = document.getElementById('root') as HTMLElement;
 const root = createRoot(container);
 const queryClient = new QueryClient();

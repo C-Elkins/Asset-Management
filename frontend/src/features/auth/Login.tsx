@@ -72,8 +72,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           >
             <Package size={32} className="text-white" />
           </motion.div>
-          {/* Heading text must match /IT Asset Management Login/i for tests */}
-          <h1 className="text-3xl font-bold text-gray-900" data-testid="login-heading">IT Asset Management Login</h1>
+          {/* Heading text must match /Asset Management by Krubles Login/i for tests */}
+          <h1 className="text-3xl font-bold text-gray-900" data-testid="login-heading">Asset Management by Krubles Login</h1>
           <p className="text-gray-600 mt-2">Sign in to continue</p>
         </motion.div>
 
