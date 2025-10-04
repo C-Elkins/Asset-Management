@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="../Krubles-Logos/krubles-banner.svg" alt="Krubles Asset Management Banner" width="100%">
-</p>
-
 <h1 align="center">🚀 Krubles Asset Management (KAM)</h1>
 
 <p align="center">
