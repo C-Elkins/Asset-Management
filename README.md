@@ -36,12 +36,30 @@
 - **Advanced Search & Filtering** - Find assets instantly
 - **Bulk Operations** - Import, export, and update hundreds of assets at once
 
+### 🏢 Multi-Tenant SaaS Architecture
+- **Complete Tenant Isolation** - Row-level security with database constraints
+- **Subdomain Routing** - `{tenant}.krubles.com` automatic routing
+- **Tenant Context** - Thread-safe request scoping with Spring AOP
+- **13+ Multi-Tenant Entities** - Assets, users, categories, API keys, and more
+- **Tenant-Aware Filtering** - Automatic query filtering via Hibernate interceptors
+- **Self-Service Signup** - Automated tenant provisioning
+
+### 💳 Stripe Integration & Billing
+- **Usage-Based Billing** - Metered pricing for API calls, storage, assets
+- **Subscription Management** - Create, update, cancel subscriptions via API
+- **Webhook Processing** - Real-time payment events (succeeded, failed, disputes)
+- **Customer Portal** - Self-service billing management
+- **Invoice Generation** - Automatic invoicing with Stripe
+- **Multiple Payment Methods** - Cards, ACH, SEPA, and more
+- **Revenue Recognition** - Automated with Stripe Billing
+
 ### 🔗 Integrations (11 Live!)
 - ✅ **REST API** - Full programmatic access with OpenAPI docs
 - ✅ **Google OAuth 2.0** - Sign in with Google accounts
 - ✅ **Microsoft OAuth / Azure AD** - Enterprise SSO with Microsoft
 - ✅ **JWT Authentication** - Secure, stateless token-based auth
 - ✅ **API Keys & Rate Limiting** - Programmatic access with bcrypt-hashed keys
+- ✅ **Stripe Payments** - Complete subscription & usage-based billing
 - ✅ **CSV Import/Export** - Standard data exchange
 - ✅ **Excel Import/Export** - Direct .xlsx file support with formatting
 - ✅ **Webhooks** - Real-time event notifications to any endpoint
@@ -77,6 +95,15 @@
 - **Prometheus Metrics** - Full metric export
 - **Structured Logging** - JSON logs with correlation IDs
 - **Performance Monitoring** - Request timing & throughput
+
+### 📊 Production Monitoring Stack
+- **Sentry** - Error tracking & performance monitoring (7.10.0)
+- **Prometheus + Grafana** - Metrics collection & visualization
+- **ELK Stack** - Elasticsearch, Logstash, Kibana for log management
+- **Uptime Kuma** - Uptime monitoring & status pages
+- **AlertManager** - Prometheus alert routing & notifications
+- **Filebeat** - Log shipping to Logstash
+- **Docker Compose** - Complete monitoring infrastructure included
 
 ---
 
@@ -598,7 +625,7 @@ If you find Krubles useful, please consider giving us a star on GitHub! It helps
 
 **Built with ❤️ by the Krubles team**
 
-*Making IT asset management simple, powerful, and enjoyable.*
+*Making asset management simple, powerful, and enjoyable.*
 
 ---
 

@@ -1,35 +1,14 @@
-# Contributing to Asset Management System by Krubles™
+# Contributing to Krubles Asset Management
 
-Thank you for your interest in contributing to the Asset Management System by Krubles LLC! We welcome contributions from the community while maintaining strict intellectual property protection.
+Thank you for your interest in contributing to Krubles Asset Management! We welcome contributions from the community.
 
-## ⚠️ Important Legal Notice
+## 📜 Code of Conduct
 
-**By contributing to this project, you agree to the following:**
+By participating in this project, you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before contributing.
 
-1. **All contributions become the exclusive property of Krubles LLC**
-2. You assign all intellectual property rights (including copyright, patent rights, and trade secrets) to Krubles LLC
-3. You waive any moral rights or right to attribution
-4. You agree that Krubles LLC may use your contributions in any way, including in commercial products
-5. You confirm you have the right to make these assignments and that your contributions do not violate any third-party rights
+## 🤝 How to Contribute
 
-**Before making your first contribution, you MUST sign our Contributor License Agreement (CLA).** See the [CLA Requirements](#cla-requirements) section below.
-
-## 🚫 Prohibited Activities
-
-To protect Krubles LLC's intellectual property, the following activities are **strictly prohibited**:
-
-- ❌ **Forking this repository** (except for bug reports or security research under our Security Policy)
-- ❌ Creating derivative works or adaptations
-- ❌ Redistributing the code or any portion of it
-- ❌ Using any code from this project in other projects
-- ❌ Commercial use without a separate commercial license from Krubles LLC
-- ❌ Reverse engineering or attempting to extract trade secrets
-
-**Unauthorized forking or code reuse will be reported to GitHub and may result in legal action.**
-
-## ✅ How You Can Contribute
-
-We welcome the following types of contributions:
+We welcome contributions in many forms:
 
 ### 1. Bug Reports
 
@@ -39,14 +18,34 @@ Help us improve by reporting bugs! Before submitting:
 - Use our bug report template
 - Include clear reproduction steps
 - Provide relevant logs and screenshots
+- Specify your environment (OS, browser, versions)
+
+**To report a bug:**
+1. Go to [Issues](https://github.com/C-Elkins/IT-Asset-Management/issues)
+2. Click "New Issue"
+3. Select "Bug Report" template
+4. Fill in all required fields
 
 ### 2. Security Vulnerabilities
 
-**Do not report security issues publicly!** See our [Security Policy](./SECURITY.md) for responsible disclosure procedures. We offer recognition and rewards for valid security reports.
+**Do not report security issues publicly!** See our [Security Policy](./SECURITY.md) for responsible disclosure procedures.
+
+**Security contact:** security@krubles.com
 
 ### 3. Feature Requests
 
 We love hearing your ideas! When suggesting features:
+
+- Explain the use case and problem it solves
+- Provide examples or mockups if possible
+- Consider how it fits with existing features
+- Be open to discussion and alternative approaches
+
+**To request a feature:**
+1. Go to [Issues](https://github.com/C-Elkins/IT-Asset-Management/issues)
+2. Click "New Issue"
+3. Select "Feature Request" template
+4. Describe your idea clearly
 
 - Use our feature request template
 - Explain the problem you're trying to solve

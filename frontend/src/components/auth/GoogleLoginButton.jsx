@@ -116,7 +116,7 @@ const GoogleLoginButton = ({ onError, onLoading, disabled }) => {
     <button
       onClick={handleGoogleLogin}
       disabled={disabled || isLoading || !googleLoaded}
-      className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg shadow-sm bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
       type="button"
     >
       {isLoading ? (
