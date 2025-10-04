@@ -15,9 +15,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = {
+    @Index(name = "idx_users_tenant", columnList = "tenant_id"),
+    @Index(name = "idx_users_username", columnList = "username"),
+    @Index(name = "idx_users_email", columnList = "email")
+})
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class User extends TenantAwareEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +37,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
     
-    @NotBlank(message = "Password is required")
+    // Password is nullable for OAuth2 users
     @Size(min = 6, message = "Password must be at least 6 characters")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
     
     @NotBlank(message = "First name is required")
@@ -70,6 +74,20 @@ public class User {
     // Require user to change password on next login (first login or after admin reset)
     @Column(name = "must_change_password", nullable = false)
     private Boolean mustChangePassword = false;
+    
+    // OAuth2 fields
+    @Column(name = "google_id", unique = true)
+    private String googleId;
+    
+    @Column(name = "microsoft_id", unique = true)
+    private String microsoftId;
+    
+    @Enumerated(EnumType.STRING)
+    @Column(name = "auth_provider", nullable = false)
+    private AuthProvider authProvider = AuthProvider.LOCAL;
+    
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -223,12 +241,50 @@ public class User {
         this.assignedAssets = assignedAssets;
     }
     
+    public String getGoogleId() {
+        return googleId;
+    }
+    
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+    
+    public String getMicrosoftId() {
+        return microsoftId;
+    }
+    
+    public void setMicrosoftId(String microsoftId) {
+        this.microsoftId = microsoftId;
+    }
+    
+    public AuthProvider getAuthProvider() {
+        return authProvider;
+    }
+    
+    public void setAuthProvider(AuthProvider authProvider) {
+        this.authProvider = authProvider;
+    }
+    
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+    
+    public void setProfilePictureUrl(String profilePictureUrl) {
+        this.profilePictureUrl = profilePictureUrl;
+    }
+    
     // Enums
     public enum Role {
         USER,           // Regular employee
         IT_ADMIN,       // IT department admin
         MANAGER,        // Department manager
         SUPER_ADMIN     // System administrator
+    }
+    
+    public enum AuthProvider {
+        LOCAL,          // Traditional username/password authentication
+        GOOGLE,         // Google OAuth2 authentication
+        MICROSOFT       // Microsoft/Azure AD OAuth2 authentication
     }
     
     // Helper methods

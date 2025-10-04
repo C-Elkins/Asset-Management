@@ -13,12 +13,11 @@ import java.security.SecureRandom;
 import java.util.HexFormat;
 
 /**
- * Seeds a single SUPER_ADMIN user if none exist. Active in all profiles except 'dev'
- * (dev seeding handled by DevDataInitializer). The generated password is logged ONCE
- * at startup. Operators should immediately change this password post-deployment.
+ * DISABLED: Multi-tenant systems should use TenantController.registerTenant() instead.
+ * This initializer is no longer needed as each tenant creates their own admin during registration.
  */
 @Component
-@Profile("!dev")
+@Profile("disabled-for-multitenant")  // Changed from "!dev" to disable this initializer
 public class AdminInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(AdminInitializer.class);
@@ -35,36 +34,7 @@ public class AdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        boolean hasAdmin = userRepository.countByRole(User.Role.SUPER_ADMIN) > 0
-                || userRepository.countByRole(User.Role.IT_ADMIN) > 0;
-        if (hasAdmin) {
-            return; // At least one admin present—no action.
-        }
-
-        String username = "admin";
-        String email = "admin@local";
-        String tempPassword = generateStrongPassword();
-
-       User user = new User(
-    username,
-    email,
-    encoder.encode(tempPassword),
-    "System",
-    "Administrator",
-    "IT",
-    "Platform Admin",
-    null,
-    User.Role.SUPER_ADMIN,
-    true,  // active
-    true   // mustChangePassword: force admin to change password on first login
-);
-        userRepository.save(user);
-
-        log.warn("================ INITIAL ADMIN CREATED ================");
-        log.warn("Username: {}", username);
-        log.warn("Temporary Password: {}", tempPassword);
-        log.warn("IMPORTANT: Change this password immediately after first login.");
-        log.warn("=======================================================");
+        log.info("AdminInitializer is disabled for multi-tenant setup. Use POST /api/v1/tenants/register instead.");
     }
 
     private String generateStrongPassword() {

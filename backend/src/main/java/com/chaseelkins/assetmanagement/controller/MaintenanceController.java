@@ -4,17 +4,21 @@ import com.chaseelkins.assetmanagement.dto.MaintenanceRecordDTO;
 import com.chaseelkins.assetmanagement.model.MaintenanceRecord;
 import com.chaseelkins.assetmanagement.service.MaintenanceService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/maintenance")
+@Validated
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173"})
 public class MaintenanceController {
 
@@ -30,7 +34,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/asset/{assetId}")
-    public ResponseEntity<List<MaintenanceRecord>> getByAsset(@PathVariable Long assetId) {
+    public ResponseEntity<List<MaintenanceRecord>> getByAsset(@PathVariable @Min(1) Long assetId) {
         return ResponseEntity.ok(maintenanceService.getByAsset(assetId));
     }
 
@@ -40,7 +44,7 @@ public class MaintenanceController {
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<List<MaintenanceRecord>> getUpcoming(@RequestParam(defaultValue = "7") int days) {
+    public ResponseEntity<List<MaintenanceRecord>> getUpcoming(@RequestParam(defaultValue = "7") @Min(1) @Max(365) int days) {
         return ResponseEntity.ok(maintenanceService.getUpcoming(days));
     }
 

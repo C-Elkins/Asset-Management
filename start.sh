@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# IT Asset Management System - Start Script
-echo "🚀 Starting IT Asset Management System..."
+# Asset Management System - Start Script
+echo "🚀 Starting Asset Management System..."
 
 # Function to kill processes on exit
 cleanup() {

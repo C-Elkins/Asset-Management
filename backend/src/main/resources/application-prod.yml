@@ -14,9 +14,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate  # Never auto-create schema in production
-    show-sql: false
+    show-sql: false  # Don't log SQL in production
     properties:
       hibernate:
+        format_sql: false
         jdbc:
           time_zone: UTC
 

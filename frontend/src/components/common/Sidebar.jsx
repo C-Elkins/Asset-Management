@@ -22,6 +22,9 @@ export const Sidebar = () => {
     { to: '/app/assets', label: 'Assets', icon: Laptop, description: 'IT Equipment Management' },
     { to: '/app/maintenance', label: 'Maintenance', icon: Wrench, description: 'Service & Repairs' },
     { to: '/app/reports', label: 'Reports', icon: FileText, description: 'Business Intelligence' },
+    { to: '/app/privacy', label: 'Privacy', icon: Shield, description: 'Consent & My Data' },
+    // Only show Billing for admins
+    ...(isAdmin ? [{ to: '/app/billing', label: 'Billing', icon: Shield, description: 'Subscription & Invoices' }] : []),
     { to: '/app/settings', label: 'Settings', icon: Settings, description: 'System Configuration' },
     { to: '/app/showcase', label: 'Components', icon: Layers3, description: 'Design System' }
   ];
@@ -56,7 +59,7 @@ export const Sidebar = () => {
 
   return (
     <motion.aside 
-      className="sidebar"
+      className="sidebar relative"
       style={{
         background: 'linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
         backdropFilter: 'blur(32px) saturate(180%)',
@@ -83,6 +86,16 @@ export const Sidebar = () => {
         </div>
         <h2 className="text-lg font-bold text-slate-800 tracking-tight">Asset Management</h2>
         <p className="text-xs text-slate-500 mt-1 font-medium">Professional Dashboard</p>
+        {/* Tiny System Status bar under the header */}
+        <div className="mt-3" aria-label="System status: All systems operational">
+          <div className="h-1.5 rounded-full bg-emerald-500/15">
+            <div className="h-full w-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500" />
+          </div>
+          <div className="mt-1 flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-[10px] font-semibold text-emerald-700">All Systems Operational</span>
+          </div>
+        </div>
       </motion.div>
 
       <nav className="px-6 py-6">
@@ -296,28 +309,7 @@ export const Sidebar = () => {
         )}
       </nav>
 
-      <motion.div 
-        className="absolute bottom-32 left-6 right-6 pb-6"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.8 }}
-      >
-        <div className="px-5 py-4 bg-gradient-to-br from-white/70 via-slate-50/60 to-white/40 backdrop-blur-sm rounded-xl border border-slate-200/50 shadow-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-[11px] font-bold text-slate-800 tracking-wider uppercase mb-1">System Status</p>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-semibold text-slate-600">All Systems Operational</span>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] font-semibold text-slate-500 mb-1">Version</p>
-              <p className="text-[11px] font-bold text-slate-700">v2.5.0 Pro</p>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+      {/* Removed floating/bottom System Status card to avoid overlap; replaced with tiny bar under header */}
     </motion.aside>
   );
 };

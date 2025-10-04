@@ -1,0 +1,346 @@
+/* Responsive Design System for KA by Krubles */
+
+/* Container with responsive max-width and padding */
+.container-responsive {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Responsive text sizes */
+.text-responsive-xs { font-size: 0.75rem; line-height: 1rem; }
+.text-responsive-sm { font-size: 0.875rem; line-height: 1.25rem; }
+.text-responsive-base { font-size: 1rem; line-height: 1.5rem; }
+.text-responsive-lg { font-size: 1.125rem; line-height: 1.75rem; }
+.text-responsive-xl { font-size: 1.25rem; line-height: 1.75rem; }
+.text-responsive-2xl { font-size: 1.5rem; line-height: 2rem; }
+.text-responsive-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+.text-responsive-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+.text-responsive-5xl { font-size: 3rem; line-height: 1; }
+.text-responsive-6xl { font-size: 3.75rem; line-height: 1; }
+
+@media (max-width: 640px) {
+  .text-responsive-3xl { font-size: 1.5rem; line-height: 2rem; }
+  .text-responsive-4xl { font-size: 1.875rem; line-height: 2.25rem; }
+  .text-responsive-5xl { font-size: 2.25rem; line-height: 2.5rem; }
+  .text-responsive-6xl { font-size: 2.5rem; line-height: 1.1; }
+}
+
+/* Responsive spacing utilities */
+.section-spacing {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .section-spacing {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+
+/* Responsive grid layouts */
+.grid-responsive-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .grid-responsive-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+  }
+}
+
+.grid-responsive-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .grid-responsive-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive-3 {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+}
+
+.grid-responsive-4 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .grid-responsive-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .grid-responsive-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+}
+
+/* Card with responsive padding */
+.card-responsive {
+  border-radius: 1rem;
+  padding: 1.5rem;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .card-responsive {
+    padding: 2rem;
+    border-radius: 1.5rem;
+  }
+}
+
+.card-responsive:hover {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+/* Responsive flex utilities */
+.flex-responsive-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .flex-responsive-row {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
+
+/* Hide on mobile/desktop */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: block;
+  }
+}
+
+.hide-desktop {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none;
+  }
+}
+
+/* Responsive button sizes */
+.btn-responsive {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .btn-responsive {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+    border-radius: 0.75rem;
+  }
+}
+
+/* Responsive max width for content */
+.content-max-width {
+  max-width: 100%;
+}
+
+@media (min-width: 640px) {
+  .content-max-width {
+    max-width: 42rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .content-max-width {
+    max-width: 48rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-max-width {
+    max-width: 56rem;
+  }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 768px) {
+  a, button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Prevent text overflow */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Better focus states for accessibility */
+a:focus-visible, button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Responsive image containers */
+.img-responsive {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Aspect ratio utilities */
+.aspect-video {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+
+.aspect-square {
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
+
+/* Responsive padding utilities */
+.p-responsive {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .p-responsive {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .p-responsive {
+    padding: 2rem;
+  }
+}
+
+/* Mobile-first margin utilities */
+.mb-responsive {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .mb-responsive {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mb-responsive {
+    margin-bottom: 2rem;
+  }
+}
+
+/* Stack spacing */
+.stack-space > * + * {
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  .stack-space > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+/* Responsive hero section */
+.hero-responsive {
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .hero-responsive {
+    padding: 5rem 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-responsive {
+    padding: 6rem 2rem 4rem;
+  }
+}
+
+/* Better line lengths for reading */
+.prose-responsive {
+  max-width: 65ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive gap utilities */
+.gap-responsive {
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .gap-responsive {
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .gap-responsive {
+    gap: 2rem;
+  }
+}

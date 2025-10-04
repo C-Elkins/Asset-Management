@@ -8,17 +8,20 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update  # Use Hibernate for H2, Flyway for PostgreSQL
     show-sql: true
-    # Ensure Hibernate creates schema before running data scripts
-    defer-datasource-initialization: true
     properties:
       hibernate:
         format_sql: true
 
-  # Disable Flyway in development since we use Hibernate DDL auto-generation
+  # Disable Flyway in dev (H2), enable in production (PostgreSQL)
   flyway:
     enabled: false
+    
+  # Disable SQL initialization (we use DevDataSeeder instead)
+  sql:
+    init:
+      mode: never
     
   h2:
     console:
@@ -30,10 +33,47 @@ spring:
     serialization:
       fail-on-empty-beans: false
 
+  mail:
+    host: localhost
+    port: 2525
+    username: dev
+    password: dev
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
 # Development-specific JWT settings (weaker security for testing)
 jwt:
   secret: "devSecretKey123456789012345678901234567890"
   expiration: 86400000 # 24 hours
+
+# Stripe API Keys for Development/Testing
+stripe:
+  api-key: "sk_test_51SE1M7RnSgrmRk1TxkwctZ6e5Xpun0pkOA8TdvUeKiqT1aTNwKwbwQWQMq6o11nzo8xTS8FhODhSLCJnkUXWXt6J00L2AjI7bm"
+  publishable-key: "pk_test_51SE1M7RnSgrmRk1TXlB3HyFWd0jPCj0ffgk4nLZlKhguHybdx7QblMdxZ4ve8Qn1gNt7eiMfbDn6eOK3zrKgnNJC00BXa2ya6q"
+  webhook-secret: "${STRIPE_WEBHOOK_SECRET:whsec_test_webhook_secret_here}"
+  # Note: You'll need to set up webhook secret after configuring webhooks in Stripe Dashboard
+  
+  # Price IDs from Stripe Dashboard (update after creating products)
+  price-ids: |
+    {
+      'professional-monthly': 'price_placeholder_professional_monthly',
+      'professional-yearly': 'price_placeholder_professional_yearly',
+      'enterprise-monthly': 'price_placeholder_enterprise_monthly',
+      'enterprise-yearly': 'price_placeholder_enterprise_yearly',
+      'metered-asset': 'price_placeholder_metered'
+    }
+  
+  # Subscription plan limits
+  plans: |
+    {
+      'Free': { 'asset-limit': 50, 'user-limit': 3 },
+      'Professional': { 'asset-limit': 500, 'user-limit': 25 },
+      'Enterprise': { 'asset-limit': -1, 'user-limit': -1 }
+    }
 
 logging:
   level:
@@ -43,15 +83,33 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
-# Development CORS settings
+# Application-specific configuration
+app:
+  cors:
+    allowed-origins: "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3005,http://127.0.0.1:3005,http://localhost:5173,http://127.0.0.1:5173"
+
+# Development CORS settings (for WebConfig)
 cors:
   allowed-origins: 
     - "http://localhost:3000"
     - "http://127.0.0.1:3000"
-    - "http://localhost:5173" # Vite dev server
+    - "http://localhost:3005"      # Vite dev server (current)
+    - "http://127.0.0.1:3005"      # Vite dev server (IP)
+    - "http://localhost:5173"      # Vite dev server (alternate)
+    - "http://127.0.0.1:5173"      # Vite dev server (alternate IP)
   
 # Development API Documentation
 springdoc:
   swagger-ui:
     enabled: true
     try-it-out-enabled: true
+
+# Disable mail health contributor in dev to avoid actuator DOWN status when SMTP is unconfigured
+management:
+  health:
+    mail:
+      enabled: false
+
+# (Optional) Provide a no-op mail configuration override to prevent connection attempts
+# Add to top spring block (shown above) – appended here for clarity via YAML merge comment
+

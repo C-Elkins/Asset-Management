@@ -16,9 +16,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "maintenance_records")
+@Table(name = "maintenance_records", indexes = {
+    @Index(name = "idx_maintenance_tenant", columnList = "tenant_id"),
+    @Index(name = "idx_maintenance_asset", columnList = "asset_id")
+})
 @EntityListeners(AuditingEntityListener.class)
-public class MaintenanceRecord {
+public class MaintenanceRecord extends TenantAwareEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

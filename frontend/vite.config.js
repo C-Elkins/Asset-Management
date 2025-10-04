@@ -3,7 +3,13 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      // Explicitly configure for React 19
+      jsxRuntime: 'automatic',
+      babel: {
+        plugins: []
+      }
+    }),
     {
       name: 'healthcheck',
       configureServer(server) {

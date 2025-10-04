@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { assetService } from '../../services/assetService.js';
+import { useNavigate } from 'react-router-dom';
 
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalAssets: 0,
     availableAssets: 0,
@@ -15,6 +17,7 @@ export const Dashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [recentAssets, setRecentAssets] = useState([]);
 
   const loadDashboardData = useCallback(async () => {
     try {
@@ -23,10 +26,19 @@ export const Dashboard = () => {
 
       // Load assets first (this endpoint definitely exists)
       const assetsData = await assetService.list({ size: 1000 }); // Get more assets for better statistics
-      const assets = Array.isArray(assetsData) ? assetsData : (assetsData.content || []);
+  const assets = Array.isArray(assetsData) ? assetsData : (assetsData.content || []);
       
       // Calculate statistics from assets data
       const calculatedStats = calculateStatistics(assets);
+      // Compute recent assets (top 5 by updatedAt/createdAt if present)
+      const recent = [...assets]
+        .map(a => ({
+          ...a,
+          _ts: a.updatedAt ? new Date(a.updatedAt).getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0)
+        }))
+        .sort((a, b) => b._ts - a._ts)
+        .slice(0, 5);
+      setRecentAssets(recent);
       
       // Try to get backend statistics, but don't fail if it doesn't exist
       let backendStats = {};
@@ -163,7 +175,7 @@ export const Dashboard = () => {
     const colors = {
       'AVAILABLE': '#10b981',
       'ASSIGNED': '#3b82f6',
-      'IN MAINTENANCE': '#f59e0b',
+      'IN_MAINTENANCE': '#f59e0b',
       'RETIRED': '#6b7280',
       'LOST': '#ef4444',
       'DAMAGED': '#dc2626'
@@ -207,7 +219,7 @@ export const Dashboard = () => {
     <div className="dashboard-container">
       <div className="dashboard-header">
         <h1>Dashboard</h1>
-        <p>IT Asset Management Overview</p>
+  <p>Asset Management by Krubles — Overview</p>
       </div>
 
       {/* Key Metrics */}
@@ -255,6 +267,26 @@ export const Dashboard = () => {
 
       {/* Charts Section */}
       <div className="charts-grid">
+        {/* Alerts Summary */}
+        <div className="chart-card">
+          <h3>Alerts</h3>
+          <div className="chart-content">
+            <div className="alerts-grid">
+              <div className="alert-pill" style={{ background: '#fee2e2', border: '1px solid #fecaca' }}>
+                <span className="alert-dot" style={{ background: '#ef4444' }} />
+                Lost: {Array.isArray(stats.statusBreakdown) ? (stats.statusBreakdown.find(s => s.name.toUpperCase() === 'LOST')?.value || 0) : 0}
+              </div>
+              <div className="alert-pill" style={{ background: '#ffe4e6', border: '1px solid #fecdd3' }}>
+                <span className="alert-dot" style={{ background: '#dc2626' }} />
+                Damaged: {Array.isArray(stats.statusBreakdown) ? (stats.statusBreakdown.find(s => s.name.toUpperCase() === 'DAMAGED')?.value || 0) : 0}
+              </div>
+              <div className="alert-pill" style={{ background: '#fffbeb', border: '1px solid #fef3c7' }}>
+                <span className="alert-dot" style={{ background: '#f59e0b' }} />
+                Warranty soon: {Array.isArray(stats.warrantyExpiring) ? stats.warrantyExpiring.length : 0}
+              </div>
+            </div>
+          </div>
+        </div>
         {/* Asset Status Breakdown */}
         <div className="chart-card">
           <h3>Asset Status</h3>
@@ -327,6 +359,28 @@ export const Dashboard = () => {
           </div>
         </div>
 
+        {/* Recent Assets */}
+        <div className="chart-card">
+          <h3>Recent Activity</h3>
+          <div className="chart-content">
+            {recentAssets.length === 0 ? (
+              <div className="no-data">No recent asset activity</div>
+            ) : (
+              <ul className="recent-list">
+                {recentAssets.map(a => (
+                  <li key={a.id} className="recent-item">
+                    <div className="recent-title">{a.name || a.model || a.assetTag || `Asset #${a.id}`}</div>
+                    <div className="recent-meta">
+                      <span className="badge" style={{ background: getStatusColor((a.status || '').toUpperCase()) }}>{(a.status || '').replace(/_/g,' ') || 'UNKNOWN'}</span>
+                      <span className="muted">{a.updatedAt ? new Date(a.updatedAt).toLocaleString() : (a.createdAt ? new Date(a.createdAt).toLocaleString() : '')}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
         {/* Warranty Expiring */}
         <div className="chart-card">
           <h3>Warranty Expiring Soon</h3>
@@ -354,15 +408,15 @@ export const Dashboard = () => {
       <div className="quick-actions">
         <h3>Quick Actions</h3>
         <div className="action-buttons">
-          <button className="action-btn" onClick={() => window.location.href = '#assets'}>
+          <button className="action-btn" onClick={() => navigate('/app/assets/new')}>
             <span className="action-icon">➕</span>
             Add New Asset
           </button>
-          <button className="action-btn" onClick={() => window.location.href = '#maintenance'}>
+          <button className="action-btn" onClick={() => navigate('/app/maintenance')}>
             <span className="action-icon">🔧</span>
             Schedule Maintenance
           </button>
-          <button className="action-btn" onClick={() => window.location.href = '#reports'}>
+          <button className="action-btn" onClick={() => navigate('/app/reports')}>
             <span className="action-icon">📈</span>
             Generate Report
           </button>

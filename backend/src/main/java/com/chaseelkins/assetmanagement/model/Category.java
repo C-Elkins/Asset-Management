@@ -13,9 +13,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "categories", indexes = {
+    @Index(name = "idx_categories_tenant", columnList = "tenant_id"),
+    @Index(name = "idx_categories_active", columnList = "active")
+})
 @EntityListeners(AuditingEntityListener.class)
-public class Category {
+public class Category extends TenantAwareEntity {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

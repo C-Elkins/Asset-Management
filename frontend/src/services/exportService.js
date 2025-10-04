@@ -134,7 +134,7 @@ const generatePDFHTML = (assets) => {
     </head>
     <body>
       <div class="header">
-        <h1>IT Asset Management Report</h1>
+  <h1>Asset Management by Krubles — Report</h1>
         <p>Generated on ${currentDate}</p>
       </div>
       
@@ -185,7 +185,7 @@ const generatePDFHTML = (assets) => {
       </table>
 
       <div class="footer">
-        <p>IT Asset Management System - Report generated automatically</p>
+  <p>Asset Management by Krubles — Report generated automatically</p>
       </div>
     </body>
     </html>

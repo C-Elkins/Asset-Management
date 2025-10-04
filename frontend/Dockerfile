@@ -2,13 +2,14 @@ ARG NODE_VERSION=20-alpine
 FROM node:${NODE_VERSION} AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --no-audit --no-fund
+# Use legacy peer deps to accommodate packages not yet declaring React 19 peer support
+RUN npm ci --no-audit --no-fund --legacy-peer-deps
 COPY . .
 # Ensure production env so Vite uses .env.production
 ENV NODE_ENV=production
 RUN npm run build
 
-FROM docker.io/nginxinc/nginx-unprivileged:1.27.3-alpine3.21 AS runtime
+FROM docker.io/nginxinc/nginx-unprivileged:1.27.3-alpine AS runtime
 # Apply latest security patches to base packages to mitigate known CVEs
 USER root
 RUN apk -U --no-cache upgrade || true

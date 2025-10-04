@@ -1,4 +1,4 @@
-// Advanced SaaS-specific types for IT Asset Management
+// Advanced SaaS-specific types for Asset Management by Krubles
 // Import ONLY what is necessary to prevent circular/forward reference issues
 import type { User, AssetStatus, AssetCondition } from './index';
 

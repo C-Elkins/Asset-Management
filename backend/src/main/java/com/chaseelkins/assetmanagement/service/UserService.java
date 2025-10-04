@@ -22,10 +22,12 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
     
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
     
     /**
@@ -59,6 +61,9 @@ public class UserService {
 
     User savedUser = userRepository.save(user);
     log.info("Successfully created user: {} with ID: {}", savedUser.getUsername(), savedUser.getId());
+
+    // Send welcome email
+    emailService.sendWelcomeEmail(savedUser);
 
     return savedUser;
     }

@@ -1,7 +1,7 @@
 -- Initial schema for IT Asset Management System
 -- This script creates the production database schema
 
--- Enable UUID extension (PostgreSQL specific)
+-- Enable UUID extension (PostgreSQL specific - not needed for H2)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Users table
@@ -47,6 +47,7 @@ CREATE TABLE assets (
     name VARCHAR(100) NOT NULL,
     asset_tag VARCHAR(50) NOT NULL UNIQUE,
     description TEXT,
+    vendor VARCHAR(100),
     brand VARCHAR(100),
     model VARCHAR(100),
     serial_number VARCHAR(100),
@@ -58,6 +59,7 @@ CREATE TABLE assets (
     condition_rating VARCHAR(20) NOT NULL DEFAULT 'EXCELLENT',
     category_id BIGINT NOT NULL,
     next_maintenance DATE,
+    notes TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     
@@ -89,12 +91,17 @@ CREATE TABLE maintenance_records (
     id BIGSERIAL PRIMARY KEY,
     asset_id BIGINT NOT NULL,
     maintenance_type VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
     maintenance_date DATE NOT NULL,
     completed_date DATE,
+    status VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED',
+    priority VARCHAR(20) NOT NULL DEFAULT 'MEDIUM',
     cost NUMERIC(10,2),
     downtime_hours INTEGER,
     next_maintenance_date DATE,
     notes TEXT,
+    vendor VARCHAR(100),
+    parts_used TEXT,
     performed_by VARCHAR(200),
     created_by_user_id BIGINT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

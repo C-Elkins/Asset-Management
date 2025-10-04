@@ -1,51 +1,74 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, User, Bell, Search, Settings, ChevronDown, X, Check, AlertCircle, Info } from 'lucide-react';
+import { getNotifications, markRead as apiMarkRead, markAllRead as apiMarkAllRead } from '../../services/notificationService';
+import { useAuthStore } from '../../app/store/authStore';
+import { getSettings, updateSettings } from '../../services/settingsService';
 
 export const Header = ({ user, onLogout }) => {
+  // Session expiry UX
+  const expiresAt = useAuthStore(s => s.expiresAt);
+  const refreshAuth = useAuthStore(s => s.refreshAuth);
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [showExpiry, setShowExpiry] = useState(false);
+
+  useEffect(() => {
+    let id;
+    const tick = () => {
+      if (!expiresAt) { setShowExpiry(false); setTimeLeft(null); return; }
+      const ms = expiresAt - Date.now();
+      setTimeLeft(ms);
+      setShowExpiry(ms > 0 && ms <= 120_000); // show when <= 2 minutes
+    };
+    tick();
+    id = setInterval(tick, 1_000);
+    return () => clearInterval(id);
+  }, [expiresAt]);
+
+  const staySignedIn = async () => {
+    try {
+      await refreshAuth();
+      setShowExpiry(false);
+    } catch {}
+  };
 
   // Interactive states
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'success',
-      title: 'Asset Updated',
-      message: 'MacBook Pro LT001 has been successfully updated',
-      time: '2 min ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'warning', 
-      title: 'Maintenance Due',
-      message: 'Server maintenance scheduled for tonight',
-      time: '1 hour ago',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'info',
-      title: 'New User Added',
-      message: 'John Smith has been added to the system',
-      time: '3 hours ago',
-      read: true
-    }
-  ]);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoaded, setNotificationsLoaded] = useState(false);
+  const [polling, setPolling] = useState(true);
+  const [notifTab, setNotifTab] = useState('all'); // all | unread | prefs
+  const [notifPrefs, setNotifPrefs] = useState({ emailNotifications: true, pushNotifications: false, maintenanceAlerts: true, weeklyReports: true });
+  const navigate = useNavigate();
 
   // Interactive functions
   const markAsRead = (id) => {
-    setNotifications(prev => prev.map(n => n.id === id ? {...n, read: true} : n));
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    apiMarkRead(id);
   };
 
   // Ensure mutual exclusivity - only one dropdown open at a time
-  const toggleNotifications = () => {
+  const toggleNotifications = async () => {
     setShowSettings(false); // Close settings first
-    setShowNotifications(!showNotifications);
+    const next = !showNotifications;
+    setShowNotifications(next);
+    setPolling(!next); // pause polling when the panel is open
+    if (next && !notificationsLoaded) {
+      try {
+        const { items } = await getNotifications({ status: 'all', limit: 50 });
+        setNotifications(items);
+        try {
+          const s = await getSettings();
+          if (s?.notifications) setNotifPrefs(s.notifications);
+        } catch {}
+      } finally {
+        setNotificationsLoaded(true);
+      }
+    }
   };
 
   const toggleSettings = () => {
@@ -54,8 +77,28 @@ export const Header = ({ user, onLogout }) => {
   };
   
   const clearAllNotifications = () => {
-    setNotifications(prev => prev.map(n => ({...n, read: true})));
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    apiMarkAllRead();
   };
+
+  // Non-blocking polling for notifications when panel is closed
+  useEffect(() => {
+    if (!polling) return;
+    let cancelled = false;
+    let timer;
+    const run = async () => {
+      try {
+        const { items } = await getNotifications({ status: 'all', limit: 50 });
+        if (!cancelled) setNotifications(items);
+      } catch {
+        // ignore errors; retry later
+      } finally {
+        if (!cancelled) timer = setTimeout(run, 90000); // 90s
+      }
+    };
+    run();
+    return () => { cancelled = true; if (timer) clearTimeout(timer); };
+  }, [polling]);
   
   const unreadCount = notifications.filter(n => !n.read).length;
   
@@ -65,11 +108,11 @@ export const Header = ({ user, onLogout }) => {
   };
   
   const settingsItems = [
-    { label: 'Profile Settings', action: () => alert('Profile Settings clicked') },
-    { label: 'System Preferences', action: () => alert('System Preferences clicked') },
-    { label: 'Security Settings', action: () => alert('Security Settings clicked') },
-    { label: 'Backup & Restore', action: () => alert('Backup & Restore clicked') },
-    { label: 'API Settings', action: () => alert('API Settings clicked') }
+    { label: 'Profile Settings', action: () => navigate('/app/settings/profile') },
+    { label: 'System Preferences', action: () => navigate('/app/settings/system') },
+    { label: 'Security Settings', action: () => navigate('/app/settings/security') },
+    { label: 'Backup & Restore', action: () => navigate('/app/settings/backup') },
+    { label: 'API Settings', action: () => navigate('/app/settings/api') }
   ];
 
   // Map backend role codes to friendly labels
@@ -95,6 +138,7 @@ export const Header = ({ user, onLogout }) => {
 
   const location = useLocation();
   const [animating, setAnimating] = useState(false);
+  const [showPrivacyNudge, setShowPrivacyNudge] = useState(false);
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -116,25 +160,24 @@ export const Header = ({ user, onLogout }) => {
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
+  // Show a one-time privacy review nudge for authenticated users
+  useEffect(() => {
+    try {
+      const key = 'privacy_nudge_dismissed';
+      const dismissed = localStorage.getItem(key) === '1';
+      const onPrivacy = location.pathname.includes('/app/privacy');
+      if (!dismissed && !onPrivacy) setShowPrivacyNudge(true);
+    } catch { /* ignore */ }
+  }, [location.pathname]);
+
   return (
     <>
       {/* Executive Progress Indicator */}
-      <motion.div 
-        className="fixed top-0 left-0 right-0 h-1 z-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: animating ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
-      >
-        <motion.div
-          className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500"
-          initial={{ width: '0%' }}
-          animate={{ width: animating ? '100%' : '0%' }}
-          transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
-        />
-      </motion.div>
+      {/* Progress indicator moved inside header to avoid overlapping content */}
+      <div className="hidden" aria-hidden="true" />
       
       <motion.header 
-        className="relative z-[100]"
+        className="relative z-[30]"
         style={{
           background: 'linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
           backdropFilter: 'blur(32px) saturate(180%)',
@@ -146,12 +189,93 @@ export const Header = ({ user, onLogout }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
       >
+        {/* Backdrop overlay for dropdowns to improve contrast and capture clicks */}
+        <AnimatePresence>
+          {(showNotifications || showSettings) && (
+            <motion.div
+              className="fixed inset-0 bg-black/10"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              style={{ zIndex: 9990 }}
+              onClick={() => { setShowNotifications(false); setShowSettings(false); }}
+            />
+          )}
+        </AnimatePresence>
+        {/* Local progress bar within header bounds */}
+        <motion.div 
+          className="absolute top-0 left-0 right-0 h-1 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: animating ? 1 : 0 }}
+          transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+        >
+          <motion.div
+            className="h-full bg-gradient-to-r from-blue-500 via-cyan-500 to-emerald-500"
+            initial={{ width: '0%' }}
+            animate={{ width: animating ? '100%' : '0%' }}
+            transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
+          />
+        </motion.div>
         <div className="px-8 py-6">
+          {/* Privacy settings nudge */}
+          <AnimatePresence>
+            {showPrivacyNudge && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="mb-3 mx-auto max-w-4xl rounded-xl border border-blue-300 bg-blue-50 text-blue-900 px-4 py-3 shadow-sm flex items-center justify-between gap-3"
+                role="status" aria-live="polite"
+              >
+                <div className="text-sm">
+                  Please review your privacy preferences and data export options.
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigate('/app/privacy')}
+                    className="text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg"
+                  >
+                    Open Privacy
+                  </button>
+                  <button
+                    onClick={() => { try { localStorage.setItem('privacy_nudge_dismissed', '1'); } catch {}; setShowPrivacyNudge(false); }}
+                    className="text-sm font-semibold text-blue-900 bg-blue-200 hover:bg-blue-300 px-3 py-1.5 rounded-lg"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {/* Session Expiring Banner */}
+          <AnimatePresence>
+            {showExpiry && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.2 }}
+                className="mb-3 mx-auto max-w-3xl rounded-xl border border-amber-300 bg-amber-50 text-amber-900 px-4 py-3 shadow-sm flex items-center justify-between gap-3"
+                role="status" aria-live="polite"
+              >
+                <div className="text-sm">
+                  Your session is about to expire{typeof timeLeft === 'number' ? ` in ${Math.max(0, Math.ceil(timeLeft/1000))}s` : ''}.
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={staySignedIn} className="text-sm font-semibold text-amber-900 bg-amber-200 hover:bg-amber-300 px-3 py-1.5 rounded-lg">
+                    Stay signed in
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className="flex items-center justify-between">
             
             {/* Executive Search Section */}
             <motion.div 
-              className="flex-1 max-w-xl"
+              className="flex-1 max-w-xl mr-4 md:mr-6 lg:mr-8"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
@@ -178,7 +302,7 @@ export const Header = ({ user, onLogout }) => {
 
             {/* Executive Actions */}
             <motion.div 
-              className="flex items-center gap-4"
+              className="flex items-center gap-4 ml-2 sm:ml-0"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
@@ -188,7 +312,7 @@ export const Header = ({ user, onLogout }) => {
               <div className="relative dropdown-container">
                 <motion.button
                   onClick={toggleNotifications}
-                  className="relative p-3 text-slate-600 hover:text-slate-900 bg-white/70 hover:bg-white/95 border border-slate-200/60 rounded-xl shadow-sm backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  className="relative p-3 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
@@ -209,17 +333,17 @@ export const Header = ({ user, onLogout }) => {
                 <AnimatePresence>
                   {showNotifications && (
                     <motion.div
-                      className="absolute right-0 top-full mt-3 w-80 bg-white/98 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-2xl overflow-hidden"
+                      className="absolute right-0 top-full mt-3 w-80 bg-white border border-slate-200/80 rounded-2xl shadow-2xl overflow-hidden"
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                       style={{
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                        zIndex: 9999
+                        zIndex: 10000
                       }}
                     >
-                      <div className="p-4 border-b border-slate-200/80 bg-gradient-to-r from-white/60 to-slate-50/40">
+                      <div className="p-4 border-b border-slate-200/80 bg-white">
                         <div className="flex items-center justify-between">
                           <h3 className="font-bold text-slate-900">Notifications</h3>
                           <div className="flex gap-3">
@@ -237,9 +361,21 @@ export const Header = ({ user, onLogout }) => {
                             </button>
                           </div>
                         </div>
+                        {/* Tabs */}
+                        <div className="mt-3 flex items-center gap-2 text-xs">
+                          {['all','unread','prefs'].map(t => (
+                            <button
+                              key={t}
+                              onClick={() => setNotifTab(t)}
+                              className={`px-3 py-1.5 rounded-lg border ${notifTab===t?'border-blue-500 text-blue-700 bg-blue-50':'border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+                            >
+                              {t==='all' ? 'All' : t==='unread' ? `Unread (${unreadCount})` : 'Settings'}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="max-h-64 overflow-y-auto">
-                        {notifications.map((notification) => {
+                      <div className="max-h-64 overflow-y-auto bg-white">
+                        {notifTab !== 'prefs' && (notifTab === 'all' ? notifications : notifications.filter(n => !n.read)).map((notification) => {
                           const icons = {
                             success: <Check className="w-4 h-4 text-green-600" />,
                             warning: <AlertCircle className="w-4 h-4 text-orange-600" />,
@@ -271,6 +407,29 @@ export const Header = ({ user, onLogout }) => {
                             </motion.div>
                           );
                         })}
+                        {notifTab === 'prefs' && (
+                          <div className="p-4 space-y-3">
+                            {[
+                              { key: 'emailNotifications', label: 'Email notifications' },
+                              { key: 'pushNotifications', label: 'Push notifications' },
+                              { key: 'maintenanceAlerts', label: 'Maintenance alerts' },
+                              { key: 'weeklyReports', label: 'Weekly reports' }
+                            ].map(item => (
+                              <label key={item.key} className="flex items-center justify-between text-sm text-slate-700">
+                                <span>{item.label}</span>
+                                <input
+                                  type="checkbox"
+                                  checked={!!notifPrefs[item.key]}
+                                  onChange={async (e) => {
+                                    const next = { ...notifPrefs, [item.key]: e.target.checked };
+                                    setNotifPrefs(next);
+                                    try { await updateSettings({ notifications: next }); } catch {}
+                                  }}
+                                />
+                              </label>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   )}
@@ -281,8 +440,8 @@ export const Header = ({ user, onLogout }) => {
               <div className="relative dropdown-container">
                 <motion.button
                   onClick={toggleSettings}
-                  className="p-3 text-slate-600 hover:text-slate-900 bg-white/70 hover:bg-white/95 border border-slate-200/60 rounded-xl shadow-sm backdrop-blur-md transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
-                  whileHover={{ scale: 1.05, rotate: showSettings ? 180 : 90 }}
+                  className="relative p-3 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
@@ -293,18 +452,18 @@ export const Header = ({ user, onLogout }) => {
                 <AnimatePresence>
                   {showSettings && (
                     <motion.div
-                      className="absolute right-0 top-full mt-3 w-64 bg-white/98 backdrop-blur-xl border border-slate-200/80 rounded-2xl shadow-2xl overflow-hidden"
+                      className="absolute right-0 top-full mt-3 w-64 bg-white border border-slate-200/80 rounded-2xl shadow-2xl overflow-hidden"
                       initial={{ opacity: 0, y: -10, scale: 0.95 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                       style={{
                         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.8)',
-                        zIndex: 9999
+                        zIndex: 10000
                       }}
                     >
-                      <div className="p-3">
-                        <div className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100/80 mb-2 bg-gradient-to-r from-slate-50/60 to-white/40 rounded-lg">
+                      <div className="p-3 bg-white">
+                        <div className="px-4 py-3 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-100/80 mb-2 bg-white rounded-lg">
                           Quick Settings
                         </div>
                         {settingsItems.map((item, index) => (
@@ -314,7 +473,7 @@ export const Header = ({ user, onLogout }) => {
                               item.action();
                               setShowSettings(false);
                             }}
-                            className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-50/50 rounded-lg transition-colors duration-150 flex items-center gap-2"
+                            className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-50 rounded-lg transition-colors duration-150 flex items-center gap-2"
                             whileHover={{ x: 2 }}
                             transition={{ duration: 0.1 }}
                           >
@@ -380,7 +539,7 @@ export const Header = ({ user, onLogout }) => {
                 {onLogout && (
                   <motion.button
                     onClick={onLogout}
-                    className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-2xl font-semibold text-[13px] shadow-2xl hover:shadow-3xl hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-slate-500/20 transition-all duration-300 active:scale-[0.97]"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl font-semibold text-[12px] shadow-xl hover:shadow-2xl hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-slate-500/20 transition-all duration-300 active:scale-[0.98]"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}

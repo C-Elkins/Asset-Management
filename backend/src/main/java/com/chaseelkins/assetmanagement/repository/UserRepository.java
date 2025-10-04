@@ -17,7 +17,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Basic finder methods
     Optional<User> findByUsername(String username);
     
-    Optional<User> findByEmail(String email);
+    @Query("SELECT u FROM User u WHERE u.email = :email")
+    Optional<User> findByEmail(@Param("email") String email);
+    
+    // OAuth2 finder methods
+    Optional<User> findByGoogleId(String googleId);
+    
+    Optional<User> findByMicrosoftId(String microsoftId);
     
     boolean existsByUsername(String username);
     

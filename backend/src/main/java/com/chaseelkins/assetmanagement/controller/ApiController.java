@@ -18,7 +18,7 @@ public class ApiController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getApiInfo() {
         Map<String, Object> response = new HashMap<>();
-        response.put("name", "IT Asset Management System API");
+        response.put("name", "Asset Management System API");
         response.put("version", "1.0.0");
         response.put("status", "running");
         response.put("timestamp", LocalDateTime.now());

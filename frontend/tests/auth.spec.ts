@@ -111,3 +111,44 @@ test('auth: logout returns to login', async ({ page }) => {
   ]);
   await expect(page).toHaveURL(/\/login/);
 });
+
+// 6. Session expiring banner appears and refresh hides it
+test('auth: session expiring banner refreshes and hides', async ({ page }) => {
+  await page.route('**/actuator/health', async route => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'UP' }) });
+  });
+  // Seed auth and set expiresAt ~30s in the future to trigger <=2m threshold
+  await page.goto('/login?e2e=1');
+  await page.evaluate(() => (window).__e2eLogin && (window).__e2eLogin('shortAccess', 'shortRefresh'));
+  await page.goto('/app');
+
+  // Force the persisted store's expiresAt to a near-future point to ensure banner shows
+  await page.evaluate(() => {
+    try {
+      const raw = localStorage.getItem('auth-store');
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      data.state = data.state || {};
+      data.state.expiresAt = Date.now() + 30 * 1000; // 30s remaining
+      localStorage.setItem('auth-store', JSON.stringify(data));
+    } catch {}
+  });
+  // Trigger a re-render (navigate to dashboard route)
+  await page.goto('/app/dashboard');
+
+  // Expect banner visible
+  const banner = page.getByRole('status', { name: /session is about to expire/i });
+  await expect(banner).toBeVisible();
+
+  // Mock refresh endpoint
+  await page.route('**/auth/refresh', async route => {
+    const resp = { accessToken: 'refreshedAccess', refreshToken: 'refreshedRefresh', user: { username: 'admin', role: 'SUPER_ADMIN' }, expiresIn: 900 };
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(resp) });
+  });
+
+  // Click Stay signed in
+  await page.getByRole('button', { name: /stay signed in/i }).click();
+
+  // Banner should disappear shortly after successful refresh
+  await expect(banner).toBeHidden({ timeout: 3000 });
+});

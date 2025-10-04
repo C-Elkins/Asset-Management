@@ -1,0 +1,12 @@
+# GitHub Sponsors Configuration for Krubles LLC
+# Asset Management System by Krubles
+
+# These are supported funding model platforms
+
+github: # Replace with your GitHub Sponsors username(s)
+  - C-Elkins
+
+# Other funding platforms
+custom:
+  - https://krubles.com/support
+  - https://paypal.me/krubles

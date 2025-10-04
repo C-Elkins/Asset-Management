@@ -21,6 +21,10 @@ export const AssetList = () => {
   const [selectedAssets, setSelectedAssets] = useState(new Set());
   const [bulkLoading, setBulkLoading] = useState(false);
   const [showShortcutsHelp, setShowShortcutsHelp] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importSummary, setImportSummary] = useState(null);
+  const [catImporting, setCatImporting] = useState(false);
+  const [catImportSummary, setCatImportSummary] = useState(null);
 
   // Asset status options
   const statusOptions = [
@@ -145,6 +149,102 @@ export const AssetList = () => {
     const assetsToExport = searchTerm || statusFilter !== 'ALL' ? assets : allAssets;
     exportService.exportToPDF(assetsToExport, 'assets-report');
   }, [searchTerm, statusFilter, assets, allAssets]);
+
+  // Import handlers
+  const handleImportClick = () => {
+    const input = document.getElementById('assetImportInput');
+    if (input) input.click();
+  };
+
+  const handleCategoryImportClick = () => {
+    const input = document.getElementById('categoryImportInput');
+    if (input) input.click();
+  };
+
+  const handleImportFile = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      const records = Array.isArray(json) ? json : (Array.isArray(json.assets) ? json.assets : []);
+      if (!Array.isArray(records) || records.length === 0) {
+        alert('No assets found in file. Expecting a JSON array of asset objects or { "assets": [...] }');
+        return;
+      }
+      if (!window.confirm(`Import ${records.length} assets?`)) return;
+      setImporting(true);
+      // Prefer bulk endpoint when available
+      try {
+        const resp = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'}/imports/assets`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('jwt_token') || ''}`
+          },
+          body: JSON.stringify({ assets: records })
+        });
+        if (!resp.ok) throw new Error(`Bulk import failed with status ${resp.status}`);
+        const summary = await resp.json();
+        setImportSummary({ total: summary.received, success: summary.created + summary.updated, failed: summary.failed, errors: (summary.errors || []).slice(0, 5) });
+      } catch (bulkErr) {
+        console.warn('Bulk import unavailable, falling back to per-record import', bulkErr);
+        let success = 0, failed = 0;
+        const errors = [];
+        for (let i = 0; i < records.length; i++) {
+          const rec = records[i];
+          try {
+            await assetService.create(rec);
+            success++;
+          } catch (err) {
+            failed++;
+            errors.push({ index: i, message: err?.response?.data?.message || err?.message || 'Failed' });
+          }
+        }
+        setImportSummary({ total: records.length, success, failed, errors: errors.slice(0, 5) });
+      }
+      await fetchAssets();
+    } catch (err) {
+      console.error('Import failed:', err);
+      alert('Import failed: invalid JSON or read error.');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleCategoryImportFile = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const json = JSON.parse(text);
+      const records = Array.isArray(json?.categories) ? json.categories : (Array.isArray(json) ? json : []);
+      if (!Array.isArray(records) || records.length === 0) {
+        alert('No categories found in file. Expecting { "categories": [...] } or a JSON array of categories.');
+        return;
+      }
+      if (!window.confirm(`Import ${records.length} categories?`)) return;
+      setCatImporting(true);
+      const resp = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1'}/imports/categories`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('jwt_token') || ''}`
+        },
+        body: JSON.stringify({ categories: records })
+      });
+      if (!resp.ok) throw new Error(`Bulk import failed with status ${resp.status}`);
+      const summary = await resp.json();
+      setCatImportSummary({ total: summary.received, success: summary.created + summary.updated, failed: summary.failed, errors: (summary.errors || []).slice(0, 5) });
+    } catch (err) {
+      console.error('Category import failed:', err);
+      alert('Category import failed. Check JSON format and permissions.');
+    } finally {
+      setCatImporting(false);
+    }
+  };
 
   // Bulk action handlers
   const handleSelectAsset = (assetId, selected) => {
@@ -310,6 +410,42 @@ export const AssetList = () => {
         <div className="header-actions">
           {/* Export Buttons */}
           <div className="export-actions">
+            <input id="assetImportInput" type="file" accept="application/json" className="hidden" onChange={handleImportFile} />
+            <input id="categoryImportInput" type="file" accept="application/json" className="hidden" onChange={handleCategoryImportFile} />
+            <button 
+              className="btn-outline"
+              onClick={handleImportClick}
+              disabled={importing}
+              title="Import Assets from JSON"
+            >
+              📥 Import JSON{importing ? '…' : ''}
+            </button>
+            <a
+              className="btn-outline"
+              href="/examples/assets-template.json"
+              download
+              title="Download JSON template"
+              style={{ textDecoration: 'none' }}
+            >
+              ⬇️ Template
+            </a>
+            <button 
+              className="btn-outline"
+              onClick={handleCategoryImportClick}
+              disabled={catImporting}
+              title="Import Categories from JSON"
+            >
+              📦 Import Categories{catImporting ? '…' : ''}
+            </button>
+            <a
+              className="btn-outline"
+              href="/examples/categories-template.json"
+              download
+              title="Download Categories template"
+              style={{ textDecoration: 'none' }}
+            >
+              ⬇️ Categories Template
+            </a>
             <button 
               className="btn-outline"
               onClick={handleExportCSV}
@@ -336,7 +472,7 @@ export const AssetList = () => {
                   } else {
                     alert('⚠️ Backend responding but returned error: ' + response.status);
                   }
-                } catch (error) {
+                } catch {
                   alert('❌ Backend connection failed. Make sure Spring Boot is running on port 8080.');
                 }
               }}
@@ -387,6 +523,38 @@ export const AssetList = () => {
           </button>
         ))}
       </div>
+
+      {importSummary && (
+        <div className="import-summary" style={{ margin: '10px 0', padding: '10px', border: '1px solid #e5e7eb', borderRadius: 8 }}>
+          <div><strong>Import Summary:</strong> {importSummary.success}/{importSummary.total} succeeded, {importSummary.failed} failed</div>
+          {importSummary.errors && importSummary.errors.length > 0 && (
+            <ul className="text-sm" style={{ marginTop: 6, color: '#6b7280' }}>
+              {importSummary.errors.map((e, idx) => (
+                <li key={idx}>Row {e.index + 1}: {e.message}</li>
+              ))}
+              {importSummary.failed > importSummary.errors.length && (
+                <li>…and {importSummary.failed - importSummary.errors.length} more</li>
+              )}
+            </ul>
+          )}
+        </div>
+      )}
+
+      {catImportSummary && (
+        <div className="import-summary" style={{ margin: '10px 0', padding: '10px', border: '1px solid #e5e7eb', borderRadius: 8 }}>
+          <div><strong>Categories Import Summary:</strong> {catImportSummary.success}/{catImportSummary.total} succeeded, {catImportSummary.failed} failed</div>
+          {catImportSummary.errors && catImportSummary.errors.length > 0 && (
+            <ul className="text-sm" style={{ marginTop: 6, color: '#6b7280' }}>
+              {catImportSummary.errors.map((e, idx) => (
+                <li key={idx}>Row {e.index + 1}: {e.message}</li>
+              ))}
+              {catImportSummary.failed > catImportSummary.errors.length && (
+                <li>…and {catImportSummary.failed - catImportSummary.errors.length} more</li>
+              )}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Filters */}
       <div className="asset-filters">

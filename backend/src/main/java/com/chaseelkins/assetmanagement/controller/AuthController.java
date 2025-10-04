@@ -70,13 +70,14 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletRequest httpRequest) {
         try {
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
             UserDetails principal = (UserDetails) auth.getPrincipal();
             String accessToken = jwtTokenProvider.generateToken(principal);
             String userAgent = httpRequest.getHeader("User-Agent");
             String ip = httpRequest.getRemoteAddr();
-            User user = userRepository.findByUsername(principal.getUsername()).orElseThrow();
+            // principal.getUsername() returns email now (changed in CustomUserDetailsService)
+            User user = userRepository.findByEmail(principal.getUsername()).orElseThrow();
             if (Boolean.TRUE.equals(user.getMustChangePassword())) {
                 // Do not issue tokens, require password change
                 loginFailure.increment();
@@ -141,8 +142,8 @@ public class AuthController {
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null || "anonymousUser".equals(auth.getPrincipal())) {
             return ResponseEntity.status(401).body(new ErrorResponse("Unauthorized"));
         }
-        String username = auth.getName();
-        User user = userRepository.findByUsername(username).orElse(null);
+        String email = auth.getName(); // auth.getName() returns email now
+        User user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
             return ResponseEntity.status(404).body(new ErrorResponse("User not found"));
         }
@@ -165,8 +166,8 @@ public class AuthController {
             return ResponseEntity.status(401).body(new ErrorResponse("Unauthorized"));
         }
         
-        String username = auth.getName();
-        User user = userRepository.findByUsername(username).orElse(null);
+        String email = auth.getName(); // auth.getName() returns email now
+        User user = userRepository.findByEmail(email).orElse(null);
         if (user == null) {
             return ResponseEntity.status(404).body(new ErrorResponse("User not found"));
         }

@@ -10,16 +10,18 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Creates a default admin user for development environment.
- * Only runs in 'dev' profile with simple, known credentials.
+ * DISABLED: Multi-tenant systems should use TenantController.registerTenant() instead.
+ * This initializer is no longer needed as each tenant creates their own admin during registration.
  */
 @Component
-@Profile("dev")
+@Profile("disabled-for-multitenant")  // Changed from "dev" to disable this initializer
 public class DevAdminInitializer implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DevAdminInitializer.class);
 
+    @SuppressWarnings("unused")
     private final UserRepository userRepository;
+    @SuppressWarnings("unused")
     private final PasswordEncoder encoder;
 
     public DevAdminInitializer(UserRepository userRepository, PasswordEncoder encoder) {
@@ -29,38 +31,6 @@ public class DevAdminInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        boolean hasAdmin = userRepository.countByRole(User.Role.SUPER_ADMIN) > 0
-                || userRepository.countByRole(User.Role.IT_ADMIN) > 0;
-        if (hasAdmin) {
-            log.info("Admin user already exists, skipping dev admin creation");
-            return;
-        }
-
-        String username = "admin";
-        String email = "admin@dev.local";
-        String devPassword = "admin123"; // Simple password for development
-
-        User devAdmin = new User(
-            username,
-            email,
-            encoder.encode(devPassword),
-            "Dev",
-            "Administrator",
-            "IT",
-            "System Administrator",
-            null,
-            User.Role.SUPER_ADMIN,
-            true,  // active
-            false  // mustChangePassword: false for dev convenience
-        );
-        
-        userRepository.save(devAdmin);
-
-        log.warn("================ DEV ADMIN CREATED ================");
-        log.warn("Username: {}", username);
-        log.warn("Password: {}", devPassword);
-        log.warn("Email: {}", email);
-        log.warn("Note: This is for development only!");
-        log.warn("==================================================");
+        log.info("DevAdminInitializer is disabled for multi-tenant setup. Use POST /api/v1/tenants/register instead.");
     }
 }

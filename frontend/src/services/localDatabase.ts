@@ -18,7 +18,17 @@ export interface Asset {
   brand?: string;
   model?: string;
   serialNumber?: string;
-        // Demo admin user removed for production
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  syncStatus: 'synced' | 'pending' | 'conflict';
+}
+
+export interface User {
+  id?: number;
+  username: string;
+  email: string;
+  firstName: string;
   lastName: string;
   department?: string;
   jobTitle?: string;

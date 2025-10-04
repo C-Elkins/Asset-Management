@@ -22,11 +22,13 @@ export const ProtectedRoute = ({ children }) => {
   }
   
   if (process.env.NODE_ENV === 'development') {
-    console.debug('[ProtectedRoute] state', { authed, tokenExists, path: location.pathname });
+    console.debug('🛡️ [ProtectedRoute] Auth check:', { authed, tokenExists, path: location.pathname });
   }
   
   // If not authenticated and no token, redirect to login
+  // But be more permissive - if we have a token, allow through even if authed is false (race condition)
   if (!authed && !tokenExists) {
+    if (process.env.NODE_ENV === 'development') console.log('🚫 [ProtectedRoute] Redirecting to login - no auth and no token');
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
   

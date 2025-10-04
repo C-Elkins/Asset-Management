@@ -1,16 +1,41 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Wrench, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
+import { api } from '../../services/api.js';
 
 export const MaintenanceSchedule = () => {
-  const [selectedStatus, setSelectedStatus] = useState('all');
-  
-  const tasks = [
-    { id: 1, title: 'Server Hardware Update', asset: 'Dell R740', status: 'scheduled', priority: 'High', date: '2024-12-28' },
-    { id: 2, title: 'Network Switch Maintenance', asset: 'Cisco 2960', status: 'in-progress', priority: 'Medium', date: '2024-12-27' },
-    { id: 3, title: 'Printer Maintenance', asset: 'HP LaserJet', status: 'completed', priority: 'Low', date: '2024-12-26' },
-    { id: 4, title: 'Laptop Screen Repair', asset: 'MacBook Pro', status: 'scheduled', priority: 'High', date: '2024-12-29' }
-  ];
+  const [selectedStatus, setSelectedStatus] = useState('all'); // all | scheduled | in-progress | completed
+  const [timeFilter, setTimeFilter] = useState('all'); // all | today | overdue | upcoming
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [records, setRecords] = useState([]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      setError('');
+      try {
+        // Load base data initially
+        const all = await api.get('/maintenance', { params: { page: 0, size: 100 } }).catch(() => ({ data: { content: [] } }));
+        const allData = Array.isArray(all.data) ? all.data : (all?.data?.content || []);
+        const items = allData.map(m => ({
+          id: m.id,
+          title: m.title || m.description || 'Maintenance',
+          asset: m.asset?.name || m.assetTag || '—',
+          status: (m.status || 'scheduled').toLowerCase(),
+          priority: (m.priority || 'Medium'),
+          date: m.scheduledDate || m.dueDate || m.createdAt || ''
+        }));
+        if (mounted) setRecords(items);
+      } catch {
+        if (mounted) setError('Failed to load maintenance');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const statusColors = {
     scheduled: 'bg-blue-100 text-blue-800',
@@ -25,7 +50,12 @@ export const MaintenanceSchedule = () => {
     High: 'border-red-300'
   };
 
-  const filteredTasks = selectedStatus === 'all' ? tasks : tasks.filter(t => t.status === selectedStatus);
+  const filteredTasks = useMemo(() => {
+    let list = records;
+    if (selectedStatus === 'all') return list;
+    list = list.filter(t => t.status === selectedStatus);
+    return list;
+  }, [records, selectedStatus]);
 
   return (
     <div className="space-y-6">
@@ -49,6 +79,38 @@ export const MaintenanceSchedule = () => {
             </button>
           ))}
         </div>
+        <div className="flex gap-2">
+          {['all', 'today', 'overdue', 'upcoming'].map(t => (
+            <button
+              key={t}
+              onClick={async () => {
+                setTimeFilter(t);
+                setLoading(true);
+                try {
+                  if (t === 'all') {
+                    const all = await api.get('/maintenance', { params: { page: 0, size: 100 } });
+                    const allData = Array.isArray(all.data) ? all.data : (all?.data?.content || []);
+                    setRecords(allData.map(m => ({ id: m.id, title: m.title || m.description || 'Maintenance', asset: m.asset?.name || m.assetTag || '—', status: (m.status || 'scheduled').toLowerCase(), priority: (m.priority || 'Medium'), date: m.scheduledDate || m.dueDate || m.createdAt || '' })));
+                  } else if (t === 'today') {
+                    const { data } = await api.get('/maintenance/today');
+                    setRecords((Array.isArray(data) ? data : []).map(m => ({ id: m.id, title: m.title || m.description || 'Maintenance', asset: m.asset?.name || m.assetTag || '—', status: (m.status || 'scheduled').toLowerCase(), priority: (m.priority || 'Medium'), date: m.scheduledDate || m.dueDate || m.createdAt || '' })));
+                  } else if (t === 'overdue') {
+                    const { data } = await api.get('/maintenance/overdue');
+                    setRecords((Array.isArray(data) ? data : []).map(m => ({ id: m.id, title: m.title || m.description || 'Maintenance', asset: m.asset?.name || m.assetTag || '—', status: (m.status || 'scheduled').toLowerCase(), priority: (m.priority || 'Medium'), date: m.scheduledDate || m.dueDate || m.createdAt || '' })));
+                  } else if (t === 'upcoming') {
+                    const { data } = await api.get('/maintenance/upcoming', { params: { days: 14 } });
+                    setRecords((Array.isArray(data) ? data : []).map(m => ({ id: m.id, title: m.title || m.description || 'Maintenance', asset: m.asset?.name || m.assetTag || '—', status: (m.status || 'scheduled').toLowerCase(), priority: (m.priority || 'Medium'), date: m.scheduledDate || m.dueDate || m.createdAt || '' })));
+                  }
+                } catch {
+                  // ignore load errors in quick filters
+                } finally { setLoading(false); }
+              }}
+              className={`px-3 py-2 rounded-lg text-sm ${timeFilter===t ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 hover:bg-slate-50'}`}
+            >
+              {t[0].toUpperCase()+t.slice(1)}
+            </button>
+          ))}
+        </div>
         
         <motion.button 
           className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -60,6 +122,10 @@ export const MaintenanceSchedule = () => {
           Schedule Task
         </motion.button>
       </motion.div>
+
+      {error && (
+        <div className="p-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded">{error}</div>
+      )}
 
       <div className="grid gap-4">
         {filteredTasks.map((task, index) => {
@@ -119,7 +185,7 @@ export const MaintenanceSchedule = () => {
         })}
       </div>
 
-      {filteredTasks.length === 0 && (
+      {(!loading && filteredTasks.length === 0) && (
         <div className="text-center py-12">
           <Wrench className="w-12 h-12 mx-auto text-slate-300 mb-4" />
           <p className="text-slate-500">No maintenance tasks found for the selected filter.</p>

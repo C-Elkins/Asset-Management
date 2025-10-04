@@ -10,36 +10,47 @@ const AssetAssignPage = lazy(() => import('./pages/AssetAssignPage.jsx').then(m 
 const MaintenancePage = lazy(() => import('./pages/MaintenancePage.jsx').then(m => ({ default: m.MaintenancePage })));
 const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx').then(m => ({ default: m.ReportsPage })));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx').then(m => ({ default: m.SettingsPage })));
+const ProfileSettings = lazy(() => import('./pages/settings/ProfileSettings.jsx').then(m => ({ default: m.ProfileSettings })));
+const SystemPreferences = lazy(() => import('./pages/settings/SystemPreferences.jsx').then(m => ({ default: m.SystemPreferences })));
+const SecuritySettings = lazy(() => import('./pages/settings/SecuritySettings.jsx').then(m => ({ default: m.SecuritySettings })));
+const BackupRestore = lazy(() => import('./pages/settings/BackupRestore.jsx').then(m => ({ default: m.BackupRestore })));
+const ApiSettings = lazy(() => import('./pages/settings/ApiSettings.jsx').then(m => ({ default: m.ApiSettings })));
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx').then(m => ({ default: m.default })));
 const AIAssistant = lazy(() => import('./pages/AIAssistant.jsx').then(m => ({ default: m.AIAssistant })));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx').then(m => ({ default: m.default || m.PrivacyPage })));
+const BillingPage = lazy(() => import('./pages/BillingPage.jsx').then(m => ({ default: m.default })));
 
 const NotFound = lazy(() => import('./pages/NotFound.jsx').then(m => ({ default: m.NotFound })));
 import { useAuthStore } from './app/store/authStore';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { ExecutivePageLoader } from './components/common/ExecutiveLoader.jsx';
-
-// Stable component to prevent recreation on every render
-const DefaultRedirect = ({ user }) => {
-  let tokenAuthed = false;
-  try {
-    tokenAuthed = !!localStorage.getItem('jwt_token');
-  } catch {}
-  const dest = (user || tokenAuthed) ? '/app/dashboard' : '/login';
-  console.log('🔄 [DefaultRedirect] Redirecting to:', dest, { hasUser: !!user, hasToken: tokenAuthed });
-  return <Navigate to={dest} replace />;
-};
+import { MinimalPageLoader } from './components/common/MinimalPageLoader.jsx';
+const Signup = lazy(() => import('./pages/auth/Signup.jsx').then(m => ({ default: m.Signup })));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword.jsx').then(m => ({ default: m.ForgotPassword })));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword.jsx').then(m => ({ default: m.ResetPassword })));
+const MarketingHome = lazy(() => import('./pages/marketing/Home.jsx').then(m => ({ default: m.default || m.MarketingHome })));
+const Pricing = lazy(() => import('./pages/marketing/Pricing.jsx').then(m => ({ default: m.default || m.Pricing })));
+const About = lazy(() => import('./pages/marketing/About.jsx').then(m => ({ default: m.default || m.About })));
+const Features = lazy(() => import('./pages/marketing/Features.jsx').then(m => ({ default: m.default || m.Features })));
+const Solutions = lazy(() => import('./pages/marketing/Solutions.jsx').then(m => ({ default: m.default || m.Solutions })));
+const Security = lazy(() => import('./pages/marketing/Security.jsx').then(m => ({ default: m.default || m.Security })));
+const Integrations = lazy(() => import('./pages/marketing/Integrations.jsx').then(m => ({ default: m.default || m.Integrations })));
+const Customers = lazy(() => import('./pages/marketing/Customers.jsx').then(m => ({ default: m.default || m.Customers })));
+const Contact = lazy(() => import('./pages/marketing/Contact.jsx').then(m => ({ default: m.default || m.Contact })));
 
 function App() {
   const user = useAuthStore(s => s.user);
   const isLoading = useAuthStore(s => s.isLoading);
   const initSession = useAuthStore(s => s.initSession);
   const logout = useAuthStore(s => s.logout);
+  // If a token exists, treat as authenticated for routing purposes
+  let tokenAuthed = false;
+  try {
+    tokenAuthed = !!localStorage.getItem('jwt_token');
+  } catch {}
 
-  // Debug auth state changes
-  useEffect(() => {
-    console.log('👤 [App] Auth state changed:', { hasUser: !!user, isLoading, username: user?.username });
-  }, [user, isLoading]);
+    // Debug auth state changes (removed for production)
 
   useEffect(() => { initSession(); }, [initSession]);
 
@@ -52,7 +63,38 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-  <Route path="/login" element={<Login />} />
+        {/* Public marketing pages */}
+        <Route
+          path="/"
+          element={(user || tokenAuthed)
+            ? <Navigate to="/app/dashboard" replace />
+            : <Suspense fallback={<MinimalPageLoader />}><MarketingHome /></Suspense>}
+        />
+        <Route path="/features" element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Suspense fallback={<MinimalPageLoader />}><Features /></Suspense>} />
+        <Route path="/solutions" element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Suspense fallback={<MinimalPageLoader />}><Solutions /></Suspense>} />
+        <Route path="/security" element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Suspense fallback={<MinimalPageLoader />}><Security /></Suspense>} />
+        <Route path="/integrations" element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Suspense fallback={<MinimalPageLoader />}><Integrations /></Suspense>} />
+  <Route path="/customers" element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Suspense fallback={<MinimalPageLoader />}><Customers /></Suspense>} />
+        <Route path="/contact" element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Suspense fallback={<MinimalPageLoader />}><Contact /></Suspense>} />
+        <Route
+          path="/pricing"
+          element={(user || tokenAuthed)
+            ? <Navigate to="/app/dashboard" replace />
+            : <Suspense fallback={<MinimalPageLoader />}><Pricing /></Suspense>}
+        />
+        <Route
+          path="/about"
+          element={(user || tokenAuthed)
+            ? <Navigate to="/app/dashboard" replace />
+            : <Suspense fallback={<MinimalPageLoader />}><About /></Suspense>}
+        />
+  <Route
+    path="/login"
+    element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Login />}
+  />
+        <Route path="/signup" element={<Suspense fallback={<ExecutivePageLoader message="Opening signup…" />}><Signup /></Suspense>} />
+        <Route path="/forgot-password" element={<Suspense fallback={<ExecutivePageLoader message="Opening forgot password…" />}><ForgotPassword /></Suspense>} />
+        <Route path="/reset-password" element={<Suspense fallback={<ExecutivePageLoader message="Opening reset password…" />}><ResetPassword /></Suspense>} />
         <Route
           path="/app"
           element={
@@ -69,17 +111,21 @@ function App() {
           <Route path="assets/:id/assign" element={<Suspense fallback={<ExecutivePageLoader message="Loading assignment..." />}><AssetAssignPage /></Suspense>} />
           <Route path="maintenance" element={<Suspense fallback={<ExecutivePageLoader message="Loading maintenance..." />}><MaintenancePage /></Suspense>} />
           <Route path="reports" element={<Suspense fallback={<ExecutivePageLoader message="Loading reports..." />}><ReportsPage /></Suspense>} />
+          <Route path="privacy" element={<Suspense fallback={<ExecutivePageLoader message="Loading privacy..." />}><PrivacyPage /></Suspense>} />
+          <Route path="billing" element={<Suspense fallback={<ExecutivePageLoader message="Loading billing..." />}><BillingPage /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ExecutivePageLoader message="Loading settings..." />}><SettingsPage /></Suspense>} />
+          <Route path="settings/profile" element={<Suspense fallback={<ExecutivePageLoader message="Loading profile settings..." />}><ProfileSettings /></Suspense>} />
+          <Route path="settings/system" element={<Suspense fallback={<ExecutivePageLoader message="Loading system preferences..." />}><SystemPreferences /></Suspense>} />
+          <Route path="settings/security" element={<Suspense fallback={<ExecutivePageLoader message="Loading security settings..." />}><SecuritySettings /></Suspense>} />
+          <Route path="settings/backup" element={<Suspense fallback={<ExecutivePageLoader message="Loading backup & restore..." />}><BackupRestore /></Suspense>} />
+          <Route path="settings/api" element={<Suspense fallback={<ExecutivePageLoader message="Loading API settings..." />}><ApiSettings /></Suspense>} />
           <Route path="admin" element={<Suspense fallback={<ExecutivePageLoader message="Loading admin panel..." />}><AdminPage /></Suspense>} />
           <Route path="ai" element={<Suspense fallback={<ExecutivePageLoader message="Booting AI Assistant..." />}><AIAssistant /></Suspense>} />
           <Route path="showcase" element={<Suspense fallback={<ExecutivePageLoader message="Loading showcase..." />}><div style={{padding: '2rem', textAlign: 'center'}}><h2>Component Showcase</h2><p>Coming Soon - UI Components Demo</p></div></Suspense>} />
           <Route path="*" element={<Suspense fallback={<ExecutivePageLoader message="Loading..." />}><NotFound /></Suspense>} />
         </Route>
-        {/* Default redirect based on auth; allow E2E/test mode or token presence to land at /app */}
-        <Route
-          path="*"
-          element={<DefaultRedirect user={user} />}
-        />
+        {/* Catch-all for truly unknown routes - 404 page */}
+        <Route path="*" element={<Suspense fallback={<MinimalPageLoader />}><NotFound /></Suspense>} />
       </Routes>
   {/* AuthDebugPanel removed */}
     </BrowserRouter>

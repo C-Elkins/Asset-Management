@@ -1,0 +1,112 @@
+services:
+  # Sentry Relay (optional, for self-hosted Sentry or proxying events)
+  sentry-relay:
+    image: getsentry/relay:latest
+    restart: unless-stopped
+    environment:
+      RELAY_RELAY_MODE: proxy
+    ports:
+      - "3000:3000"
+    depends_on: []
+
+  # Prometheus for metrics
+  prometheus:
+    image: prom/prometheus:latest
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/rules:/etc/prometheus/rules:ro
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    ports:
+      - "3003:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # Optional: set these when exposing Grafana on the internet (behind HTTPS)
+      # - GF_SERVER_DOMAIN=grafana.example.com
+      # - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s/
+      # - GF_SERVER_ENFORCE_DOMAIN=true
+      # - GF_AUTH_DISABLE_LOGIN_FORM=false
+      # - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+
+  # Elasticsearch for logs
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  # Logstash for log ingestion
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.4
+    ports:
+      - "5044:5044"
+    volumes:
+      - ./monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    depends_on:
+      - elasticsearch
+
+  # Kibana for log visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+  # Uptime Kuma for uptime monitoring
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    volumes:
+      - uptime_kuma_data:/app/data
+
+  # Node Exporter for basic host/container metrics (container-level on macOS)
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+
+  # Filebeat to ship local app logs to Logstash
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.13.4
+    user: root
+    depends_on:
+      - logstash
+    volumes:
+      - ./monitoring/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      # Mount backend and repo logs into the container
+      - ./backend/logs:/hostlogs/backend:ro
+      - ./logs:/hostlogs/root:ro
+    command: ["--strict.perms=false"]
+
+volumes:
+  grafana_data:
+  esdata:
+  uptime_kuma_data:

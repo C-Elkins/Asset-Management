@@ -11,6 +11,11 @@ WORKDIR /app
 ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0" \
     SPRING_PROFILES_ACTIVE=prod
 
+# Install curl for healthchecks
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy built jar
 COPY --from=build /app/target/*.jar app.jar
 

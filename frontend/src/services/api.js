@@ -30,6 +30,10 @@ api.interceptors.request.use(
     const token = localStorage.getItem('jwt_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     config.headers['X-Correlation-Id'] = corrId;
+    try {
+      const tenant = localStorage.getItem('tenant_id');
+      if (tenant) config.headers['X-Tenant-Id'] = tenant;
+    } catch {}
   // authDebug removed
     return config;
   },
@@ -74,26 +78,44 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
       
-      const { refreshToken } = useAuthStore.getState();
+  const { refreshToken, lastLoginTime } = useAuthStore.getState();
+  const recentLogin = lastLoginTime && (Date.now() - lastLoginTime) < 5_000; // 5s guard
       // Only attempt a refresh if we actually have a refresh token
       if (refreshToken && !original._retry) {
+          if (import.meta && import.meta.env && import.meta.env.MODE === 'development') console.log('🔄 [API Interceptor] Attempting token refresh for failed request:', reqUrl);
         original._retry = true;
+        // small jittered backoff to avoid racing right after login
+        if (recentLogin) {
+          await new Promise(res => setTimeout(res, 300));
+        }
         try {
           const ok = await useAuthStore.getState().refreshAuth();
           if (ok) {
+              if (import.meta && import.meta.env && import.meta.env.MODE === 'development') console.log('✅ [API Interceptor] Token refresh successful, retrying request');
             const { accessToken } = useAuthStore.getState();
             if (accessToken) {
               original.headers = { ...(original.headers || {}), Authorization: `Bearer ${accessToken}` };
             }
             return await axios.request(original);
+            } else {
+              if (import.meta && import.meta.env && import.meta.env.MODE === 'development') console.error('❌ [API Interceptor] Token refresh returned false');
           }
         } catch {
+            if (import.meta && import.meta.env && import.meta.env.MODE === 'development') console.error('❌ [API Interceptor] Token refresh threw error');
           // fall through to logout
         }
       }
       
       // If we had a refresh token and refresh failed, log out
       if (refreshToken) {
+        if (import.meta && import.meta.env && import.meta.env.MODE === 'development') {
+          console.error('🚨 [API Interceptor] Refresh failed, logging out automatically!', { 
+           url: reqUrl, 
+           status: error.response?.status,
+           hasRefreshToken: !!refreshToken 
+          });
+        }
+        try { localStorage.setItem('logout_reason', 'Your session ended. Please sign in again.'); } catch {}
         await useAuthStore.getState().logout();
       }
       

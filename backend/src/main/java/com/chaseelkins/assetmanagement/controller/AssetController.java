@@ -4,15 +4,18 @@ import com.chaseelkins.assetmanagement.dto.AssetDTO;
 import com.chaseelkins.assetmanagement.model.Asset;
 import com.chaseelkins.assetmanagement.service.AssetService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/assets")
+@Validated
 @CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3006", "http://127.0.0.1:3006"})
 public class AssetController {
     
@@ -45,7 +48,7 @@ public class AssetController {
      * Get asset by ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Asset> getAssetById(@PathVariable Long id) {
+    public ResponseEntity<Asset> getAssetById(@PathVariable @Min(1) Long id) {
         try {
             Asset asset = assetService.getAssetById(id);
             return ResponseEntity.ok(asset);
@@ -59,7 +62,7 @@ public class AssetController {
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('IT_ADMIN','MANAGER','SUPER_ADMIN')")
-    public ResponseEntity<Asset> updateAsset(@PathVariable Long id, @Valid @RequestBody AssetDTO assetDTO) {
+    public ResponseEntity<Asset> updateAsset(@PathVariable @Min(1) Long id, @Valid @RequestBody AssetDTO assetDTO) {
         try {
             Asset updatedAsset = assetService.updateAsset(id, assetDTO);
             return ResponseEntity.ok(updatedAsset);
@@ -73,7 +76,7 @@ public class AssetController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('IT_ADMIN','SUPER_ADMIN')")
-    public ResponseEntity<Void> deleteAsset(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteAsset(@PathVariable @Min(1) Long id) {
         try {
             assetService.deleteAsset(id);
             return ResponseEntity.noContent().build();
