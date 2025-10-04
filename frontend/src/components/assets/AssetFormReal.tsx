@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import useAssetStore from '../../stores/assetStore';
 import { useAI } from '../../services/aiService';
-import { ExecutiveButton } from '../common/ExecutiveButton';
+import ExecutiveButton from '../common/ExecutiveButton';
 import { Asset } from '../../services/localDatabase';
 
 interface AssetFormProps {

@@ -115,92 +115,19 @@ export const Header = ({ user, onLogout }) => {
     { label: 'API Settings', action: () => navigate('/app/settings/api') }
   ];
 
-  // Interactive states
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'success',
-      title: 'Asset Updated',
-      message: 'MacBook Pro LT001 has been successfully updated',
-      time: '2 min ago',
-      read: false
-    },
-    {
-      id: 2,
-      type: 'warning', 
-      title: 'Maintenance Due',
-      message: 'Server maintenance scheduled for tonight',
-      time: '1 hour ago',
-      read: false
-    },
-    {
-      id: 3,
-      type: 'info',
-      title: 'New User Added',
-      message: 'John Smith has been added to the system',
-      time: '3 hours ago',
-      read: true
-    }
-  ]);
-
-  // Interactive functions
-  const markAsRead = (id) => {
-    setNotifications(prev => prev.map(n => n.id === id ? {...n, read: true} : n));
-  };
-
-  // Ensure mutual exclusivity - only one dropdown open at a time
-  const toggleNotifications = () => {
-    setShowSettings(false); // Close settings first
-    setShowNotifications(!showNotifications);
-  };
-
-  const toggleSettings = () => {
-    setShowNotifications(false); // Close notifications first
-    setShowSettings(!showSettings);
-  };
-  
-  const clearAllNotifications = () => {
-    setNotifications(prev => prev.map(n => ({...n, read: true})));
-  };
-  
-  const unreadCount = notifications.filter(n => !n.read).length;
-  
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    // Add search functionality here
-  };
-  
-  const settingsItems = [
-    { label: 'Profile Settings', action: () => alert('Profile Settings clicked') },
-    { label: 'System Preferences', action: () => alert('System Preferences clicked') },
-    { label: 'Security Settings', action: () => alert('Security Settings clicked') },
-    { label: 'Backup & Restore', action: () => alert('Backup & Restore clicked') },
-    { label: 'API Settings', action: () => alert('API Settings clicked') }
-  ];
-
-  // Map backend role codes to friendly labels
-  const roleLabel = (code) => {
-    if (!code) return '';
-    const map = {
-      'ROLE_SUPER_ADMIN': 'Super Admin',
-      'ROLE_ADMIN': 'Admin', 
-      'ROLE_MANAGER': 'Manager',
-      'ROLE_USER': 'User'
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.notifications-dropdown') && !event.target.closest('.notifications-btn')) {
+        setShowNotifications(false);
+      }
+      if (!event.target.closest('.settings-dropdown') && !event.target.closest('.settings-btn')) {
+        setShowSettings(false);
+      }
     };
-    return map[code] || code.replace(/^ROLE_/, '').toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  };
-
-  // const compactUser = (() => {
-  //   if (!user) return '';
-  //   const name = user.username || 'Signed in';
-  //   const roles = Array.isArray(user.roles) && user.roles.length > 0
-  //     ? user.roles.map(roleLabel).join(', ')
-  //     : '';
-  //   return roles ? `${name} · ${roles}` : name;
-  // })();
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const location = useLocation();
   const [animating, setAnimating] = useState(false);
