@@ -38,7 +38,7 @@ public class User extends TenantAwareEntity {
     private String email;
     
     // Password is nullable for OAuth2 users
-    @Size(min = 6, message = "Password must be at least 6 characters")
+    @Size(min = 12, message = "Password must be at least 12 characters")
     @Column(nullable = true)
     private String password;
     

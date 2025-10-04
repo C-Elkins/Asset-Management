@@ -41,16 +41,16 @@ spring:
       client:
         registration:
           google:
-            client-id: "${GOOGLE_CLIENT_ID:your-google-client-id-here}"
-            client-secret: "${GOOGLE_CLIENT_SECRET:your-google-client-secret-here}"
+            client-id: "${GOOGLE_CLIENT_ID}"
+            client-secret: "${GOOGLE_CLIENT_SECRET}"
             scope:
               - email
               - profile
             redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/google"
             authorization-grant-type: authorization_code
           microsoft:
-            client-id: ${MICROSOFT_CLIENT_ID:placeholder-microsoft-client-id}
-            client-secret: ${MICROSOFT_CLIENT_SECRET:placeholder-microsoft-secret}
+            client-id: ${MICROSOFT_CLIENT_ID}
+            client-secret: ${MICROSOFT_CLIENT_SECRET}
             scope:
               - openid
               - profile
@@ -80,10 +80,11 @@ server:
   max-http-header-size: 8KB
 
 # Stripe Configuration
+# REQUIRED: Set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET environment variables
 stripe:
-  api-key: ${STRIPE_SECRET_KEY:sk_test_51SE1M7RnSgrmRk1TxkwctZ6e5Xpun0pkOA8TdvUeKiqT1aTNwKwbwQWQMq6o11nzo8xTS8FhODhSLCJnkUXWXt6J00L2AjI7bm}
-  publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_51SE1M7RnSgrmRk1TXlB3HyFWd0jPCj0ffgk4nLZlKhguHybdx7QblMdxZ4ve8Qn1gNt7eiMfbDn6eOK3zrKgnNJC00BXa2ya6q}
-  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_your_webhook_secret_here}
+  api-key: ${STRIPE_SECRET_KEY}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
   price-ids:
     free: ${STRIPE_FREE_PRICE_ID:price_free}
     professional-monthly: ${STRIPE_PRO_MONTHLY_PRICE_ID:price_pro_monthly}
@@ -128,8 +129,9 @@ logging:
 
 # JWT Configuration
 jwt:
-  # In production supply via environment: export JWT_SECRET=... (length >= 32 chars)
-  secret: "${JWT_SECRET:mySecretKey123456789012345678901234567890}"
+  # REQUIRED: Set JWT_SECRET environment variable (minimum 32 characters)
+  # Generate with: openssl rand -base64 64
+  secret: "${JWT_SECRET}"
   # Legacy property (will be superseded by access-expiration if present)
   expiration: 86400000 # 24 hours in milliseconds (fallback)
   # New granular expirations

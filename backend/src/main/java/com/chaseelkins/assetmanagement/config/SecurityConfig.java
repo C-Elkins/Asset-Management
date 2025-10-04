@@ -46,7 +46,10 @@ public class SecurityConfig {
         
         http
             .cors(Customizer.withDefaults())
-            // Stateless API with JWT — disable CSRF entirely (no cookies used)
+            // CSRF disabled: This is a stateless JWT API without cookie-based sessions.
+            // CSRF protection is not needed as tokens are sent via Authorization header,
+            // not cookies. Attacks would require stealing the JWT token itself.
+            // See: https://owasp.org/www-community/attacks/csrf
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> {
@@ -56,8 +59,8 @@ public class SecurityConfig {
                 // Public health endpoints (without /api/v1 prefix - it's the context path)
                 auth.requestMatchers("/actuator/health", "/healthz", "/health").permitAll();
                 
-                // H2 Console - ONLY in dev/test, NEVER production
-                if ("dev".equals(activeProfile) || "test".equals(activeProfile)) {
+                // H2 Console - ONLY in dev profile, NEVER production or test
+                if ("dev".equals(activeProfile)) {
                     auth.requestMatchers("/h2-console/**").permitAll();
                 }
                 
@@ -67,9 +70,13 @@ public class SecurityConfig {
                 // Tenant registration - public endpoint for SaaS signup (without /api/v1 prefix)
                 auth.requestMatchers("/tenants/register").permitAll();
                 
-                // Swagger/OpenAPI - only in non-production
-                if (!"prod".equals(activeProfile)) {
-                    auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**").permitAll();
+                // Swagger/OpenAPI - require authentication in all environments
+                if ("prod".equals(activeProfile)) {
+                    // Completely disable in production for security
+                    auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**").denyAll();
+                } else {
+                    // Require SUPER_ADMIN in non-production
+                    auth.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**").hasRole("SUPER_ADMIN");
                 }
                 
                 // Admin-only actuator endpoints (without /api/v1 prefix)

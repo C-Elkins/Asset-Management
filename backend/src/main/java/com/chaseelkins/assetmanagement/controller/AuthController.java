@@ -1,6 +1,7 @@
 package com.chaseelkins.assetmanagement.controller;
 
 import com.chaseelkins.assetmanagement.security.JwtTokenProvider;
+import com.chaseelkins.assetmanagement.security.AuthRateLimiter;
 import com.chaseelkins.assetmanagement.service.RefreshTokenService;
 import com.chaseelkins.assetmanagement.service.RefreshTokenService.GeneratedToken;
 import com.chaseelkins.assetmanagement.service.UserService;
@@ -43,6 +44,7 @@ public class AuthController {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final AuthRateLimiter authRateLimiter;
 
     private final Counter loginSuccess;
     private final Counter loginFailure;
@@ -54,12 +56,14 @@ public class AuthController {
                           RefreshTokenService refreshTokenService,
                           UserRepository userRepository,
                           UserService userService,
-                          MeterRegistry registry) {
+                          MeterRegistry registry,
+                          AuthRateLimiter authRateLimiter) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.authRateLimiter = authRateLimiter;
         this.loginSuccess = Counter.builder("auth_login_success_total").description("Successful logins").register(registry);
         this.loginFailure = Counter.builder("auth_login_failure_total").description("Failed logins").register(registry);
         this.refreshSuccess = Counter.builder("auth_refresh_success_total").description("Successful refreshes").register(registry);
@@ -68,6 +72,19 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletRequest httpRequest) {
+        String ipAddress = httpRequest.getRemoteAddr();
+        
+        // Check rate limit BEFORE attempting authentication
+        if (!authRateLimiter.allowLoginAttempt(request.getEmail(), ipAddress)) {
+            loginFailure.increment();
+            int remaining = authRateLimiter.getRemainingAttempts(request.getEmail(), ipAddress);
+            return ResponseEntity.status(429)
+                .body(new ErrorResponse(
+                    "Too many login attempts. Please try again in 15 minutes. " +
+                    "Attempts remaining: " + remaining
+                ));
+        }
+        
         try {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -80,10 +97,15 @@ public class AuthController {
             User user = userRepository.findByEmail(principal.getUsername()).orElseThrow();
             if (Boolean.TRUE.equals(user.getMustChangePassword())) {
                 // Do not issue tokens, require password change
+                authRateLimiter.recordFailedLogin(request.getEmail(), ipAddress);
                 loginFailure.increment();
                 return ResponseEntity.status(403)
                         .body(new ErrorResponse("Password change required. Please change your password before logging in."));
             }
+            
+            // Clear rate limits on successful login
+            authRateLimiter.clearLimits(request.getEmail(), ipAddress);
+            
             GeneratedToken refresh = refreshTokenService.generate(user, userAgent, ip);
             long expiresInSeconds = jwtTokenProvider.getAccessExpirationMillis() / 1000;
             AuthResponse payload = new AuthResponse(accessToken, refresh.raw(), expiresInSeconds, UserDTO.fromEntity(user));
@@ -92,14 +114,18 @@ public class AuthController {
             loginSuccess.increment();
             return builder.body(payload);
         } catch (BadCredentialsException ex) {
+            // Record failed login for rate limiting
+            authRateLimiter.recordFailedLogin(request.getEmail(), ipAddress);
             loginFailure.increment();
             return ResponseEntity.status(401)
                     .body(new ErrorResponse("Invalid username or password. Please check your credentials and try again."));
         } catch (AuthenticationException ex) {
+            authRateLimiter.recordFailedLogin(request.getEmail(), ipAddress);
             loginFailure.increment();
             return ResponseEntity.status(401)
                 .body(new ErrorResponse("Authentication failed. Please verify your account status and try again."));
         } catch (Exception ex) {
+            authRateLimiter.recordFailedLogin(request.getEmail(), ipAddress);
             loginFailure.increment();
             return ResponseEntity.status(500)
                     .body(new ErrorResponse("Login failed. Please try again."));
