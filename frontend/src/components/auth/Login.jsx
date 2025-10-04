@@ -104,9 +104,9 @@ export const Login = () => {
       if (shouldFallback) {
         try {
           // Attempt direct /healthz first, then actuator if needed
-          let direct = await fetch('http://localhost:8080/api/v1/healthz', { headers: { 'Accept': 'application/json' } });
+          let direct = await fetch('/api/healthz', { headers: { 'Accept': 'application/json' } });
           if (!direct.ok) {
-            direct = await fetch('http://localhost:8080/api/v1/actuator/health', { headers: { 'Accept': 'application/json' } });
+            direct = await fetch('/api/actuator/health', { headers: { 'Accept': 'application/json' } });
           }
           if (direct.ok) {
             const json = await direct.json();
@@ -334,7 +334,8 @@ export const Login = () => {
         <button
           type="submit"
           disabled={isSubmitting || googleLoading || microsoftLoading || (backendStatus.state === 'down' && !isE2E)}
-          className="primary-btn"
+          className="w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+          style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)' }}
           aria-disabled={isSubmitting || googleLoading || microsoftLoading || (backendStatus.state === 'down' && !isE2E)}
         >
           { isSubmitting ? 'Authenticating…' : (backendStatus.state === 'down' && !isE2E) ? 'Backend Offline' : backendStatus.state === 'warn' ? 'Login (Degraded)' : 'Login' }

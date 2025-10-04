@@ -6,8 +6,8 @@ import { useRateLimitStore } from '../store/rateLimitStore';
 
 // Derive base URL. Prefer explicit env, then proxy path in dev, else absolute.
 const EXPLICIT = import.meta.env.VITE_API_BASE_URL;
-// Fix: Use correct backend API path consistently
-const BASE_URL = EXPLICIT || 'http://localhost:8080/api/v1';
+// Use proxy path for development to avoid CORS issues
+const BASE_URL = EXPLICIT || '/api';
 
 // Create axios instance with backend configuration
 export const api = axios.create({
