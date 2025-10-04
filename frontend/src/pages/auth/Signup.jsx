@@ -215,7 +215,24 @@ export const Signup = () => {
               </div>
 
               <p className="text-xs text-gray-500 text-center mt-6">
-                By signing up, you agree to our Terms of Service and Privacy Policy
+                By signing up, you agree to our{' '}
+                <a 
+                  href="/terms-of-service.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  Terms of Service
+                </a>
+                {' '}and{' '}
+                <a 
+                  href="/privacy-policy.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:text-blue-700 underline"
+                >
+                  Privacy Policy
+                </a>
               </p>
             </div>
           </div>
@@ -226,6 +243,32 @@ export const Signup = () => {
       <footer className="max-w-7xl mx-auto px-6 py-8 mt-12 border-t border-gray-200 relative">
         <div className="text-center text-sm text-gray-600">
           <p>© 2025 Krubles. All rights reserved.</p>
+          <div className="mt-2 space-x-4">
+            <a 
+              href="/terms-of-service.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Terms of Service
+            </a>
+            <span className="text-gray-400">•</span>
+            <a 
+              href="/privacy-policy.html" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Privacy Policy
+            </a>
+            <span className="text-gray-400">•</span>
+            <a 
+              href="mailto:support@krubles.com"
+              className="text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              Contact
+            </a>
+          </div>
         </div>
       </footer>
     </div>
