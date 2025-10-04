@@ -38,11 +38,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Clean install dependencies and build
+      - name: Clean install dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm install --no-audit --no-fund
-          npm run build
+      - name: Build frontend
+        run: npm run build
+      - name: Verify build artifacts
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist folder not found after build"
+            exit 1
+          fi
+          ls -la dist/
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
       - name: Run E2E smoke tests
