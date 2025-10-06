@@ -150,15 +150,7 @@ export function SettingsPageModern() {
       return;
     }
     
-    if (section === 'system' && key === 'darkMode') {
-      toggleDarkMode();
-      addToast({ 
-        type: 'info', 
-        title: (globalSettings?.system?.darkMode ? 'Light' : 'Dark') + ' Mode Enabled',
-        message: 'Theme updated across all pages'
-      });
-      return;
-    }
+    // dark mode removed from user-accessible settings
     
     setSettings(prev => ({
       ...prev,
@@ -323,17 +315,11 @@ export function SettingsPageModern() {
                     
                     // Add helpful descriptions
                     const descriptions = {
-                      showTooltips: 'Show helpful hints and explanations throughout the app',
-                      // Clarify scope: app-only, not marketing pages
-                      darkMode: darkModeAllowed
-                        ? 'Enable dark theme across the app (marketing pages are unaffected)'
-                        : 'Dark theme is disabled by admin'
+                      showTooltips: 'Show helpful hints and explanations throughout the app'
                     };
 
-                    // If dark mode is feature-flagged off, hide the toggle entirely
-                    if (!darkModeAllowed && key === 'darkMode') {
-                      return null;
-                    }
+                    // Dark mode is not exposed in settings anymore
+                    if (key === 'darkMode') return null;
                     
                     return (
                       <motion.div
