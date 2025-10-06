@@ -39,6 +39,12 @@ export const useSettingsStore = create(
 
       // Toggle dark mode for app shell only
       toggleDarkMode: () => {
+        // Feature flag: allow globally disabling dark mode behavior if needed
+        const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') !== 'off');
+        if (!DARK_MODE_ENABLED) {
+          console.warn('[settingsStore] Dark mode is disabled by feature flag.');
+          return;
+        }
         set((state) => {
           const newDarkMode = !state.settings.system.darkMode;
           const appRoot = document.getElementById('app-root');
@@ -64,6 +70,11 @@ export const useSettingsStore = create(
 
       // Set dark mode explicitly for app shell only
       setDarkMode: (enabled) => {
+        const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') !== 'off');
+        if (!DARK_MODE_ENABLED) {
+          console.warn('[settingsStore] Dark mode is disabled by feature flag.');
+          enabled = false;
+        }
         set((state) => {
           const appRoot = document.getElementById('app-root');
           if (appRoot) {
