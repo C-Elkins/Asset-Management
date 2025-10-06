@@ -39,6 +39,9 @@ export function SettingsPageModern() {
   const [error, setError] = useState('');
   const [sessionExpired, setSessionExpired] = useState(false);
 
+  // Feature flag: dark mode can be disabled globally
+  const darkModeAllowed = (typeof window !== 'undefined' && localStorage.getItem('feature_dark_mode') !== 'off');
+
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -321,8 +324,16 @@ export function SettingsPageModern() {
                     // Add helpful descriptions
                     const descriptions = {
                       showTooltips: 'Show helpful hints and explanations throughout the app',
-                      darkMode: 'Enable dark theme across all pages including marketing pages'
+                      // Clarify scope: app-only, not marketing pages
+                      darkMode: darkModeAllowed
+                        ? 'Enable dark theme across the app (marketing pages are unaffected)'
+                        : 'Dark theme is disabled by admin'
                     };
+
+                    // If dark mode is feature-flagged off, hide the toggle entirely
+                    if (!darkModeAllowed && key === 'darkMode') {
+                      return null;
+                    }
                     
                     return (
                       <motion.div
