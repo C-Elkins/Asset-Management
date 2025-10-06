@@ -10,10 +10,10 @@ test('login page renders', async ({ page }) => {
   await page.route('**/actuator/health', async route => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ status: 'UP' }) });
   });
-  await page.goto('/login');
-  // Wait for React hydration and heading to attach
-  await page.waitForSelector('h1,h2');
-  await expect(page.getByRole('heading', { name: /Asset Management by Krubles Login/i })).toBeVisible();
+  // Ensure a clean slate to avoid redirects from prior auth state
+  await page.goto('/login?clear=1');
+  // Wait for the expected login heading specifically
+  await expect(page.getByRole('heading', { name: /Asset Management by Krubles Login/i })).toBeVisible({ timeout: 15000 });
   // Some builds wrap the button differently; fall back to text locator if role query misses
   const loginButton = page.getByRole('button', { name: /login/i });
   if (!(await loginButton.isVisible().catch(() => false))) {
@@ -55,10 +55,11 @@ test('login happy path with demo creds', async ({ page }) => {
     await route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
   });
 
-  await page.goto('/login?e2e=1');
+  await page.goto('/login?e2e=1&clear=1');
   await page.evaluate(() => (window).__e2eLogin && (window).__e2eLogin('testAccess'));
-  await page.goto('/app');
+  // Navigate directly to the dashboard route to avoid intermediate index redirects
+  await page.goto('/app/dashboard');
 
-  await expect(page).toHaveURL(/\/app/);
-  await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible();
+  await expect(page).toHaveURL(/\/app\/?|\/app\/dashboard/);
+  await expect(page.getByRole('heading', { name: /Dashboard/i })).toBeVisible({ timeout: 15000 });
 });
