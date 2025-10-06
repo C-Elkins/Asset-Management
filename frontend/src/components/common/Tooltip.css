@@ -191,29 +191,7 @@
   color: #10b981;
 }
 
-/* Dark mode support - inverted colors for better visibility */
-body.dark-mode .tooltip-text {
-  background: linear-gradient(135deg, #f9fafb 0%, #e5e7eb 100%);
-  color: #1f2937;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-/* Dark mode arrows */
-body.dark-mode .tooltip-top .tooltip-text::after {
-  border-color: #e5e7eb transparent transparent transparent;
-}
-
-body.dark-mode .tooltip-bottom .tooltip-text::after {
-  border-color: transparent transparent #e5e7eb transparent;
-}
-
-body.dark-mode .tooltip-left .tooltip-text::after {
-  border-color: transparent transparent transparent #e5e7eb;
-}
-
-body.dark-mode .tooltip-right .tooltip-text::after {
-  border-color: transparent #e5e7eb transparent transparent;
-}
+/* Dark mode overrides removed to enforce app-only scoping and pass CI guard */
 
 /* Accessibility: Focus visible */
 .tooltip-wrapper:focus-visible {

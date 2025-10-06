@@ -3,6 +3,10 @@
 .env
 *.log
 
+# PIDs and runtime state
+*.pid
+.pids/
+
 # Java / Maven
 backend/target/
 backend/.mvn/
@@ -31,6 +35,14 @@ frontend/dist/
 frontend/.cache/
 frontend/test-results/
 frontend/playwright-report/
+frontend/frontend.pid
+# Ignore all frontend env files except examples
+frontend/.env*
+!frontend/.env*.example
+
+# Logs directories
+backend/logs/
+logs/
 
 # Docker
 .docker/
