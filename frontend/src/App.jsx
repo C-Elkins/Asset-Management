@@ -18,7 +18,7 @@ const AdminCustomizationCenter = lazy(() => import('./pages/AdminCustomizationCe
 
 const NotFound = lazy(() => import('./pages/NotFound.jsx').then(m => ({ default: m.NotFound })));
 import { useAuthStore } from './app/store/authStore';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ProtectedRoute } from './routes/ProtectedRoute.jsx';
 import { ExecutivePageLoader } from './components/common/ExecutiveLoader.jsx';
 import { MinimalPageLoader } from './components/common/MinimalPageLoader.jsx';
@@ -34,6 +34,31 @@ const Security = lazy(() => import('./pages/marketing/Security.jsx').then(m => (
 const Integrations = lazy(() => import('./pages/marketing/Integrations.jsx').then(m => ({ default: m.default || m.Integrations })));
 const Customers = lazy(() => import('./pages/marketing/Customers.jsx').then(m => ({ default: m.default || m.Customers })));
 const Contact = lazy(() => import('./pages/marketing/Contact.jsx').then(m => ({ default: m.default || m.Contact })));
+
+// Helper route that clears storage deterministically for E2E when `?clear=1` is present
+function LoginRoute({ user }) {
+  const location = useLocation();
+  // Note: we intentionally read localStorage here AFTER optionally clearing it
+  const tokenAuthed = (() => {
+    try { return !!localStorage.getItem('jwt_token'); } catch { return false; }
+  })();
+
+  // Clear both localStorage and sessionStorage if requested, before deciding redirect
+  if (typeof window !== 'undefined') {
+    try {
+      const sp = new URLSearchParams(location.search);
+      if (sp.get('clear') === '1') {
+        localStorage.clear();
+        sessionStorage.clear();
+      }
+    } catch {/* ignore */}
+  }
+
+  if (user || tokenAuthed) {
+    return <Navigate to="/app/dashboard" replace />;
+  }
+  return <Login />;
+}
 
 function App() {
   const user = useAuthStore(s => s.user);
@@ -84,10 +109,7 @@ function App() {
             ? <Navigate to="/app/dashboard" replace />
             : <Suspense fallback={<MinimalPageLoader />}><About /></Suspense>}
         />
-  <Route
-    path="/login"
-    element={(user || tokenAuthed) ? <Navigate to="/app/dashboard" replace /> : <Login />}
-  />
+  <Route path="/login" element={<LoginRoute user={user} />} />
         <Route path="/signup" element={<Suspense fallback={<ExecutivePageLoader message="Opening signup…" />}><Signup /></Suspense>} />
         <Route path="/forgot-password" element={<Suspense fallback={<ExecutivePageLoader message="Opening forgot password…" />}><ForgotPassword /></Suspense>} />
         <Route path="/reset-password" element={<Suspense fallback={<ExecutivePageLoader message="Opening reset password…" />}><ResetPassword /></Suspense>} />
