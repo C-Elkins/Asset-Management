@@ -52,9 +52,9 @@ function App() {
 
   const handleLogout = () => { logout(); };
 
-  if (isLoading && !user) {
-    return <ExecutivePageLoader message="Initializing Enterprise Portal..." />;
-  }
+  // Note: Do not block initial render with a global loader so that public routes like /login
+  // can render their headings immediately for accessibility and E2E stability. App routes
+  // are already guarded with loading state inside ProtectedRoute.
 
   return (
     <BrowserRouter>
