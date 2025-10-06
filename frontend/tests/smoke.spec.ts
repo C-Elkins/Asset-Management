@@ -13,7 +13,7 @@ test('login page renders', async ({ page }) => {
   await page.goto('/login');
   // Wait for React hydration and heading to attach
   await page.waitForSelector('h1,h2');
-  await expect(page.getByRole('heading', { name: /IT Asset Management Login/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Asset Management by Krubles Login/i })).toBeVisible();
   // Some builds wrap the button differently; fall back to text locator if role query misses
   const loginButton = page.getByRole('button', { name: /login/i });
   if (!(await loginButton.isVisible().catch(() => false))) {

@@ -10,7 +10,8 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = Number(process.env.PORT || 4173);
 
-app.use(express.json());
+// Accept primitive JSON bodies like `null` for endpoints that don't send a payload (e.g., /auth/refresh)
+app.use(express.json({ strict: false }));
 
 // Simple in-memory user
 const demoUser = {
@@ -33,8 +34,12 @@ api.get('/actuator/health', (_req, res) => {
 });
 
 api.post('/auth/login', (req, res) => {
-  const { username, password } = req.body || {};
-  if (username === 'admin' && password === 'admin123') {
+  const { username, email, password } = req.body || {};
+  const userField = username || email;
+  // Accept common demo creds used in tests
+  const isAdmin = userField === 'admin' && password === 'admin123';
+  const isDevUser = userField === 'user@devorg.com' && password === 'DevUser123!';
+  if (isAdmin || isDevUser) {
     return res.json({
       accessToken: 'mock-access-token',
       refreshToken: 'mock-refresh-token',
@@ -62,7 +67,9 @@ api.get('/auth/me', (req, res) => {
   return res.json(demoUser);
 });
 
+// Mount API under both /api and /api/v1 to satisfy different test expectations
 app.use('/api', api);
+app.use('/api/v1', api);
 
 // Static frontend from dist
 const distDir = path.resolve(__dirname, '../dist');
@@ -80,7 +87,10 @@ const frontendLimiter = rateLimit({
 });
 
 app.use(frontendLimiter, express.static(distDir));
-app.get('*', frontendLimiter, (_req, res) => {
+// SPA fallback for any non-API GET route
+app.use((req, res, next) => {
+  if (req.method !== 'GET') return next();
+  if (req.path.startsWith('/api')) return next();
   res.sendFile(path.join(distDir, 'index.html'));
 });
 
