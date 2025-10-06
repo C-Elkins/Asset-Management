@@ -88,7 +88,7 @@ const frontendLimiter = rateLimit({
 
 app.use(frontendLimiter, express.static(distDir));
 // SPA fallback for any non-API GET route
-app.use((req, res, next) => {
+app.use(frontendLimiter, (req, res, next) => {
   if (req.method !== 'GET') return next();
   if (req.path.startsWith('/api')) return next();
   res.sendFile(path.join(distDir, 'index.html'));
