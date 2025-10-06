@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
 import { exportService } from '../../services/exportService.js';
+import { useCustomization } from '../../hooks/useCustomization';
 
 export const MaintenanceAlerts = () => {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { terminology } = useCustomization();
 
   const loadMaintenanceAlerts = React.useCallback(async () => {
     try {
@@ -200,7 +202,7 @@ export const MaintenanceAlerts = () => {
     <div className="maintenance-alerts-container">
       <div className="alerts-header">
         <div>
-          <h2>Maintenance & Alerts</h2>
+          <h2>{(terminology.maintenance || 'Maintenance')} & Alerts</h2>
           <p>Monitor asset maintenance, warranties, and urgent actions</p>
         </div>
         <div className="alerts-actions">
@@ -220,10 +222,10 @@ export const MaintenanceAlerts = () => {
       </div>
 
       {alerts.length === 0 ? (
-        <div className="no-alerts">
+          <div className="no-alerts">
           <div className="no-alerts-icon">✅</div>
           <h3>All Clear!</h3>
-          <p>No maintenance alerts or urgent actions required at this time.</p>
+          <p>No {(terminology.maintenance || 'maintenance').toLowerCase()} alerts or urgent actions required at this time.</p>
         </div>
       ) : (
         <div className="alerts-list">
@@ -276,7 +278,7 @@ export const MaintenanceAlerts = () => {
                   </button>
                   {alert.type === 'maintenance' && (
                     <button className="action-btn secondary" onClick={() => navigate('/app/maintenance')}>
-                      Schedule Maintenance
+                      {`Schedule ${terminology.maintenance || 'Maintenance'}`}
                     </button>
                   )}
                 </div>

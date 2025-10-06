@@ -1,16 +1,18 @@
 import React from 'react';
+import { useCustomization } from '../../hooks/useCustomization';
 import { motion } from 'framer-motion';
 import { Card, Badge } from '@/components/ui';
 import { Wrench } from 'lucide-react';
 
 const MaintenancePage: React.FC = () => {
+  const { terminology } = useCustomization();
   return (
     <div className="space-y-6">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900">Maintenance</h1>
+  <h1 className="text-3xl font-bold text-gray-900">{terminology.maintenance || 'Maintenance'}</h1>
         <p className="text-gray-600 mt-1">Track and schedule maintenance activities</p>
       </motion.div>
 

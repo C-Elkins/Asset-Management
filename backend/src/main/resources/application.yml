@@ -36,40 +36,11 @@ spring:
       enabled: true
       path: /h2-console
 
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: "${GOOGLE_CLIENT_ID}"
-            client-secret: "${GOOGLE_CLIENT_SECRET}"
-            scope:
-              - email
-              - profile
-            redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/google"
-            authorization-grant-type: authorization_code
-          microsoft:
-            client-id: ${MICROSOFT_CLIENT_ID}
-            client-secret: ${MICROSOFT_CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - email
-              - User.Read
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/api/v1/auth/oauth2/callback/microsoft"
-            client-name: Microsoft
-        provider:
-          google:
-            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
-            token-uri: https://oauth2.googleapis.com/token
-            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
-            user-name-attribute: sub
-          microsoft:
-            authorization-uri: https://login.microsoftonline.com/${MICROSOFT_TENANT_ID:common}/oauth2/v2.0/authorize
-            token-uri: https://login.microsoftonline.com/${MICROSOFT_TENANT_ID:common}/oauth2/v2.0/token
-            user-info-uri: https://graph.microsoft.com/v1.0/me
-            user-name-attribute: id
+  # OAuth2 configuration - only enabled when credentials are provided
+  # OAuth2 configuration is now handled programmatically in ConditionalOAuth2Config.java
+  # This allows OAuth2 to be completely optional for development while remaining production-ready
+  # To enable OAuth2 login, set these environment variables:
+  # GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET
 
 server:
   port: 8080

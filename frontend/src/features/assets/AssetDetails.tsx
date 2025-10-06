@@ -2,10 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useParams, Link } from 'react-router-dom';
 import { Card, Button, Badge } from '@/components/ui';
+// Import customization hook (types provided by useCustomization.d.ts)
+import { useCustomization } from '../../hooks/useCustomization';
 import { Package, ArrowLeft, Edit, Trash2 } from 'lucide-react';
 
 const AssetDetails: React.FC = () => {
   const { id } = useParams();
+  const { terminology } = useCustomization();
 
   return (
     <div className="space-y-6">
@@ -19,7 +22,7 @@ const AssetDetails: React.FC = () => {
           className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft size={16} />
-          Back to Assets
+          Back to {terminology.assets || 'Assets'}
         </Link>
       </motion.div>
 
@@ -36,7 +39,7 @@ const AssetDetails: React.FC = () => {
                 <Package size={24} className="text-primary-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Asset #{id}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{terminology.assetSingular || 'Asset'} #{id}</h1>
                 <p className="text-gray-600">Detailed view coming soon</p>
               </div>
             </div>

@@ -19,13 +19,27 @@ const DEFAULT_SETTINGS = Object.freeze({
     backupEnabled: true,
     maintenanceWindow: '02:00 - 04:00',
     logLevel: 'INFO',
-    maxUsers: 50
+    maxUsers: 50,
+    showTooltips: true,
+    darkMode: false
   },
   notifications: {
     emailNotifications: true,
     pushNotifications: false,
     maintenanceAlerts: true,
     weeklyReports: true
+  },
+  privacy: {
+    marketingEmails: false,
+    analytics: true,
+    dataProcessing: true,
+    shareWithThirdParties: false
+  },
+  billing: {
+    autoRenew: true,
+    invoiceEmails: true,
+    paymentReminders: true,
+    usageAlerts: false
   }
 });
 

@@ -1,9 +1,47 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { assetService } from '../../services/assetService.js';
 import { useNavigate } from 'react-router-dom';
+import { useCustomization } from '../../hooks/useCustomization';
+
+// Krubles Logo Component
+const KrublesLogo = ({ className = "" }) => (
+  <svg className={className} viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="stemGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" style={{stopColor:'#6ee7b7', stopOpacity:1}} />
+        <stop offset="50%" style={{stopColor:'#34d399', stopOpacity:1}} />
+        <stop offset="100%" style={{stopColor:'#10b981', stopOpacity:1}} />
+      </linearGradient>
+      <linearGradient id="topArmGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style={{stopColor:'#10b981', stopOpacity:1}} />
+        <stop offset="100%" style={{stopColor:'#059669', stopOpacity:1}} />
+      </linearGradient>
+      <linearGradient id="bottomArmGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+        <stop offset="0%" style={{stopColor:'#047857', stopOpacity:1}} />
+        <stop offset="100%" style={{stopColor:'#10b981', stopOpacity:1}} />
+      </linearGradient>
+    </defs>
+    <circle cx="80" cy="100" r="40" fill="#a7f3d0" opacity="0.3"/>
+    <circle cx="320" cy="300" r="50" fill="#6ee7b7" opacity="0.25"/>
+    <circle cx="300" cy="120" r="35" fill="#34d399" opacity="0.2"/>
+    <rect x="85" y="80" width="55" height="240" rx="27.5" fill="url(#stemGradient)"/>
+    <path d="M 150 145 L 285 85 Q 305 78 315 95 L 325 115 Q 330 130 315 138 L 165 195 Q 148 202 145 185 Z" fill="url(#topArmGradient)"/>
+    <path d="M 145 215 L 165 205 L 315 262 Q 330 270 325 285 L 315 305 Q 305 322 285 315 L 150 255 Q 140 250 145 235 Z" fill="url(#bottomArmGradient)"/>
+    <circle cx="325" cy="105" r="20" fill="#10b981"/>
+    <circle cx="330" cy="295" r="24" fill="#059669"/>
+    <circle cx="70" cy="160" r="14" fill="#6ee7b7" opacity="0.8"/>
+    <circle cx="65" cy="240" r="16" fill="#34d399" opacity="0.75"/>
+    <circle cx="190" cy="120" r="6" fill="#d1fae5"/>
+    <circle cx="200" cy="280" r="7" fill="#a7f3d0"/>
+    <circle cx="250" cy="200" r="5" fill="#ecfdf5"/>
+    <circle cx="340" cy="200" r="10" fill="#6ee7b7" opacity="0.6"/>
+    <circle cx="60" cy="320" r="12" fill="#34d399" opacity="0.5"/>
+  </svg>
+);
 
 export const Dashboard = () => {
   const navigate = useNavigate();
+  const { terminology } = useCustomization();
   const [stats, setStats] = useState({
     totalAssets: 0,
     availableAssets: 0,
@@ -24,13 +62,10 @@ export const Dashboard = () => {
       setLoading(true);
       setError(null);
 
-      // Load assets first (this endpoint definitely exists)
-      const assetsData = await assetService.list({ size: 1000 }); // Get more assets for better statistics
-  const assets = Array.isArray(assetsData) ? assetsData : (assetsData.content || []);
+      const assetsData = await assetService.list({ size: 1000 });
+      const assets = Array.isArray(assetsData) ? assetsData : (assetsData.content || []);
       
-      // Calculate statistics from assets data
       const calculatedStats = calculateStatistics(assets);
-      // Compute recent assets (top 5 by updatedAt/createdAt if present)
       const recent = [...assets]
         .map(a => ({
           ...a,
@@ -40,21 +75,14 @@ export const Dashboard = () => {
         .slice(0, 5);
       setRecentAssets(recent);
       
-      // Try to get backend statistics, but don't fail if it doesn't exist
       let backendStats = {};
       try {
         backendStats = await assetService.getStatistics();
       } catch {
-        // Backend statistics endpoint may not exist; fall back to calculated stats
+        // Backend statistics endpoint may not exist
       }
       
-      // Merge backend stats with calculated stats (calculated stats as fallback)
-      const mergedStats = {
-        ...calculatedStats,
-        ...backendStats
-      };
-
-      // Normalize to expected shapes to avoid runtime errors from unexpected backend values
+      const mergedStats = { ...calculatedStats, ...backendStats };
       const finalStats = {
         ...mergedStats,
         totalAssets: typeof mergedStats.totalAssets === 'number' ? mergedStats.totalAssets : calculatedStats.totalAssets,
@@ -71,9 +99,7 @@ export const Dashboard = () => {
       setStats(finalStats);
     } catch (err) {
       console.error('Failed to load dashboard data:', err);
-      
       let errorMessage = 'Failed to load dashboard data.';
-      
       if (err.code === 'NETWORK_ERROR' || err.message.includes('Network Error')) {
         errorMessage = 'Cannot connect to backend server. Please make sure your backend is running on http://localhost:8080';
       } else if (err.response?.status === 401) {
@@ -83,7 +109,6 @@ export const Dashboard = () => {
       } else {
         errorMessage = `Error: ${err.message}`;
       }
-      
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -101,7 +126,6 @@ export const Dashboard = () => {
     const maintenanceAssets = assets.filter(a => a.status === 'IN_MAINTENANCE').length;
     const totalValue = assets.reduce((sum, asset) => sum + (asset.purchasePrice || 0), 0);
 
-    // Status breakdown
     const statusCounts = {};
     assets.forEach(asset => {
       statusCounts[asset.status] = (statusCounts[asset.status] || 0) + 1;
@@ -112,7 +136,6 @@ export const Dashboard = () => {
       percentage: ((count / totalAssets) * 100).toFixed(1)
     }));
 
-    // Condition breakdown
     const conditionCounts = {};
     assets.forEach(asset => {
       if (asset.condition) {
@@ -125,7 +148,6 @@ export const Dashboard = () => {
       percentage: ((count / totalAssets) * 100).toFixed(1)
     }));
 
-    // Category breakdown
     const categoryCounts = {};
     assets.forEach(asset => {
       if (asset.category) {
@@ -138,10 +160,8 @@ export const Dashboard = () => {
       percentage: ((count / totalAssets) * 100).toFixed(1)
     }));
 
-    // Warranty expiring (next 90 days)
     const ninetyDaysFromNow = new Date();
     ninetyDaysFromNow.setDate(ninetyDaysFromNow.getDate() + 90);
-    
     const warrantyExpiring = assets.filter(asset => {
       if (!asset.warrantyExpiry) return false;
       const warrantyDate = new Date(asset.warrantyExpiry);
@@ -196,18 +216,28 @@ export const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="dashboard-container">
-        <div className="loading">Loading dashboard...</div>
+      <div className="krubles-dashboard">
+        <div className="loading-modern">
+          <div className="loading-spinner-modern"></div>
+          <p>Loading your dashboard...</p>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="dashboard-container">
-        <div className="error">
-          {error}
-          <button onClick={loadDashboardData} className="retry-button">
+      <div className="krubles-dashboard">
+        <div className="error-modern">
+          <div className="error-icon">⚠️</div>
+          <h3>Oops! Something went wrong</h3>
+          <p>{error}</p>
+          {error.includes('403') && (
+            <p className="text-sm text-amber-600 mt-2">
+              <strong>Tip:</strong> If you're seeing 403 errors, try signing out and signing back in to refresh your session.
+            </p>
+          )}
+          <button onClick={loadDashboardData} className="retry-button-modern">
             Try Again
           </button>
         </div>
@@ -216,95 +246,129 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>Dashboard</h1>
-  <p>Asset Management by Krubles — Overview</p>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="metrics-grid">
-        <div className="metric-card">
-          <div className="metric-icon">📊</div>
-          <div className="metric-content">
-            <div className="metric-value">{stats.totalAssets}</div>
-            <div className="metric-label">Total Assets</div>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-icon">✅</div>
-          <div className="metric-content">
-            <div className="metric-value">{stats.availableAssets}</div>
-            <div className="metric-label">Available</div>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-icon">👥</div>
-          <div className="metric-content">
-            <div className="metric-value">{stats.assignedAssets}</div>
-            <div className="metric-label">Assigned</div>
-          </div>
-        </div>
-
-        <div className="metric-card">
-          <div className="metric-icon">🔧</div>
-          <div className="metric-content">
-            <div className="metric-value">{stats.maintenanceAssets}</div>
-            <div className="metric-label">In Maintenance</div>
-          </div>
-        </div>
-
-        <div className="metric-card total-value">
-          <div className="metric-icon">💰</div>
-          <div className="metric-content">
-            <div className="metric-value">{formatCurrency(stats.totalValue)}</div>
-            <div className="metric-label">Total Value</div>
+    <div className="krubles-dashboard">
+      {/* Hero Header with Logo */}
+      <div className="dashboard-hero">
+        <div className="dashboard-hero-bg"></div>
+        <div className="dashboard-hero-content">
+          <KrublesLogo className="krubles-logo-dashboard" />
+          <div className="dashboard-hero-text">
+            <h1 className="dashboard-title-modern">{terminology.dashboard || 'Dashboard'}</h1>
+            <p className="dashboard-subtitle-modern">Real-time insights powered by Krubles</p>
           </div>
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="charts-grid">
-        {/* Alerts Summary */}
-        <div className="chart-card">
-          <h3>Alerts</h3>
-          <div className="chart-content">
-            <div className="alerts-grid">
-              <div className="alert-pill" style={{ background: '#fee2e2', border: '1px solid #fecaca' }}>
-                <span className="alert-dot" style={{ background: '#ef4444' }} />
-                Lost: {Array.isArray(stats.statusBreakdown) ? (stats.statusBreakdown.find(s => s.name.toUpperCase() === 'LOST')?.value || 0) : 0}
-              </div>
-              <div className="alert-pill" style={{ background: '#ffe4e6', border: '1px solid #fecdd3' }}>
-                <span className="alert-dot" style={{ background: '#dc2626' }} />
-                Damaged: {Array.isArray(stats.statusBreakdown) ? (stats.statusBreakdown.find(s => s.name.toUpperCase() === 'DAMAGED')?.value || 0) : 0}
-              </div>
-              <div className="alert-pill" style={{ background: '#fffbeb', border: '1px solid #fef3c7' }}>
-                <span className="alert-dot" style={{ background: '#f59e0b' }} />
-                Warranty soon: {Array.isArray(stats.warrantyExpiring) ? stats.warrantyExpiring.length : 0}
-              </div>
+      {/* Key Metrics Grid */}
+      <div className="metrics-grid-modern">
+        <div className="metric-card-modern metric-primary" onClick={() => navigate('/app/assets')} title="View all assets">
+          <div className="metric-card-glow"></div>
+          <div className="metric-header-modern">
+            <div className="metric-icon-wrapper-modern">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" fill="currentColor"/>
+              </svg>
             </div>
+            <div className="metric-badge-modern">Total</div>
+          </div>
+          <div className="metric-body-modern">
+            <div className="metric-value-modern">{stats.totalAssets}</div>
+            <div className="metric-label-modern">{terminology.assets || 'Assets'}</div>
           </div>
         </div>
-        {/* Asset Status Breakdown */}
-        <div className="chart-card">
-          <h3>Asset Status</h3>
-          <div className="chart-content">
+
+        <div className="metric-card-modern metric-success" onClick={() => navigate('/app/assets?status=AVAILABLE')} title="View available assets">
+          <div className="metric-card-glow"></div>
+          <div className="metric-header-modern">
+            <div className="metric-icon-wrapper-modern">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="metric-badge-modern">Available</div>
+          </div>
+          <div className="metric-body-modern">
+            <div className="metric-value-modern">{stats.availableAssets}</div>
+            <div className="metric-label-modern">Ready to Deploy</div>
+          </div>
+        </div>
+
+        <div className="metric-card-modern metric-info" onClick={() => navigate('/app/assets?status=ASSIGNED')} title="View assigned assets">
+          <div className="metric-card-glow"></div>
+          <div className="metric-header-modern">
+            <div className="metric-icon-wrapper-modern">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="metric-badge-modern">Assigned</div>
+          </div>
+          <div className="metric-body-modern">
+            <div className="metric-value-modern">{stats.assignedAssets}</div>
+            <div className="metric-label-modern">In Use</div>
+          </div>
+        </div>
+
+        <div 
+          className={`metric-card-modern ${stats.maintenanceAssets > 0 ? 'metric-warning' : 'metric-success'}`} 
+          onClick={() => navigate('/app/maintenance')} 
+          title="View maintenance schedule"
+        >
+          <div className="metric-card-glow"></div>
+          <div className="metric-header-modern">
+            <div className="metric-icon-wrapper-modern">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M22.7 19l-9.1-15.8c-.5-.8-1.7-.8-2.2 0L2.3 19c-.5.8.1 1.9 1.1 1.9h18.3c1 0 1.6-1.1 1-1.9zM12 17c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zm1-4h-2v-4h2v4z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="metric-badge-modern">{terminology.maintenance || 'Maintenance'}</div>
+          </div>
+          <div className="metric-body-modern">
+            <div className="metric-value-modern">{stats.maintenanceAssets}</div>
+            <div className="metric-label-modern">Under Service</div>
+          </div>
+        </div>
+
+        <div className="metric-card-modern metric-value" onClick={() => navigate('/app/reports')} title="View financial reports">
+          <div className="metric-card-glow"></div>
+          <div className="metric-header-modern">
+            <div className="metric-icon-wrapper-modern">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="metric-badge-modern">Value</div>
+          </div>
+          <div className="metric-body-modern">
+            <div className="metric-value-modern">{formatCurrency(stats.totalValue)}</div>
+            <div className="metric-label-modern">Total Worth</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts and Widgets Grid */}
+      <div className="dashboard-grid-modern">
+        {/* Asset Status Chart */}
+        <div className="dashboard-card-modern">
+          <div className="card-header-modern">
+            <h3>Asset Status</h3>
+            <span className="card-badge-modern">{stats.totalAssets} total</span>
+          </div>
+          <div className="card-content-modern">
             {stats.statusBreakdown.map((item, index) => (
-              <div key={index} className="bar-chart-item">
-                <div className="bar-info">
-                  <span className="bar-label">{item.name}</span>
-                  <span className="bar-value">{item.value} ({item.percentage}%)</span>
+              <div key={index} className="progress-bar-item-modern">
+                <div className="progress-bar-header-modern">
+                  <span className="progress-bar-label-modern">{item.name}</span>
+                  <span className="progress-bar-value-modern">{item.value} ({item.percentage}%)</span>
                 </div>
-                <div className="bar-container">
+                <div className="progress-bar-track-modern">
                   <div 
-                    className="bar-fill"
+                    className="progress-bar-fill-modern"
                     style={{ 
                       width: `${item.percentage}%`,
-                      backgroundColor: getStatusColor(item.name.toUpperCase())
+                      background: `linear-gradient(90deg, ${getStatusColor(item.name.toUpperCase())}, ${getStatusColor(item.name.toUpperCase())}dd)`
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
             ))}
@@ -312,67 +376,68 @@ export const Dashboard = () => {
         </div>
 
         {/* Asset Condition */}
-        <div className="chart-card">
-          <h3>Asset Condition</h3>
-          <div className="chart-content">
+        <div className="dashboard-card-modern">
+          <div className="card-header-modern">
+            <h3>Asset Condition</h3>
+            <span className="card-badge-modern">{stats.conditionBreakdown.length} conditions</span>
+          </div>
+          <div className="card-content-modern">
             {stats.conditionBreakdown.map((item, index) => (
-              <div key={index} className="bar-chart-item">
-                <div className="bar-info">
-                  <span className="bar-label">{item.name}</span>
-                  <span className="bar-value">{item.value} ({item.percentage}%)</span>
+              <div key={index} className="progress-bar-item-modern">
+                <div className="progress-bar-header-modern">
+                  <span className="progress-bar-label-modern">{item.name}</span>
+                  <span className="progress-bar-value-modern">{item.value} ({item.percentage}%)</span>
                 </div>
-                <div className="bar-container">
+                <div className="progress-bar-track-modern">
                   <div 
-                    className="bar-fill"
+                    className="progress-bar-fill-modern"
                     style={{ 
                       width: `${item.percentage}%`,
-                      backgroundColor: getConditionColor(item.name)
+                      background: `linear-gradient(90deg, ${getConditionColor(item.name)}, ${getConditionColor(item.name)}dd)`
                     }}
-                  ></div>
+                  />
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Category Breakdown */}
-        <div className="chart-card">
-          <h3>Assets by Category</h3>
-          <div className="chart-content">
-            {stats.categoryBreakdown.slice(0, 5).map((item, index) => (
-              <div key={index} className="bar-chart-item">
-                <div className="bar-info">
-                  <span className="bar-label">{item.name}</span>
-                  <span className="bar-value">{item.value} ({item.percentage}%)</span>
-                </div>
-                <div className="bar-container">
-                  <div 
-                    className="bar-fill"
-                    style={{ 
-                      width: `${item.percentage}%`,
-                      backgroundColor: `hsl(${(index * 60) % 360}, 70%, 50%)`
-                    }}
-                  ></div>
-                </div>
-              </div>
-            ))}
+        {/* Recent Activity */}
+        <div className="dashboard-card-modern">
+          <div className="card-header-modern">
+            <h3>Recent Activity</h3>
+            <button className="card-action-modern" onClick={() => navigate('/app/assets')}>View All</button>
           </div>
-        </div>
-
-        {/* Recent Assets */}
-        <div className="chart-card">
-          <h3>Recent Activity</h3>
-          <div className="chart-content">
+          <div className="card-content-modern">
             {recentAssets.length === 0 ? (
-              <div className="no-data">No recent asset activity</div>
+              <div className="no-data-modern">
+                <span className="no-data-icon-modern">📋</span>
+                <p>No recent activity</p>
+              </div>
             ) : (
-              <ul className="recent-list">
+              <ul className="activity-list-modern">
                 {recentAssets.map(a => (
-                  <li key={a.id} className="recent-item">
-                    <div className="recent-title">{a.name || a.model || a.assetTag || `Asset #${a.id}`}</div>
-                    <div className="recent-meta">
-                      <span className="badge" style={{ background: getStatusColor((a.status || '').toUpperCase()) }}>{(a.status || '').replace(/_/g,' ') || 'UNKNOWN'}</span>
-                      <span className="muted">{a.updatedAt ? new Date(a.updatedAt).toLocaleString() : (a.createdAt ? new Date(a.createdAt).toLocaleString() : '')}</span>
+                  <li 
+                    key={a.id} 
+                    className="activity-item-modern"
+                    onClick={() => navigate(`/app/assets/${a.id}`)}
+                    title="Click to view details"
+                  >
+                    <div className="activity-icon-modern" style={{ background: `${getStatusColor((a.status || '').toUpperCase())}20`, color: getStatusColor((a.status || '').toUpperCase()) }}>
+                      {(a.status || '').toUpperCase() === 'AVAILABLE' ? '✓' : 
+                       (a.status || '').toUpperCase() === 'ASSIGNED' ? '👤' : 
+                       (a.status || '').toUpperCase() === 'IN_MAINTENANCE' ? '🔧' : '📦'}
+                    </div>
+                    <div className="activity-content-modern">
+                      <div className="activity-title-modern">{a.name || a.model || a.assetTag || `Asset #${a.id}`}</div>
+                      <div className="activity-meta-modern">
+                        <span className="activity-status-modern" style={{ color: getStatusColor((a.status || '').toUpperCase()) }}>
+                          {(a.status || '').replace(/_/g,' ') || 'UNKNOWN'}
+                        </span>
+                        <span className="activity-date-modern">
+                          {a.updatedAt ? new Date(a.updatedAt).toLocaleDateString() : (a.createdAt ? new Date(a.createdAt).toLocaleDateString() : '')}
+                        </span>
+                      </div>
                     </div>
                   </li>
                 ))}
@@ -381,46 +446,62 @@ export const Dashboard = () => {
           </div>
         </div>
 
-        {/* Warranty Expiring */}
-        <div className="chart-card">
-          <h3>Warranty Expiring Soon</h3>
-          <div className="chart-content">
+        {/* Warranty Alerts */}
+        <div className="dashboard-card-modern">
+          <div className="card-header-modern">
+            <h3>Warranty Alerts</h3>
+            <span className="card-badge-modern card-badge-warning">{Array.isArray(stats.warrantyExpiring) ? stats.warrantyExpiring.length : 0} expiring</span>
+          </div>
+          <div className="card-content-modern">
             {(!Array.isArray(stats.warrantyExpiring) || stats.warrantyExpiring.length === 0) ? (
-              <div className="no-data">No warranties expiring in the next 90 days 🎉</div>
+              <div className="no-data-modern">
+                <span className="no-data-icon-modern">🎉</span>
+                <p>All warranties are current!</p>
+                <small>No expiration in the next 90 days</small>
+              </div>
             ) : (
-              stats.warrantyExpiring.slice(0, 5).map((asset, index) => (
-                <div key={index} className="warranty-item">
-                  <div className="warranty-info">
-                    <span className="asset-name">{asset.name}</span>
-                    <span className="asset-tag">#{asset.assetTag}</span>
-                  </div>
-                  <div className="warranty-date">
-                    {new Date(asset.warrantyExpiry).toLocaleDateString()}
-                  </div>
-                </div>
-              ))
+              <ul className="warranty-list-modern">
+                {stats.warrantyExpiring.slice(0, 5).map((asset, index) => (
+                  <li key={index} className="warranty-item-modern">
+                    <div className="warranty-icon-modern">⚠️</div>
+                    <div className="warranty-info-modern">
+                      <span className="warranty-asset-modern">{asset.name}</span>
+                      <span className="warranty-tag-modern">#{asset.assetTag}</span>
+                    </div>
+                    <div className="warranty-date-modern">
+                      {new Date(asset.warrantyExpiry).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="quick-actions">
-        <h3>Quick Actions</h3>
-        <div className="action-buttons">
-          <button className="action-btn" onClick={() => navigate('/app/assets/new')}>
-            <span className="action-icon">➕</span>
-            Add New Asset
-          </button>
-          <button className="action-btn" onClick={() => navigate('/app/maintenance')}>
-            <span className="action-icon">🔧</span>
-            Schedule Maintenance
-          </button>
-          <button className="action-btn" onClick={() => navigate('/app/reports')}>
-            <span className="action-icon">📈</span>
-            Generate Report
-          </button>
-        </div>
+      <div className="quick-actions-modern">
+        <button className="action-btn-modern action-btn-primary" onClick={() => navigate('/app/assets/new')}>
+          <span className="action-btn-icon-modern">+</span>
+          <span className="action-btn-text-modern">
+            <span className="action-btn-title-modern">Add Asset</span>
+            <span className="action-btn-subtitle-modern">Register new equipment</span>
+          </span>
+        </button>
+        <button className="action-btn-modern action-btn-secondary" onClick={() => navigate('/app/maintenance')}>
+          <span className="action-btn-icon-modern">🔧</span>
+          <span className="action-btn-text-modern">
+            <span className="action-btn-title-modern">Schedule Maintenance</span>
+            <span className="action-btn-subtitle-modern">Plan service activities</span>
+          </span>
+        </button>
+        <button className="action-btn-modern action-btn-tertiary" onClick={() => navigate('/app/reports')}>
+          <span className="action-btn-icon-modern">📊</span>
+          <span className="action-btn-text-modern">
+            <span className="action-btn-title-modern">Generate {(terminology?.reportSingular || 'Report')}</span>
+            <span className="action-btn-subtitle-modern">Export analytics data</span>
+          </span>
+        </button>
       </div>
     </div>
   );

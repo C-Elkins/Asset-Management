@@ -5,8 +5,10 @@ import { exportService } from '../../services/exportService.js';
 import { KeyboardShortcuts, ShortcutsHelp } from '../../hooks/useKeyboardShortcuts.jsx';
 import { AssetCard } from './AssetCard.jsx';
 import { AssetForm } from './AssetForm.jsx';
+import { useCustomization } from '../../hooks/useCustomization';
 
 export const AssetList = () => {
+  const { terminology } = useCustomization();
   const navigate = useNavigate();
   const [assets, setAssets] = useState([]);
   const [allAssets, setAllAssets] = useState([]); // For export purposes
@@ -170,7 +172,7 @@ export const AssetList = () => {
       const json = JSON.parse(text);
       const records = Array.isArray(json) ? json : (Array.isArray(json.assets) ? json.assets : []);
       if (!Array.isArray(records) || records.length === 0) {
-        alert('No assets found in file. Expecting a JSON array of asset objects or { "assets": [...] }');
+        alert(`No ${(terminology.assets || 'assets').toLowerCase()} found in file. Expecting a JSON array of ${(terminology.assetSingular || 'asset')} objects or { "assets": [...] }`);
         return;
       }
       if (!window.confirm(`Import ${records.length} assets?`)) return;
@@ -393,7 +395,7 @@ export const AssetList = () => {
       {/* Header */}
       <div className="asset-list-header">
         <div className="header-left">
-          <h2>Assets ({assets.length})</h2>
+          <h2>{terminology.assets || 'Assets'} ({assets.length})</h2>
           {selectedAssets.size > 0 && (
             <div className="bulk-selection-info">
               {selectedAssets.size} selected
@@ -562,7 +564,7 @@ export const AssetList = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="Search assets by name, tag, brand, or model..."
+              placeholder={`Search ${(terminology.assets || 'assets').toLowerCase()} by name, tag, brand, or model...`}
               value={searchTerm}
               onChange={handleSearchChange}
               className="search-input"
@@ -603,7 +605,7 @@ export const AssetList = () => {
       {/* Asset Grid */}
       {assets.length === 0 ? (
         <div className="no-assets">
-          <p>No assets found.</p>
+          <p>No {(terminology.assets || 'assets').toLowerCase()} found.</p>
           {searchTerm && (
             <p>
               Try adjusting your search terms or{' '}

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { assetService } from '../services/assetService.js';
+import { useCustomization } from '../hooks/useCustomization';
 
 export const AssetDetails = () => {
   const { id } = useParams();
@@ -43,7 +44,7 @@ export const AssetDetails = () => {
           <span className={`status-badge ${statusClass}`}>{asset.status?.replace('_',' ')}</span>
           <span className={`condition-badge ${conditionClass}`}>{asset.condition}</span>
           <button className="btn-outline" onClick={() => navigate(`/app/assets/${asset.id}/assign`)}>Manage Assignment</button>
-          <button className="btn-primary" onClick={() => navigate('/app/assets')}>Back to Assets</button>
+          <button className="btn-primary" onClick={() => navigate('/app/assets')}>Back to {terminology.assets || 'Assets'}</button>
         </div>
       </div>
 

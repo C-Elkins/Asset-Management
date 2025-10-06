@@ -10,15 +10,11 @@ const AssetAssignPage = lazy(() => import('./pages/AssetAssignPage.jsx').then(m 
 const MaintenancePage = lazy(() => import('./pages/MaintenancePage.jsx').then(m => ({ default: m.MaintenancePage })));
 const ReportsPage = lazy(() => import('./pages/ReportsPage.jsx').then(m => ({ default: m.ReportsPage })));
 const SettingsPage = lazy(() => import('./pages/SettingsPage.jsx').then(m => ({ default: m.SettingsPage })));
-const ProfileSettings = lazy(() => import('./pages/settings/ProfileSettings.jsx').then(m => ({ default: m.ProfileSettings })));
-const SystemPreferences = lazy(() => import('./pages/settings/SystemPreferences.jsx').then(m => ({ default: m.SystemPreferences })));
-const SecuritySettings = lazy(() => import('./pages/settings/SecuritySettings.jsx').then(m => ({ default: m.SecuritySettings })));
-const BackupRestore = lazy(() => import('./pages/settings/BackupRestore.jsx').then(m => ({ default: m.BackupRestore })));
-const ApiSettings = lazy(() => import('./pages/settings/ApiSettings.jsx').then(m => ({ default: m.ApiSettings })));
 const AdminPage = lazy(() => import('./pages/AdminPage.jsx').then(m => ({ default: m.default })));
 const AIAssistant = lazy(() => import('./pages/AIAssistant.jsx').then(m => ({ default: m.AIAssistant })));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx').then(m => ({ default: m.default || m.PrivacyPage })));
 const BillingPage = lazy(() => import('./pages/BillingPage.jsx').then(m => ({ default: m.default })));
+const AdminCustomizationCenter = lazy(() => import('./pages/AdminCustomizationCenter.jsx').then(m => ({ default: m.default })));
 
 const NotFound = lazy(() => import('./pages/NotFound.jsx').then(m => ({ default: m.NotFound })));
 import { useAuthStore } from './app/store/authStore';
@@ -114,14 +110,9 @@ function App() {
           <Route path="privacy" element={<Suspense fallback={<ExecutivePageLoader message="Loading privacy..." />}><PrivacyPage /></Suspense>} />
           <Route path="billing" element={<Suspense fallback={<ExecutivePageLoader message="Loading billing..." />}><BillingPage /></Suspense>} />
           <Route path="settings" element={<Suspense fallback={<ExecutivePageLoader message="Loading settings..." />}><SettingsPage /></Suspense>} />
-          <Route path="settings/profile" element={<Suspense fallback={<ExecutivePageLoader message="Loading profile settings..." />}><ProfileSettings /></Suspense>} />
-          <Route path="settings/system" element={<Suspense fallback={<ExecutivePageLoader message="Loading system preferences..." />}><SystemPreferences /></Suspense>} />
-          <Route path="settings/security" element={<Suspense fallback={<ExecutivePageLoader message="Loading security settings..." />}><SecuritySettings /></Suspense>} />
-          <Route path="settings/backup" element={<Suspense fallback={<ExecutivePageLoader message="Loading backup & restore..." />}><BackupRestore /></Suspense>} />
-          <Route path="settings/api" element={<Suspense fallback={<ExecutivePageLoader message="Loading API settings..." />}><ApiSettings /></Suspense>} />
           <Route path="admin" element={<Suspense fallback={<ExecutivePageLoader message="Loading admin panel..." />}><AdminPage /></Suspense>} />
           <Route path="ai" element={<Suspense fallback={<ExecutivePageLoader message="Booting AI Assistant..." />}><AIAssistant /></Suspense>} />
-          <Route path="showcase" element={<Suspense fallback={<ExecutivePageLoader message="Loading showcase..." />}><div style={{padding: '2rem', textAlign: 'center'}}><h2>Component Showcase</h2><p>Coming Soon - UI Components Demo</p></div></Suspense>} />
+          <Route path="showcase" element={<Suspense fallback={<ExecutivePageLoader message="Loading customization..." />}><AdminCustomizationCenter /></Suspense>} />
           <Route path="*" element={<Suspense fallback={<ExecutivePageLoader message="Loading..." />}><NotFound /></Suspense>} />
         </Route>
         {/* Catch-all for truly unknown routes - 404 page */}

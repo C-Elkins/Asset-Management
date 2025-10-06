@@ -11,8 +11,9 @@ export default defineConfig({
   },
   webServer: {
     // Use an E2E server that serves dist and mocks /api endpoints
-    command: 'npm run preview:e2e',
+    command: 'PORT=4173 npm run preview:e2e',
     port: 4173,
+    timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
   },
 });

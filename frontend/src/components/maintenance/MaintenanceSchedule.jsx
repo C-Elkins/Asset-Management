@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useCustomization } from '../../hooks/useCustomization';
 import { motion } from 'framer-motion';
 import { Calendar, Wrench, AlertTriangle, CheckCircle, Plus } from 'lucide-react';
 import { api } from '../../services/api.js';
@@ -188,7 +189,7 @@ export const MaintenanceSchedule = () => {
       {(!loading && filteredTasks.length === 0) && (
         <div className="text-center py-12">
           <Wrench className="w-12 h-12 mx-auto text-slate-300 mb-4" />
-          <p className="text-slate-500">No maintenance tasks found for the selected filter.</p>
+          <p className="text-slate-500">No {(terminology.maintenance || 'maintenance').toLowerCase()} tasks found for the selected filter.</p>
         </div>
       )}
     </div>

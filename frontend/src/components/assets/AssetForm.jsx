@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { assetService } from '../../services/assetService.js';
 import { categoryService } from '../../services/categoryService.js';
+import { useCustomization } from '../../hooks/useCustomization';
 
 export const AssetForm = ({ onSubmit, onCancel, initialData = null }) => {
+  const { terminology } = useCustomization();
   const [formData, setFormData] = useState({
     name: '',
     assetTag: '',
@@ -408,7 +410,7 @@ export const AssetForm = ({ onSubmit, onCancel, initialData = null }) => {
 
           {/* Maintenance & Warranty */}
           <div className="form-section">
-            <h3>Maintenance & Warranty</h3>
+            <h3>{(terminology.maintenance || 'Maintenance')} & Warranty</h3>
             
             <div className="form-row">
               <div className="form-field">
@@ -423,7 +425,7 @@ export const AssetForm = ({ onSubmit, onCancel, initialData = null }) => {
               </div>
 
               <div className="form-field">
-                <label htmlFor="nextMaintenance">Next Maintenance</label>
+                <label htmlFor="nextMaintenance">Next {terminology.maintenance || 'Maintenance'}</label>
                 <input
                   type="date"
                   id="nextMaintenance"

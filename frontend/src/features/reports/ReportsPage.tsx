@@ -1,16 +1,18 @@
 import React from 'react';
+import { useCustomization } from '../../hooks/useCustomization';
 import { motion } from 'framer-motion';
 import { Card, Badge } from '@/components/ui';
 import { BarChart3 } from 'lucide-react';
 
 const ReportsPage: React.FC = () => {
+  const { terminology } = useCustomization();
   return (
     <div className="space-y-6">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900">Reports</h1>
+  <h1 className="text-3xl font-bold text-gray-900">{terminology.reports || 'Reports'}</h1>
         <p className="text-gray-600 mt-1">Analytics and reporting dashboard</p>
       </motion.div>
 

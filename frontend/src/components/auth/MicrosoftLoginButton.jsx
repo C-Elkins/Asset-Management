@@ -26,7 +26,13 @@ const MicrosoftLoginButton = ({ disabled = false, onError, onLoading }) => {
 
   // Load MSAL library
   useEffect(() => {
-    if (window.msal || !MICROSOFT_CLIENT_ID) {
+    // Don't load MSAL if no valid client ID is configured
+    if (!MICROSOFT_CLIENT_ID || MICROSOFT_CLIENT_ID === 'your-microsoft-client-id-here') {
+      setMsalLoaded(false);
+      return;
+    }
+
+    if (window.msal) {
       setMsalLoaded(true);
       return;
     }
@@ -145,9 +151,24 @@ const MicrosoftLoginButton = ({ disabled = false, onError, onLoading }) => {
     }
   }, [msalLoaded, isLoading, disabled, MICROSOFT_CLIENT_ID, MICROSOFT_TENANT_ID, REDIRECT_URI, handleMicrosoftResponse, onError, onLoading]);
 
-  // Don't render if Microsoft OAuth is not configured
-  if (!MICROSOFT_CLIENT_ID) {
-    return null;
+  // Show disabled state if Microsoft OAuth is not configured
+  if (!MICROSOFT_CLIENT_ID || MICROSOFT_CLIENT_ID === 'your-microsoft-client-id-here') {
+    return (
+      <button
+        disabled={true}
+        className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-xl shadow-sm bg-gray-50 opacity-50 cursor-not-allowed transition-all duration-300"
+        type="button"
+        title="Microsoft OAuth is not configured"
+      >
+        <svg className="h-5 w-5 text-gray-400" viewBox="0 0 21 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="1" y="1" width="9" height="9" fill="#9CA3AF"/>
+          <rect x="11" y="1" width="9" height="9" fill="#9CA3AF"/>
+          <rect x="1" y="11" width="9" height="9" fill="#9CA3AF"/>
+          <rect x="11" y="11" width="9" height="9" fill="#9CA3AF"/>
+        </svg>
+        <span className="text-gray-500 font-medium">Sign in with Microsoft (Not Configured)</span>
+      </button>
+    );
   }
 
   return (

@@ -1,9 +1,11 @@
 import React from 'react';
+import { useCustomization } from '../../hooks/useCustomization';
 import { motion } from 'framer-motion';
 import { Card, Button, Badge } from '@/components/ui';
 import { Package, Plus } from 'lucide-react';
 
 const AssetsPage: React.FC = () => {
+  const { terminology } = useCustomization();
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -14,7 +16,7 @@ const AssetsPage: React.FC = () => {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Assets</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{terminology.assets || 'Assets'}</h1>
           <p className="text-gray-600 mt-1">Manage your IT equipment and resources</p>
         </div>
         <Button

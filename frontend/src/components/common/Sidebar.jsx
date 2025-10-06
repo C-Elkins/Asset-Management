@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '../../app/store';
+import { useCustomization } from '../../hooks/useCustomization';
 import { 
   BarChart3, 
   Laptop, 
@@ -10,18 +11,20 @@ import {
   Settings,
   Layers3,
   ChevronRight,
-  Shield
+  Shield,
+  X
 } from 'lucide-react';
 
-export const Sidebar = () => {
+export const Sidebar = ({ isOpen, onClose }) => {
   const user = useAuthStore(s => s.user);
   const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'IT_ADMIN';
+  const { terminology, branding } = useCustomization();
 
   const menuItems = [
-    { to: '/app/dashboard', label: 'Dashboard', icon: BarChart3, description: 'Analytics & Overview' },
-    { to: '/app/assets', label: 'Assets', icon: Laptop, description: 'IT Equipment Management' },
-    { to: '/app/maintenance', label: 'Maintenance', icon: Wrench, description: 'Service & Repairs' },
-    { to: '/app/reports', label: 'Reports', icon: FileText, description: 'Business Intelligence' },
+    { to: '/app/dashboard', label: terminology.dashboard || 'Dashboard', icon: BarChart3, description: 'Analytics & Overview' },
+    { to: '/app/assets', label: terminology.assets || 'Assets', icon: Laptop, description: 'Equipment Management' },
+    { to: '/app/maintenance', label: terminology.maintenance || 'Maintenance', icon: Wrench, description: 'Service & Repairs' },
+    { to: '/app/reports', label: terminology.reports || 'Reports', icon: FileText, description: 'Business Intelligence' },
     { to: '/app/privacy', label: 'Privacy', icon: Shield, description: 'Consent & My Data' },
     // Only show Billing for admins
     ...(isAdmin ? [{ to: '/app/billing', label: 'Billing', icon: Shield, description: 'Subscription & Invoices' }] : []),
@@ -58,21 +61,48 @@ export const Sidebar = () => {
   };
 
   return (
-    <motion.aside 
-      className="sidebar relative"
-      style={{
-        background: 'linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
-        backdropFilter: 'blur(32px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(32px) saturate(180%)',
-        borderRight: '1px solid rgba(0, 0, 0, 0.03)',
-        boxShadow: 'inset -1px 0 0 0 rgba(255, 255, 255, 0.5), 8px 0 32px rgba(0, 0, 0, 0.04), 0 0 80px rgba(0, 0, 0, 0.02)'
-      }}
-      initial={{ opacity: 0, x: -320 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-    >
-      <motion.div 
-        className="px-8 py-10 border-b border-black border-opacity-[0.03]"
+    <>
+      {/* Overlay for mobile */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="sidebar-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+      
+      <motion.aside 
+        className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}
+        style={{
+          background: 'linear-gradient(145deg, rgba(248, 250, 252, 0.98) 0%, rgba(255, 255, 255, 0.95) 100%)',
+          backdropFilter: 'blur(32px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(32px) saturate(180%)',
+          borderRight: '1px solid rgba(0, 0, 0, 0.03)',
+          boxShadow: 'inset -1px 0 0 0 rgba(255, 255, 255, 0.5), 8px 0 32px rgba(0, 0, 0, 0.04), 0 0 80px rgba(0, 0, 0, 0.02)'
+        }}
+        initial={{ opacity: 0, x: -320 }}
+        animate={{ 
+          opacity: isOpen ? 1 : 1, 
+          x: isOpen ? 0 : -280,
+        }}
+        transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
+      >
+        {/* Close button for mobile */}
+        <button
+          onClick={onClose}
+          className="sidebar-close-btn lg:hidden"
+          aria-label="Close sidebar"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        
+        <motion.div 
+        className="px-4 py-6 md:px-6 md:py-8 lg:px-8 lg:py-10 border-b border-black border-opacity-[0.03]"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
@@ -84,7 +114,7 @@ export const Sidebar = () => {
           <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400 shadow-sm animate-pulse" />
           <span className="text-[10px] font-semibold text-slate-500 tracking-wider uppercase">Enterprise Portal</span>
         </div>
-        <h2 className="text-lg font-bold text-slate-800 tracking-tight">Asset Management</h2>
+  <h2 className="text-lg font-bold text-slate-800 tracking-tight">{branding.companyName || 'Asset Management'}</h2>
         <p className="text-xs text-slate-500 mt-1 font-medium">Professional Dashboard</p>
         {/* Tiny System Status bar under the header */}
         <div className="mt-3" aria-label="System status: All systems operational">
@@ -98,13 +128,15 @@ export const Sidebar = () => {
         </div>
       </motion.div>
 
-      <nav className="px-6 py-6">
-        <motion.ul
-          className="space-y-1"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+      {/* Scrollable navigation container */}
+      <div className="sidebar-nav-scroll">
+        <nav className="px-3 py-4 md:px-4 md:py-5 lg:px-6 lg:py-6">
+          <motion.ul
+            className="space-y-1"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
           <AnimatePresence>
             {menuItems.map((item, _index) => {
               const IconComponent = item.icon;
@@ -308,8 +340,10 @@ export const Sidebar = () => {
           </motion.div>
         )}
       </nav>
+      </div>
 
       {/* Removed floating/bottom System Status card to avoid overlap; replaced with tiny bar under header */}
     </motion.aside>
+    </>
   );
 };

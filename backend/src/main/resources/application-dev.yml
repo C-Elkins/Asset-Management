@@ -49,7 +49,7 @@ spring:
 
 # Development-specific JWT settings (weaker security for testing)
 jwt:
-  secret: "devSecretKey123456789012345678901234567890"
+  secret: "devTokenKey12345678901234567890123456789012345678901234567890123456789012345678901234567890"
   expiration: 86400000 # 24 hours
 
 # Stripe API Keys for Development/Testing

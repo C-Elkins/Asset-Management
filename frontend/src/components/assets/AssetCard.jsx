@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { assetService } from '../../services/assetService.js';
 import { AssetForm } from './AssetForm.jsx';
 
-export const AssetCard = ({ asset, onUpdate, selectable = false, selected = false, onSelect }) => {
+export const AssetCard = ({ asset, onUpdate, selectable = false, selected = false, onSelect, viewMode = 'grid' }) => {
   const navigate = useNavigate();
   const [isUpdating, setIsUpdating] = useState(false);
   const [showActions, setShowActions] = useState(false);
@@ -83,7 +83,7 @@ export const AssetCard = ({ asset, onUpdate, selectable = false, selected = fals
 
   return (
     <>
-      <div className={`asset-card ${selected ? 'selected' : ''}`}>
+      <div className={`asset-card asset-card-${viewMode} ${selected ? 'selected' : ''}`}>
         {/* Selection Checkbox */}
         {selectable && (
           <div className="asset-selection">

@@ -1,13 +1,15 @@
 import React from 'react';
+import { useCustomization } from '../../hooks/useCustomization';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, User, Bell, Search, Settings, ChevronDown, X, Check, AlertCircle, Info } from 'lucide-react';
+import { LogOut, User, Bell, Search, Settings, ChevronDown, X, Check, AlertCircle, Info, Menu } from 'lucide-react';
 import { getNotifications, markRead as apiMarkRead, markAllRead as apiMarkAllRead } from '../../services/notificationService';
 import { useAuthStore } from '../../app/store/authStore';
 import { getSettings, updateSettings } from '../../services/settingsService';
 
-export const Header = ({ user, onLogout }) => {
+export const Header = ({ user, onLogout, onToggleSidebar, sidebarOpen }) => {
+  const { terminology } = useCustomization();
   // Session expiry UX
   const expiresAt = useAuthStore(s => s.expiresAt);
   const refreshAuth = useAuthStore(s => s.refreshAuth);
@@ -40,9 +42,10 @@ export const Header = ({ user, onLogout }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [notificationsLoaded, setNotificationsLoaded] = useState(false);
-  const [polling, setPolling] = useState(true);
+  const [polling, setPolling] = useState(false); // Disabled until notifications backend is implemented
   const [notifTab, setNotifTab] = useState('all'); // all | unread | prefs
   const [notifPrefs, setNotifPrefs] = useState({ emailNotifications: true, pushNotifications: false, maintenanceAlerts: true, weeklyReports: true });
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const navigate = useNavigate();
 
   // Interactive functions
@@ -65,6 +68,9 @@ export const Header = ({ user, onLogout }) => {
           const s = await getSettings();
           if (s?.notifications) setNotifPrefs(s.notifications);
         } catch {}
+      } catch (error) {
+        console.warn('Notifications endpoint not available, using empty notifications');
+        setNotifications([]);
       } finally {
         setNotificationsLoaded(true);
       }
@@ -90,7 +96,8 @@ export const Header = ({ user, onLogout }) => {
       try {
         const { items } = await getNotifications({ status: 'all', limit: 50 });
         if (!cancelled) setNotifications(items);
-      } catch {
+      } catch (error) {
+        console.warn('Notifications polling failed, retrying later');
         // ignore errors; retry later
       } finally {
         if (!cancelled) timer = setTimeout(run, 90000); // 90s
@@ -118,11 +125,17 @@ export const Header = ({ user, onLogout }) => {
   // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Check if click is outside notifications dropdown
       if (!event.target.closest('.notifications-dropdown') && !event.target.closest('.notifications-btn')) {
         setShowNotifications(false);
       }
+      // Check if click is outside settings dropdown
       if (!event.target.closest('.settings-dropdown') && !event.target.closest('.settings-btn')) {
         setShowSettings(false);
+      }
+      // Check if click is outside user menu dropdown
+      if (!event.target.closest('.dropdown-container')) {
+        setShowUserMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -132,32 +145,6 @@ export const Header = ({ user, onLogout }) => {
   const location = useLocation();
   const [animating, setAnimating] = useState(false);
   const [showPrivacyNudge, setShowPrivacyNudge] = useState(false);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.dropdown-container')) {
-        setShowNotifications(false);
-        setShowSettings(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Close dropdowns when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.dropdown-container')) {
-        setShowNotifications(false);
-        setShowSettings(false);
-      }
-    };
-    
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   useEffect(() => {
     // Trigger luxurious slow pulse on route changes
@@ -223,7 +210,7 @@ export const Header = ({ user, onLogout }) => {
             transition={{ duration: 0.6, ease: [0.23, 1, 0.32, 1] }}
           />
         </motion.div>
-        <div className="px-8 py-6">
+        <div className="px-4 py-3 md:px-6 md:py-4 lg:px-8 lg:py-6">
           {/* Privacy settings nudge */}
           <AnimatePresence>
             {showPrivacyNudge && (
@@ -277,25 +264,37 @@ export const Header = ({ user, onLogout }) => {
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 md:gap-4">
+            
+            {/* Hamburger Menu Button */}
+            <motion.button
+              onClick={onToggleSidebar}
+              className="p-2 md:p-2.5 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 lg:hidden"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              aria-label="Toggle sidebar"
+            >
+              <Menu className="w-5 h-5 md:w-6 md:h-6" strokeWidth={2} />
+            </motion.button>
             
             {/* Executive Search Section */}
             <motion.div 
-              className="flex-1 max-w-xl mr-4 md:mr-6 lg:mr-8"
+              className="flex-1 max-w-xl mr-2 md:mr-4 lg:mr-8"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.23, 1, 0.32, 1] }}
             >
               <div className="relative">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                  <Search className="w-5 h-5 text-slate-400" strokeWidth={2} />
+                <div className="absolute inset-y-0 left-3 md:left-4 flex items-center pointer-events-none">
+                  <Search className="w-4 h-4 md:w-5 md:h-5 text-slate-400" strokeWidth={2} />
                 </div>
                 <motion.input
                   type="text"
-                  placeholder="Search assets, reports, maintenance..."
+                  placeholder={`Search ${(terminology.assets || 'assets').toLowerCase()}, ${(terminology.reports || 'reports').toLowerCase()}, ${(terminology.maintenance || 'maintenance').toLowerCase()}...`}
                   value={searchQuery}
                   onChange={handleSearch}
-                  className="w-full pl-12 pr-4 py-4 text-[13px] font-medium text-slate-700 placeholder-slate-400 bg-white/85 border border-slate-200/60 rounded-2xl shadow-sm backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300/50 transition-all duration-300"
+                  className="w-full pl-10 md:pl-12 pr-3 md:pr-4 py-2.5 md:py-3 lg:py-4 text-xs md:text-[13px] font-medium text-slate-700 placeholder-slate-400 bg-white/85 border border-slate-200/60 rounded-xl md:rounded-2xl shadow-sm backdrop-blur-md focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300/50 transition-all duration-300"
                   style={{
                     background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%)',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
@@ -308,7 +307,7 @@ export const Header = ({ user, onLogout }) => {
 
             {/* Executive Actions */}
             <motion.div 
-              className="flex items-center gap-4 ml-2 sm:ml-0"
+              className="flex items-center gap-2 md:gap-3 lg:gap-4 ml-0"
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
@@ -318,12 +317,12 @@ export const Header = ({ user, onLogout }) => {
               <div className="relative dropdown-container">
                 <motion.button
                   onClick={toggleNotifications}
-                  className="relative p-3 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  className="relative p-2 md:p-2.5 lg:p-3 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Bell className="w-5 h-5" strokeWidth={2} />
+                  <Bell className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2} />
                   {unreadCount > 0 && (
                     <motion.div 
                       className="absolute -top-1 -right-1 min-w-[18px] h-[18px] bg-gradient-to-r from-red-500 to-red-600 rounded-full border-2 border-white shadow-lg flex items-center justify-center"
@@ -446,12 +445,12 @@ export const Header = ({ user, onLogout }) => {
               <div className="relative dropdown-container">
                 <motion.button
                   onClick={toggleSettings}
-                  className="relative p-3 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+                  className="relative p-2 md:p-2.5 lg:p-3 text-slate-600 hover:text-slate-900 bg-white border border-slate-200/60 rounded-lg md:rounded-xl shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <Settings className="w-5 h-5" strokeWidth={2} />
+                  <Settings className="w-4 h-4 md:w-5 md:h-5" strokeWidth={2} />
                 </motion.button>
                 
                 {/* Settings Dropdown */}
@@ -503,62 +502,78 @@ export const Header = ({ user, onLogout }) => {
               <AnimatePresence>
                 {user && (
                   <motion.div
-                    className="flex items-center"
+                    className="relative dropdown-container"
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ duration: 0.3, ease: [0.23, 1, 0.32, 1] }}
                   >
-                    {/* Executive User Profile */}
+                    {/* Executive User Profile - Clickable */}
                     <motion.div 
-                      className="flex items-center gap-3 px-6 py-4 bg-gradient-to-r from-white/85 to-slate-50/85 border border-slate-200/60 rounded-2xl shadow-lg backdrop-blur-md hover:shadow-xl transition-all duration-300 cursor-pointer group"
+                      onClick={() => { setShowNotifications(false); setShowSettings(false); setShowUserMenu(!showUserMenu); }}
+                      className="flex items-center gap-2 md:gap-3 px-3 md:px-6 py-3 md:py-4 bg-gradient-to-r from-emerald-50/90 to-white/90 border border-emerald-200/60 rounded-2xl shadow-lg backdrop-blur-md hover:shadow-xl hover:border-emerald-300 transition-all duration-300 cursor-pointer group"
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}
                       style={{
-                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
+                        boxShadow: '0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.9)'
                       }}
                     >
                       <div className="relative">
-                        <div className="w-9 h-9 bg-gradient-to-br from-slate-700 to-slate-900 rounded-lg flex items-center justify-center shadow-sm">
-                          <User className="w-5 h-5 text-white" strokeWidth={2.5} />
+                        <div className="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-lg flex items-center justify-center shadow-sm">
+                          <User className="w-4 h-4 md:w-5 md:h-5 text-white" strokeWidth={2.5} />
                         </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+                        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 md:w-3 md:h-3 bg-emerald-400 border-2 border-white rounded-full" />
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 hidden md:block">
                         <p className="text-[13px] font-bold text-slate-800 tracking-[-0.01em] truncate">
-                          {user.username || 'Executive User'}
+                          {user.username || 'User'}
                         </p>
-                        <p className="text-[11px] font-medium text-slate-500 truncate">
+                        <p className="text-[11px] font-medium text-emerald-600 truncate">
                           {user.roles && user.roles.length > 0 
                             ? user.roles.map(roleLabel).join(', ')
-                            : 'System Administrator'
+                            : 'Administrator'
                           }
                         </p>
                       </div>
-                      <ChevronDown className="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors duration-200" strokeWidth={2} />
+                      <ChevronDown className="w-3 h-3 md:w-4 md:h-4 text-emerald-500 group-hover:text-emerald-700 transition-colors duration-200" strokeWidth={2} />
                     </motion.div>
+                    
+                    {/* User Dropdown Menu */}
+                    <AnimatePresence>
+                      {showUserMenu && (
+                        <motion.div
+                          className="absolute right-0 top-full mt-3 w-64 bg-white border border-emerald-200/80 rounded-2xl shadow-2xl overflow-hidden z-[10001]"
+                          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                          style={{
+                            boxShadow: '0 25px 50px -12px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.8)'
+                          }}
+                        >
+                          <div className="p-4 bg-gradient-to-br from-emerald-50 to-white border-b border-emerald-100">
+                            <p className="text-sm font-bold text-slate-800">{user.username || 'User'}</p>
+                            <p className="text-xs text-slate-500">{user.email || 'user@example.com'}</p>
+                          </div>
+                          <div className="p-2">
+                            <button onClick={() => { navigate('/app/profile'); setShowUserMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-emerald-50 rounded-lg transition-all flex items-center gap-2">
+                              <User className="w-4 h-4" /> My Profile
+                            </button>
+                            <button onClick={() => { navigate('/app/settings'); setShowUserMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-emerald-50 rounded-lg transition-all flex items-center gap-2">
+                              <Settings className="w-4 h-4" /> Settings
+                            </button>
+                            <button onClick={() => { navigate('/app/privacy'); setShowUserMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-emerald-50 rounded-lg transition-all flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4" /> Privacy
+                            </button>
+                            <div className="border-t border-slate-100 my-2"></div>
+                            <button onClick={() => { onLogout(); setShowUserMenu(false); }} className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all flex items-center gap-2 font-semibold">
+                              <LogOut className="w-4 h-4" /> Sign Out
+                            </button>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
-                )}
-              </AnimatePresence>
-              
-              <AnimatePresence>
-                {onLogout && (
-                  <motion.button
-                    onClick={onLogout}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 text-white rounded-xl font-semibold text-[12px] shadow-xl hover:shadow-2xl hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-slate-500/20 transition-all duration-300 active:scale-[0.98]"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    whileHover={{ scale: 1.02, y: -1 }}
-                    whileTap={{ scale: 0.98 }}
-                    transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
-                    style={{
-                      boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.4), 0 10px 10px -5px rgba(15, 23, 42, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                    }}
-                  >
-                    <LogOut className="w-4 h-4" strokeWidth={2.5} />
-                    Sign Out
-                  </motion.button>
                 )}
               </AnimatePresence>
             </motion.div>
