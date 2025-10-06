@@ -16,6 +16,8 @@ const MaintenancePage = React.lazy(() => import('./features/maintenance/Maintena
 const ReportsPage = React.lazy(() => import('./features/reports/ReportsPage'));
 const SettingsPage = React.lazy(() => import('./features/settings/SettingsPage'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
+// Bridge to modern privacy page used by tests
+const PrivacyPage = React.lazy(() => import('./pages/PrivacyPage.jsx').then(m => ({ default: m.default })));
 
 // Loading component for Suspense
 const PageLoader = () => (
@@ -127,6 +129,7 @@ const AppShell: React.FC = () => {
                     <Route path="maintenance" element={<MaintenancePage />} />
                     <Route path="reports" element={<ReportsPage />} />
                     <Route path="settings" element={<SettingsPage />} />
+                    <Route path="privacy" element={<PrivacyPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </React.Suspense>

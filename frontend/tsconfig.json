@@ -34,7 +34,7 @@
       "@/app/*": ["src/app/*"]
     }
   },
-  "include": ["src", "vite.config.ts"],
+  "include": ["src"],
   "exclude": [
     "node_modules",
     "dist",

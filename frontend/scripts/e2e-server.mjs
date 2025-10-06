@@ -29,6 +29,15 @@ const demoUser = {
 // API mock under /api
 const api = express.Router();
 
+// Apply a conservative rate limiter ONLY to API routes, not to static assets
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000, // generous to avoid test flakiness
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+api.use(apiLimiter);
+
 api.get('/actuator/health', (_req, res) => {
   res.json({ status: 'UP' });
 });
@@ -78,17 +87,10 @@ if (!fs.existsSync(distDir)) {
   process.exit(1);
 }
 
-// Rate limiter: max 100 requests per 15 minutes per IP
-const frontendLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-
-app.use(frontendLimiter, express.static(distDir));
+// Serve static frontend without rate limiting to prevent 429s from many asset requests in E2E
+app.use(express.static(distDir));
 // SPA fallback for any non-API GET route
-app.use(frontendLimiter, (req, res, next) => {
+app.use((req, res, next) => {
   if (req.method !== 'GET') return next();
   if (req.path.startsWith('/api')) return next();
   res.sendFile(path.join(distDir, 'index.html'));

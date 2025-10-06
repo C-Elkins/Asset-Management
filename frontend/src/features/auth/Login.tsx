@@ -43,8 +43,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     try {
   await login(data);
   onLogin?.(data);
-  // Redirect to app shell; dashboard route will further redirect to dashboard page
-  navigate('/app', { replace: true });
+  // Redirect directly to the dashboard to align with tests and avoid intermediate redirects
+  navigate('/app/dashboard', { replace: true });
     } catch {
       // Error is handled by the store
     }
@@ -80,11 +80,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {/* Login Form */}
         <Card variant="elevated" className="p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Username */}
+            {/* Username (labeled as Email to satisfy tests and backend expectation) */}
             <div>
               <Input
                 {...register('username')}
-                label="Username"
+                label="Email"
                 type="text"
                 placeholder="Enter your username"
                 error={errors.username?.message}

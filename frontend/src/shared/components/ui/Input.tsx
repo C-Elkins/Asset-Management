@@ -23,6 +23,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ...props 
   }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false);
+    // Ensure the label is programmatically associated with the input for accessibility/testing
+    const reactGeneratedId = React.useId();
+  // Extract any provided id from props so we can pass it to both label and input
+  const providedId = (props as { id?: string })?.id;
+    const inputId = providedId || `input-${reactGeneratedId}`;
 
     const isPassword = type === 'password';
     const inputType = isPassword && showPassword ? 'text' : type;
@@ -47,6 +52,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'block text-sm font-medium transition-colors duration-200',
               error ? 'text-error-700' : 'text-gray-700'
             )}
+            htmlFor={inputId}
           >
             {label}
           </label>
@@ -64,6 +70,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             type={inputType}
             className={baseInputStyles}
             disabled={disabled}
+            id={inputId}
             {...props}
           />
           
