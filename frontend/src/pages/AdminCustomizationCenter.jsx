@@ -97,8 +97,9 @@ export function AdminCustomizationCenter() {
       // Save to localStorage (in production, this would be an API call)
       localStorage.setItem('app_customization', JSON.stringify(customization));
       
-      // Apply dark mode immediately
-      setDarkMode(customization.theme.mode === 'dark');
+  // Apply dark mode immediately if feature flag permits
+  const darkFlagOn = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') === 'on');
+  setDarkMode(darkFlagOn && customization.theme.mode === 'dark');
       
       addToast({ 
         type: 'success', 
@@ -195,7 +196,8 @@ export function AdminCustomizationCenter() {
     
     // If updating theme mode, apply it immediately for preview
     if (section === 'theme' && key === 'mode') {
-      setDarkMode(value === 'dark');
+      const darkFlagOn = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') === 'on');
+      setDarkMode(darkFlagOn && value === 'dark');
     }
   };
 

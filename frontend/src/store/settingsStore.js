@@ -39,8 +39,8 @@ export const useSettingsStore = create(
 
       // Toggle dark mode for app shell only
       toggleDarkMode: () => {
-        // Feature flag: allow globally disabling dark mode behavior if needed
-        const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') !== 'off');
+        // Feature flag: default OFF unless explicitly set to 'on'
+        const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') === 'on');
         if (!DARK_MODE_ENABLED) {
           console.warn('[settingsStore] Dark mode is disabled by feature flag.');
           return;
@@ -70,7 +70,7 @@ export const useSettingsStore = create(
 
       // Set dark mode explicitly for app shell only
       setDarkMode: (enabled) => {
-        const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') !== 'off');
+        const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') === 'on');
         if (!DARK_MODE_ENABLED) {
           console.warn('[settingsStore] Dark mode is disabled by feature flag.');
           enabled = false;
@@ -120,9 +120,17 @@ export const useSettingsStore = create(
       name: 'app-settings-storage',
       // Initialize dark mode on load
       onRehydrateStorage: () => (state) => {
-        if (state?.settings?.system?.darkMode) {
+        try {
+          const DARK_MODE_ENABLED = (typeof localStorage !== 'undefined' && localStorage.getItem('feature_dark_mode') === 'on');
           const appRoot = document.getElementById('app-root');
-          if (appRoot) appRoot.classList.add('dark-mode');
+          if (!appRoot) return;
+          if (DARK_MODE_ENABLED && state?.settings?.system?.darkMode) {
+            appRoot.classList.add('dark-mode');
+          } else {
+            appRoot.classList.remove('dark-mode');
+          }
+        } catch {
+          // noop
         }
       }
     }

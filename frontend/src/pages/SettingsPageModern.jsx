@@ -40,7 +40,7 @@ export function SettingsPageModern() {
   const [sessionExpired, setSessionExpired] = useState(false);
 
   // Feature flag: dark mode can be disabled globally
-  const darkModeAllowed = (typeof window !== 'undefined' && localStorage.getItem('feature_dark_mode') !== 'off');
+  const darkModeAllowed = (typeof window !== 'undefined' && localStorage.getItem('feature_dark_mode') === 'on');
 
   useEffect(() => {
     let mounted = true;
