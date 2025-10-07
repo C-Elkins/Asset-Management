@@ -16,6 +16,13 @@ export const PrivacyPageModern = () => {
   const [consent, setConsent] = useState(getDefaultConsent());
   const [myData, setMyData] = useState(null);
 
+  // Record a simple visit marker to ensure localStorage has a key for this origin (helps E2E storageState)
+  useEffect(() => {
+    try {
+      localStorage.setItem('privacy-last-visit', new Date().toISOString());
+    } catch {}
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     (async () => {

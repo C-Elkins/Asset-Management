@@ -42,6 +42,55 @@ api.get("/actuator/health", (_req, res) => {
   res.json({ status: "UP" });
 });
 
+// Lightweight health endpoint used by Login page for faster checks
+api.get("/healthz", (_req, res) => {
+  res.json({ status: "UP" });
+});
+
+// --- Minimal assets mocks to allow Dashboard to render in E2E ---
+api.get("/assets", (_req, res) => {
+  // Return either an array or a pageable object; Dashboard supports both
+  res.json({
+    content: [
+      {
+        id: 1,
+        name: "MacBook Pro 16",
+        status: "AVAILABLE",
+        condition: "EXCELLENT",
+        purchasePrice: 2800,
+        warrantyExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24 * 180).toISOString(),
+        category: { id: 10, name: "Computers" },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    ],
+    totalElements: 1,
+    totalPages: 1,
+    number: 0,
+    size: 1000,
+  });
+});
+
+api.get("/assets/statistics", (_req, res) => {
+  res.json({
+    totalAssets: 1,
+    availableAssets: 1,
+    assignedAssets: 0,
+    maintenanceAssets: 0,
+    totalValue: 2800,
+    statusBreakdown: [
+      { name: "AVAILABLE", value: 1, percentage: 100 },
+    ],
+    conditionBreakdown: [
+      { name: "EXCELLENT", value: 1, percentage: 100 },
+    ],
+    categoryBreakdown: [
+      { name: "Computers", value: 1, percentage: 100 },
+    ],
+    warrantyExpiring: [],
+  });
+});
+
 api.post("/auth/login", (req, res) => {
   const { username, email, password } = req.body || {};
   const userField = username || email;

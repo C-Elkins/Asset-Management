@@ -182,6 +182,10 @@ export const Login = () => {
       if (isDev) console.log('✅ [Login] Login returned result:', result);
       if (isDev) console.log('📍 [Login] About to navigate to:', from);
       navigate(from, { replace: true });
+      try {
+        // Set a simple cookie so Playwright's storageState has at least one origin recorded
+        document.cookie = `iam_session=1; Path=/; SameSite=Lax`;
+      } catch {}
       if (isDev) console.log('✨ [Login] Navigation completed');
     } catch (error) {
       if (isDev) console.error('❌ [Login] Login failed with error:', error);
@@ -333,6 +337,7 @@ export const Login = () => {
 
         <button
           type="submit"
+          data-testid="login-submit"
           disabled={isSubmitting || googleLoading || microsoftLoading || (backendStatus.state === 'down' && !isE2E)}
           className="w-full py-4 rounded-xl font-bold text-lg text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)' }}
