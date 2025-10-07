@@ -1,125 +1,228 @@
-<h1 align="center">🚀 Krubles Asset Management (KAM)</h1>
-
-<p align="center">
-  <strong>Enterprise-grade IT Asset Management made simple, modern, and powerful</strong>
-</p>
-
-<p align="center">
-  <img src="https://github.com/C-Elkins/IT-Asset-Management/actions/workflows/ci.yml/badge.svg" alt="CI">
-  <img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version">
-  <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
-</p>
-
-<p align="center">
-  <strong>Krubles</strong> is a modern, full-stack asset management platform built for IT teams who need more than just a spreadsheet. Track assets, automate workflows, integrate with your favorite tools, and gain insights—all from a beautiful, responsive web interface.
-</p>
-
----
-
-## 📸 Screenshots
-
-> _Coming soon - See `/docs` folder for detailed feature documentation_
-
----
-
-## ✨ Key Features
-
-### 🎯 Core Asset Management
-- **Complete Asset Lifecycle Tracking** - From acquisition to disposal
-- **Category Management** - Organize by type, department, or custom taxonomy
-- **Asset Assignment** - Track who has what, when, and where
-- **Maintenance Scheduling** - Never miss warranty renewals or maintenance
-- **Advanced Search & Filtering** - Find assets instantly
-- **Bulk Operations** - Import, export, and update hundreds of assets at once
-
-### 🏢 Multi-Tenant SaaS Architecture
-- **Complete Tenant Isolation** - Row-level security with database constraints
-- **Subdomain Routing** - `{tenant}.krubles.com` automatic routing
-- **Tenant Context** - Thread-safe request scoping with Spring AOP
-- **13+ Multi-Tenant Entities** - Assets, users, categories, API keys, and more
-- **Tenant-Aware Filtering** - Automatic query filtering via Hibernate interceptors
-- **Self-Service Signup** - Automated tenant provisioning
-
-### 💳 Stripe Integration & Billing
-- **Usage-Based Billing** - Metered pricing for API calls, storage, assets
-- **Subscription Management** - Create, update, cancel subscriptions via API
-- **Webhook Processing** - Real-time payment events (succeeded, failed, disputes)
-- **Customer Portal** - Self-service billing management
-- **Invoice Generation** - Automatic invoicing with Stripe
-- **Multiple Payment Methods** - Cards, ACH, SEPA, and more
-- **Revenue Recognition** - Automated with Stripe Billing
-
-### 🔗 Integrations (11 Live!)
-- ✅ **REST API** - Full programmatic access with OpenAPI docs
-- ✅ **Google OAuth 2.0** - Sign in with Google accounts
-- ✅ **Microsoft OAuth / Azure AD** - Enterprise SSO with Microsoft
-- ✅ **JWT Authentication** - Secure, stateless token-based auth
-- ✅ **API Keys & Rate Limiting** - Programmatic access with bcrypt-hashed keys
-- ✅ **Stripe Payments** - Complete subscription & usage-based billing
-- ✅ **CSV Import/Export** - Standard data exchange
-- ✅ **Excel Import/Export** - Direct .xlsx file support with formatting
-- ✅ **Webhooks** - Real-time event notifications to any endpoint
-- ✅ **Slack Notifications** - Team alerts for asset events
-- ✅ **Email Notifications** - SMTP with HTML templates for assignments & reminders
-- ✅ **Enhanced Filtered Exports** - Custom columns & advanced filtering
-
-### 🔐 Security & Access Control
-- **Role-Based Access Control (RBAC)** - 5 permission levels (SUPER_ADMIN → VIEWER)
-- **OAuth 2.0 Authentication** - Sign in with Google or Microsoft/Azure AD
-- **JWT Authentication** - Secure, stateless token-based auth
-- **Multi-Factor Authentication (MFA)** - TOTP 6-digit codes for enhanced security
-- **API Keys & Rate Limiting** - Bcrypt-hashed keys with sliding window algorithm
-- **Audit Logging** - Track every change with comprehensive audit trails
-- **Session Management** - Secure token handling with configurable expiry
-- **CORS Protection** - Configured security headers and origin validation
-
-### 📊 Reporting & Analytics
-- **Asset Dashboard** - Real-time overview
-- **Custom Reports** - Filter by any criteria
-- **Value Tracking** - Monitor asset depreciation
-- **Maintenance Reports** - Upcoming and overdue items
-- **Export Options** - CSV, Excel, or API
-
-### 🤖 AI Assistant (Experimental)
-- **Smart Categorization** - Auto-categorize assets from descriptions
-- **Insights Extraction** - Pull structured data from text
-- **Rate Limited** - 30 requests per 5 minutes per user
-- **Local History** - IndexedDB-backed query history
-
-### 📈 Observability
-- **Health Checks** - `/actuator/health` endpoint
-- **Prometheus Metrics** - Full metric export
-- **Structured Logging** - JSON logs with correlation IDs
-- **Performance Monitoring** - Request timing & throughput
-
-### 📊 Production Monitoring Stack
-- **Sentry** - Error tracking & performance monitoring (7.10.0)
-- **Prometheus + Grafana** - Metrics collection & visualization
-- **ELK Stack** - Elasticsearch, Logstash, Kibana for log management
-- **Uptime Kuma** - Uptime monitoring & status pages
-- **AlertManager** - Prometheus alert routing & notifications
-- **Filebeat** - Log shipping to Logstash
-- **Docker Compose** - Complete monitoring infrastructure included
+<div align="center">
+  <img src="./krubles-banner.png" alt="Krubles Asset Management" width="100%" />
+  
+  <h1>🚀 Krubles Asset Management</h1>
+  <h3>The Modern Way to Track, Manage, and Optimize Any Asset</h3>
+  
+  <p>
+    <img src="https://github.com/C-Elkins/Asset-Management/actions/workflows/ci.yml/badge.svg" alt="CI">
+    <img src="https://img.shields.io/badge/version-1.1.0-blue.svg" alt="Version">
+    <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License">
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
+  </p>
+  
+  <p>
+    <a href="#-why-krubles">Why Krubles?</a> •
+    <a href="#-features">Features</a> •
+    <a href="#-who-uses-krubles">Who Uses Krubles</a> •
+    <a href="#-get-started">Get Started</a> •
+    <a href="#-live-demo">Live Demo</a>
+  </p>
+</div>
 
 ---
 
-## 🏗️ Architecture
+## 💡 Why Krubles?
 
-### Tech Stack
+**Stop drowning in spreadsheets.** Krubles is the enterprise-grade asset management platform that scales from startups to Fortune 500s. Whether you're tracking IT equipment, manufacturing tools, fleet vehicles, office furniture, or medical devices—Krubles gives you complete visibility and control.
+
+### The Problem
+- 📊 Spreadsheets break at scale
+- 🔍 No way to track asset lifecycle
+- 👥 No collaboration or access control
+- 📈 Zero insights or reporting
+- 🔗 Manual data entry and exports
+
+### The Solution
+**Krubles** delivers a beautiful, powerful platform that handles:
+- ✅ Any asset type (IT, Manufacturing, Fleet, Medical, Office, Equipment)
+- ✅ Complete lifecycle tracking (Purchase → Assignment → Maintenance → Disposal)
+
+---
+
+## 🎯 Who Uses Krubles?
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 🏢 **IT Teams**
+Track laptops, servers, licenses, peripherals. Automate onboarding/offboarding. Never lose track of warranty dates.
+
+</td>
+<td width="33%" valign="top">
+
+### � **Manufacturing**
+Manage tools, machinery, equipment. Schedule maintenance. Track calibration and compliance.
+
+</td>
+<td width="33%" valign="top">
+
+### 🚚 **Fleet Management**
+Monitor vehicles, trailers, equipment. Track mileage, fuel, maintenance schedules.
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### 🏥 **Healthcare**
+Medical devices, lab equipment, beds, wheelchairs. Compliance tracking and audit trails.
+
+</td>
+<td width="33%" valign="top">
+
+### 🏪 **Retail**
+POS systems, displays, signage, furniture. Multi-location inventory management.
+
+</td>
+<td width="33%" valign="top">
+
+### � **Education**
+Chromebooks, projectors, lab equipment, furniture. Student device assignment tracking.
+
+</td>
+</tr>
+</table>
+
+---
+
+## ⚡ Features That Set Us Apart
+
+### 🎨 **Modern, Intuitive Interface**
+- Beautiful responsive design that works on any device
+- Dark mode support
+- AI-powered smart asset creation (auto-detects brands, models, warranties)
+- Real-time search and filtering
+
+### � **Complete Asset Lifecycle**
+- **Purchase** → Track acquisition costs, vendors, POs
+- **Assignment** → Assign to users, departments, locations
+- **Maintenance** → Schedule preventive maintenance, log repairs
+- **Disposal** → Track decommissioning and asset retirement
+
+### 🔐 **Enterprise Security**
+- Multi-tenant SaaS architecture with complete tenant isolation
+- Role-based access control (5 levels: Super Admin → Viewer)
+- JWT authentication with refresh tokens
+- Google OAuth 2.0 & Microsoft SSO
+- Multi-factor authentication (MFA) support
+- GDPR & CCPA compliant
+- Audit logging on all changes
+
+### 📊 **Powerful Reporting**
+- Real-time dashboards and analytics
+- Custom reports by category, location, user, status
+- Export to Excel, CSV, PDF with advanced filtering
+- Asset depreciation tracking
+- Cost center allocation
+- Value tracking over time
+
+### 🔗 **11+ Integrations (All Built-In)**
+| Integration | Use Case |
+|-------------|----------|
+| **Stripe** | Subscription billing, payment links, usage-based pricing |
+| **Slack** | Real-time asset alerts and maintenance notifications |
+| **Google OAuth** | Single Sign-On for Google Workspace |
+| **Microsoft OAuth** | Azure AD / Entra ID enterprise SSO |
+| **Email** | Alerts, reports, password resets (SendGrid/AWS SES) |
+| **Excel** | Generate formatted .xlsx reports with styling |
+| **PDF** | Asset labels, reports, invoices |
+| **CSV** | Bulk import/export for data migration |
+| **Webhooks** | Custom integrations and automation |
+| **REST API** | Full programmatic access with OpenAPI docs |
+| **API Keys** | Secure programmatic access with rate limiting |
+
+### 🤖 **AI-Powered Intelligence**
+- Auto-detects 30+ brands (Apple, Dell, HP, Lenovo, Microsoft, etc.)
+- Extracts model numbers from asset names
+- Suggests warranty periods based on asset type
+- Predicts maintenance schedules
+- Smart tagging and categorization
+- Rate-limited for reliability (30 requests per 5 minutes)
+
+---
+
+## 🚀 Get Started in 60 Seconds
+
+### Option 1: Docker (Recommended)
+
+```bash
+# Clone the repo
+git clone https://github.com/C-Elkins/Asset-Management.git
+cd it-asset-management
+
+# Start everything with Docker
+docker-compose up -d
+
+# Open your browser
+open http://localhost:5173
+```
+
+**Default Admin Login:**
+- Email: `admin@example.com`
+- Password: `admin123`
+
+### Option 2: Local Development
+
+```bash
+# Backend (Java 21 + Spring Boot)
+cd backend
+./mvnw spring-boot:run
+
+# Frontend (React 19 + Vite)
+cd frontend
+npm install && npm run dev
+```
+
+📚 **Full setup guide**: [docs/deployment-guide.md](docs/deployment-guide.md)
+
+---
+
+## 🎬 Live Demo & Documentation
+
+🌐 **Try it yourself**: [Schedule a Demo](mailto:demo@krubles.com)
+
+📸 **Screenshots**:
+
+| Dashboard | Asset Details | Reports |
+|-----------|---------------|---------|
+| _Coming soon_ | _Coming soon_ | _Coming soon_ |
+
+📖 **Documentation**:
+- [API Documentation](docs/api-documentation.md)
+- [Multi-Tenant Guide](docs/MULTI_TENANT_GUIDE.md)
+- [OAuth Setup](docs/oauth-implementation-guide.md)
+- [Deployment Guide](docs/deployment-guide.md)
+- [Stripe Integration](README_STRIPE.md)
+- [Monitoring Setup](MONITORING-SETUP-GUIDE.md)
+
+---
+
+## 🛠️ Technology Stack
 
 **Frontend**
-- **React 19** - Latest React with concurrent features
-- **Vite 7.1.7** - Lightning-fast builds (< 3s)
-- **TypeScript** - Type-safe development
-- **Tailwind CSS** - Utility-first styling
-- **React Query** - Server state management
-- **Framer Motion** - Smooth animations
+- React 19 + TypeScript
+- Vite 7 for blazing-fast builds (< 3s)
+- TailwindCSS + Framer Motion
+- React Query for server state
+- Zustand for client state
 
 **Backend**
-- **Spring Boot 3.4.1** - Modern Java framework
-- **Java 21** - Latest LTS with virtual threads
-- **PostgreSQL** - Production database
-- **H2** - Development database
+- Spring Boot 3.4.1 + Java 21
+- PostgreSQL 15 with Flyway migrations
+- Spring Security + JWT + OAuth2
+- RESTful API with OpenAPI docs
+- Micrometer for metrics
+
+**DevOps**
+- Docker + Docker Compose
+- GitHub Actions CI/CD
+- Prometheus + Grafana monitoring
+- Sentry error tracking
+- ELK stack for logging
+
+---
 - **Flyway** - Database migrations
 - **Spring Security** - Authentication & authorization
 - **Apache POI** - Excel processing
@@ -294,520 +397,189 @@ Krubles includes **9 beautifully designed marketing pages** built with modern gr
 ```yaml
 # Database
 spring.datasource.url=${DATABASE_URL:jdbc:postgresql://localhost:5432/assetdb}
-spring.datasource.username=${DATABASE_USERNAME:postgres}
-spring.datasource.password=${DATABASE_PASSWORD:postgres}
-
-# JWT
-jwt.secret=${JWT_SECRET:your-secret-key-min-32-chars}
-jwt.access-expiration=900000      # 15 minutes
-jwt.refresh-expiration=604800000  # 7 days
-
-# Slack Integration (Optional)
-slack.webhook.url=${SLACK_WEBHOOK_URL:}
-slack.notifications.enabled=${SLACK_NOTIFICATIONS_ENABLED:false}
-
-# Server
-server.port=8080
-```
-
-**Frontend** (`.env`):
-
-```env
-# API Configuration
-VITE_API_URL=http://localhost:8080/api/v1
-VITE_APP_NAME=Krubles Asset Management
-
-# Google OAuth 2.0 (Optional - enables "Sign in with Google")
-# Get your client ID from: https://console.cloud.google.com/apis/credentials
-VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
-
-# Microsoft OAuth / Azure AD (Optional - enables "Sign in with Microsoft")
-# Get your client ID from: https://portal.azure.com
-VITE_MICROSOFT_CLIENT_ID=your-microsoft-client-id-here
-VITE_MICROSOFT_TENANT_ID=common
-```
-
-> **Note**: OAuth buttons will only appear if the corresponding client IDs are configured. See detailed setup guides:
-> - [Google OAuth Setup](./docs/google-oauth-integration.md)
-> - [Microsoft OAuth Setup](./docs/microsoft-oauth-integration.md)
-
-### Docker Environment
-
-Create `docker-compose.override.yml` for local overrides:
-
-```yaml
-version: '3.8'
-services:
-  backend:
-    environment:
-      - JWT_SECRET=your-production-secret-key
-      - SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK
-      - SLACK_NOTIFICATIONS_ENABLED=true
-```
 
 ---
 
-## 📖 API Documentation
+## 🌐 Marketing Pages
 
-### REST API
+Krubles includes **9 beautifully designed marketing pages** to showcase your deployment:
 
-Base URL: `http://localhost:8080/api/v1`
+1. **Home** (`/`) - Landing page with hero, features, and CTA
+2. **Features** (`/features`) - Detailed feature showcase
+3. **Solutions** (`/solutions`) - Industry use cases
+4. **Pricing** (`/pricing`) - Transparent pricing tiers
+5. **Customers** (`/customers`) - Testimonials & success stories
+6. **Integrations** (`/integrations`) - Available integrations
+7. **Security** (`/security`) - Security & compliance
+8. **About** (`/about`) - Company story & team
+9. **Contact** (`/contact`) - Get in touch
 
-**Authentication**: All endpoints (except `/auth/*`) require JWT token in `Authorization: Bearer {token}` header
+Built with modern gradients, animations, and fully responsive design.
 
-#### Key Endpoints
+---
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/auth/signin` | User login | ❌ |
-| POST | `/auth/signup` | User registration | ❌ |
-| GET | `/assets` | List all assets | ✅ |
-| POST | `/assets` | Create asset | ✅ (IT_ADMIN+) |
-| GET | `/assets/{id}` | Get asset details | ✅ |
-| PUT | `/assets/{id}` | Update asset | ✅ (IT_ADMIN+) |
-| DELETE | `/assets/{id}` | Delete asset | ✅ (SUPER_ADMIN) |
-| POST | `/imports/excel` | Import Excel file | ✅ (IT_ADMIN+) |
-| GET | `/exports/assets/csv` | Export filtered CSV | ✅ |
-| GET | `/webhooks` | List webhooks | ✅ (IT_ADMIN+) |
-| POST | `/webhooks` | Create webhook | ✅ (IT_ADMIN+) |
-| POST | `/slack/test` | Test Slack connection | ✅ (IT_ADMIN+) |
+## 🔧 Configuration
 
-**Full API Docs**: Visit `http://localhost:8080/api/v1/swagger-ui.html` when running
+### Quick Setup
 
-### User Roles
+**Backend Environment** (`backend/src/main/resources/application.yml`):
+```yaml
+# Minimal required configuration
+spring.datasource.url=${DATABASE_URL:jdbc:postgresql://localhost:5432/assetdb}
+jwt.secret=${JWT_SECRET:your-secret-key-min-32-chars}
+```
 
-| Role | Permissions |
-|------|-------------|
-| `SUPER_ADMIN` | Full system access, delete assets |
-| `IT_ADMIN` | Manage assets, users, settings, integrations |
-| `MANAGER` | Create/update assets, view reports, import/export |
-| `IT_STAFF` | View assets, export data |
-| `USER` | View assigned assets only |
+**Frontend Environment** (`.env`):
+```env
+VITE_API_URL=http://localhost:8080/api/v1
+VITE_APP_NAME=Krubles Asset Management
+
+# Optional: Enable OAuth
+VITE_GOOGLE_CLIENT_ID=your-google-client-id
+VITE_MICROSOFT_CLIENT_ID=your-microsoft-client-id
+```
+
+📖 **Detailed guides**: [docs/auth-setup.md](docs/auth-setup.md), [docs/OAUTH_SETUP.md](docs/OAUTH_SETUP.md)
 
 ---
 
 ## 🧪 Testing
 
-### Backend Tests
-
 ```bash
-cd backend
-./mvnw test                    # Run all tests
-./mvnw test -Dtest=AssetServiceTest  # Run specific test
-./mvnw verify                  # Run tests + integration tests
-```
+# Backend
+cd backend && ./mvnw test
 
-### Frontend Tests
+# Frontend
+cd frontend && npm test
 
-```bash
-cd frontend
-npm test                       # Run unit tests
-npm run test:coverage          # With coverage report
-npm run test:e2e               # Playwright E2E tests
+# End-to-end tests
+npm run test:e2e
 ```
 
 ---
 
-## 🚀 Deployment
-
-### Production Build
+## � Production Deployment
 
 ```bash
-# Backend
-cd backend
-./mvnw clean package -DskipTests
-# Creates: target/it-asset-management-1.1.0.jar
+# Build for production
+cd backend && ./mvnw clean package
+cd frontend && npm run build
 
-# Frontend
-cd frontend
-npm run build
-# Creates: dist/ folder with optimized bundle
-```
-
-### Docker Production
-
-```bash
-# Build images
-docker-compose build
-
-# Push to registry
-docker tag it-asset-management-backend:latest your-registry/krubles-backend:1.1.0
-docker push your-registry/krubles-backend:1.1.0
-
-# Deploy
+# Deploy with Docker
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-### Deployment Checklist
+**Deployment Checklist:**
+- ✅ Set strong JWT_SECRET (32+ characters)
+- ✅ Configure production database
+- ✅ Enable HTTPS
+- ✅ Set up backups
+- ✅ Configure monitoring
 
-- [ ] Set strong `JWT_SECRET` (min 32 characters)
-- [ ] Configure production database (PostgreSQL)
-- [ ] Enable HTTPS (Let's Encrypt recommended)
-- [ ] Set up database backups
-- [ ] Configure monitoring (Prometheus + Grafana)
-- [ ] Set up log aggregation
-- [ ] Configure CORS for production domain
-- [ ] Enable Slack notifications (optional)
-- [ ] Test all integrations
-- [ ] Create initial admin user
-
-**Full deployment guide**: See `docs/deployment-guide.md`
+� **Full deployment guide**: [docs/deployment-guide.md](docs/deployment-guide.md)
 
 ---
 
-## 🔌 Integrations Setup
+## 💰 Pricing
 
-### Slack Notifications
+**Self-Hosted:** Free and open source under MIT license. Deploy on your infrastructure.
 
-1. Create Slack Incoming Webhook at https://api.slack.com/apps
-2. Set environment variables:
-   ```bash
-   export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
-   export SLACK_NOTIFICATIONS_ENABLED=true
-   ```
-3. Test connection via API: `POST /slack/test`
-4. See full guide: `docs/slack-integration-guide.md`
+**SaaS (Coming Soon):**
+- **Starter**: $49/month - Up to 500 assets
+- **Business**: $199/month - Up to 5,000 assets
+- **Enterprise**: Custom pricing - Unlimited assets, dedicated support
 
-### Webhooks
-
-1. Login as IT_ADMIN or SUPER_ADMIN
-2. Create webhook via API: `POST /webhooks`
-   ```json
-   {
-     "name": "Asset Events",
-     "url": "https://your-endpoint.com/webhook",
-     "events": ["ASSET_CREATED", "ASSET_UPDATED"],
-     "active": true
-   }
-   ```
-3. Verify HMAC signature in `X-Webhook-Signature` header
-4. See full guide: `docs/integration-implementation-plan.md`
+📄 Full pricing details: [PRICING_BREAKDOWN.md](PRICING_BREAKDOWN.md)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these guidelines:
+We welcome contributions! Whether it's:
+- 🐛 Bug reports and fixes
+- ✨ Feature requests and implementations
+- 📖 Documentation improvements
+- 🧪 Test coverage expansion
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
-3. **Commit your changes**: `git commit -m 'Add amazing feature'`
-4. **Push to branch**: `git push origin feature/amazing-feature`
-5. **Open a Pull Request**
-
-### Code Standards
-
-- **Backend**: Follow Java conventions, use Spring Boot best practices
-- **Frontend**: Use TypeScript, follow React hooks patterns
-- **Tests**: Write tests for new features
-- **Documentation**: Update docs for API changes
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ---
 
-## 📊 Performance
+## 🔒 Security
 
-### Build Times
-- **Backend**: ~2.5s (Maven compile)
-- **Frontend**: ~2.8s (Vite build)
-- **Total**: < 6s from clean state
+We take security seriously. If you discover a vulnerability:
+- 📧 Email: security@krubles.com
+- 🏆 Hall of Fame: [SECURITY_HALL_OF_FAME.md](SECURITY_HALL_OF_FAME.md)
 
-### Bundle Size
-- **Frontend (gzipped)**: 84.39 KB
-- **Backend JAR**: ~45 MB (includes all dependencies)
-
-### API Response Times
-- **Asset list (100 items)**: < 100ms
-- **Asset detail**: < 50ms
-- **Excel export (1000 assets)**: ~2s
-- **Filtered CSV export**: ~1s
+See [SECURITY.md](./SECURITY.md) for our security policy.
 
 ---
 
-## 🐛 Troubleshooting
+## 📄 License
 
-### Common Issues
+MIT License - see [LICENSE](LICENSE) for details.
 
-**Port already in use**
-```bash
-# Kill process on port 8080
-lsof -ti:8080 | xargs kill -9
-
-# Or change port in application.yml
-server.port=8081
-```
-
-**Database connection failed**
-```bash
-# Check PostgreSQL is running
-docker-compose ps
-
-# View logs
-docker-compose logs postgres
-```
-
-**Frontend build errors**
-```bash
-# Clear cache and reinstall
-rm -rf node_modules package-lock.json
-npm install
-```
-
-**JWT token expired**
-- Access tokens expire after 15 minutes
-- Use refresh token to get new access token
-- Or re-authenticate via `/auth/signin`
+This means you can:
+- ✅ Use commercially
+- ✅ Modify and distribute
+- ✅ Use privately
+- ✅ Patent use
 
 ---
 
-## 📝 License
+## 🎯 Roadmap
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👥 Team
-
-**Krubles** is built by founders who care about making IT asset management simple and enjoyable.
-
-- **Contact**: support@krubles.com
-- **Website**: https://krubles.com (coming soon)
-- **GitHub**: https://github.com/C-Elkins/IT-Asset-Management
-
----
-
-## 🗺️ Roadmap
-
-### ✅ v1.1.0 (Current - October 2025)
-- [x] 9 marketing pages redesigned
-- [x] Excel import/export
-- [x] Webhooks system
-- [x] Slack notifications
-- [x] Enhanced filtered exports
-- [x] 7 live integrations
-
-### 🔄 v1.2.0 (Q4 2025)
-- [ ] Google OAuth sign-in
-- [ ] Microsoft OAuth sign-in
-- [ ] Enhanced dashboard with charts
-- [ ] Mobile app (React Native)
-- [ ] Scheduled reports
-
-### 🔮 v2.0.0 (2026)
-- [ ] ServiceNow integration
-- [ ] Jira integration
-- [ ] Power BI connector
-- [ ] Multi-tenancy support
-- [ ] Advanced analytics with AI
-
----
-
-## 📚 Additional Resources
-
-- **API Documentation**: `docs/api-documentation.md`
-- **User Guide**: `docs/user-guide.md`
-- **Deployment Guide**: `docs/deployment-guide.md`
-- **Integration Guides**: `docs/` folder
-- **Release Notes**: See GitHub Releases
+Coming soon:
+- 🔄 ServiceNow integration
+- 🎫 Jira integration
+- 🔐 Okta SSO
+- 📱 Mobile apps (iOS/Android)
+- 🤖 Advanced AI features
+- 📊 Power BI connector
+- 🌍 i18n (internationalization)
 
 ---
 
 ## ⭐ Star Us!
 
-If you find Krubles useful, please consider giving us a star on GitHub! It helps others discover the project.
+If Krubles helps your team, please give us a star on GitHub!
 
-[![GitHub stars](https://img.shields.io/github/stars/C-Elkins/IT-Asset-Management?style=social)](https://github.com/C-Elkins/IT-Asset-Management/stargazers)
-
----
-
-**Built with ❤️ by the Krubles team**
-
-*Making asset management simple, powerful, and enjoyable.*
+[![GitHub stars](https://img.shields.io/github/stars/C-Elkins/Asset-Management?style=social)](https://github.com/C-Elkins/Asset-Management/stargazers)
 
 ---
 
-## 🤖 AI Assistant (Technical Details)
+## 📞 Get in Touch
 
-The application includes an experimental, deterministic AI Assistant available at `/app/ai` ("AI Assistant" in the sidebar).
+- 🌐 Website: [Coming Soon]
+- 📧 Email: hello@krubles.com
+- 💬 Schedule a Demo: demo@krubles.com
+- 🐦 Twitter: [@KrublesHQ](https://twitter.com/KrublesHQ)
+- 💼 LinkedIn: [Krubles](https://linkedin.com/company/krubles)
 
-## Features
+---
 
-## AI Assistant (Experimental)
+## 📚 Additional Documentation
 
-The application includes an experimental, deterministic AI Assistant available at
-`/app/ai` ("AI Assistant" in the sidebar). It provides two backend-powered
-capabilities:
+Detailed guides in the `/docs` folder:
 
-1. Categorize – Heuristically assigns a category and tag set to arbitrary input
-    text (e.g., asset descriptions, incident notes) and returns a confidence
-    score.
-2. Insights – Extracts structured key/value insight pairs with simple scoring
-    (no external AI APIs required).
+- [API Documentation](docs/api-documentation.md) - Complete REST API reference
+- [Multi-Tenant Guide](docs/MULTI_TENANT_GUIDE.md) - SaaS deployment guide
+- [OAuth Setup](docs/oauth-implementation-guide.md) - Google/Microsoft SSO
+- [Deployment Guide](docs/deployment-guide.md) - Production deployment
+- [Stripe Integration](README_STRIPE.md) - Billing setup
+- [Monitoring Setup](MONITORING-SETUP-GUIDE.md) - Observability stack
+- [Email Integration](docs/email-integration.md) - SMTP configuration
+- [Slack Integration](docs/slack-integration-guide.md) - Webhook setup
 
-### Technical Architecture
+---
 
-- Backend: Spring Boot exposes POST endpoints `/ai/categorize` and
-   `/ai/insights` with per-user in-memory rate limiting (30 req / 5 min).
-- Frontend: Lightweight React Query mutations (see `src/hooks/useAIBackend.ts`)
-   wrap `backendCategorize` and `backendInsights` from `aiService`.
-- Local History: Each successful query is persisted to IndexedDB (Dexie) in a
-   new `ai_queries` table (version 4 schema upgrade) for quick recall and
-   re-run.
-- Separation of Concerns: The heuristic simulation / enrichment logic
-   (`AIService`) stays isolated from backend wrappers to allow future integration
-   of real LLM providers without bundle bloat.
+<div align="center">
+  <h3>Built with ❤️ by the Krubles team</h3>
+  <p><em>Making asset management simple, powerful, and delightful.</em></p>
+  
+  <p>
+    <strong>🚀 Ready to get started?</strong><br>
+    <code>git clone https://github.com/C-Elkins/Asset-Management.git && cd it-asset-management && docker-compose up -d</code>
+  </p>
+</div>
 
-### Extending
-
-To integrate a real model provider, add a new module (e.g., `llmProvider.ts`)
-exporting async functions with the same shape as `backendCategorize` /
-`backendInsights`, then feature toggle in the Assistant UI. Avoid modifying
-existing endpoints to preserve deterministic fallbacks.
-
-### Rate Limiting & Headers
-
-Backend applies a per-user fixed window (30 requests / 5 minutes) for both AI endpoints.
-
-Headers emitted on every successful response and 429:
-
-| Header | Meaning |
-| ------ | ------- |
-| `X-RateLimit-Limit` | Max requests permitted in the current window (e.g. 30) |
-| `X-RateLimit-Remaining` | Requests left before throttling |
-| `X-RateLimit-Reset` | Unix epoch seconds when the current window resets |
-| `Retry-After` | (On 429) Seconds until retry (matches reset delta) |
-
-Frontend cooldown logic:
-
-1. On 429 the app reads `Retry-After` (or derives from `X-RateLimit-Reset`) and
-   disables submission until that time.
-2. On success, it could (future enhancement) surface remaining quota; currently
-   it simply resets internal cooldown if any.
-3. Fallback: If headers are missing, a conservative 60s cooldown is applied.
-
-These headers make client-side UX deterministic and observable; they also enable
-external monitoring / dashboards to reason about saturation.
-
-UI Integration:
-
-- The AI Assistant page now shows: remaining requests, total limit, and a live
-   countdown until reset (derived from `X-RateLimit-Reset`). When throttled it
-   swaps to a cooldown timer sourced from `Retry-After`.
-
-## Observability & Logging
-
-- Actuator endpoints exposed: `health`, `info`, `metrics`, `env`, `prometheus`.
-- Micrometer Prometheus registry enabled (scrape `/api/v1/actuator/prometheus`).
-- Custom metrics added for AI endpoints
-   (`ai_categorize_requests_total`, `ai_insights_requests_total`,
-   `ai_rate_limit_hits_total`, latency timers).
-- Structured JSON logs written to `logs/application.json` with correlation,
-   trace, span IDs.
-- `AuthActivityFilter` injects `correlationId` (header `X-Correlation-Id` or
-   generated) and logs auth request outcomes.
-
-## Resilience (Prepared)
-
-Baseline Resilience4j config (`resilience4j.yml`) defines a circuit breaker &
-time limiter named `aiExternalProvider` for future external AI integrations
-(currently unused in code paths).
-
-## OpenAPI & Type Generation
-
-SpringDoc already exposes the OpenAPI doc at `/api/v1/api-docs` and Swagger UI
-at `/api/v1/swagger-ui.html`.
-Planned: add a frontend npm script to generate TypeScript types (e.g. using `openapi-typescript`).
-
-## Project structure
-
-- `backend/` — Spring Boot (Java 17+, Maven) REST API
-- `frontend/` — React 19 (Vite) SPA served by nginx in prod
-- `docker-compose.yml` — Compose stack for DB + API + Web
-
-## Quick start
-
-1. Backend (dev)
-
-   - Requirements: Java 17+, Maven 3.9+
-   - Build and run:
-
-   ```bash
-   mvn spring-boot:run
-   ```
-
-2. Frontend (dev)
-
-   - Requirements: Node.js 20+
-   - Install and start:
-
-   ```bash
-   npm install
-   npm run dev
-   ```
-
-3. Docker (prod-like)
-
-   Build and run all services:
-
-   ```bash
-   docker compose up -d --build
-   ```
-
-   Services:
-
-   - Frontend: <http://localhost:3002> (nginx serving Vite build)
-   - Backend: internal on 8080 in the Compose network
-   - Postgres: localhost:5432 (user/pass: iam/iam)
-
-   Health:
-
-   - Frontend: <http://localhost:3002/healthz>
-   - Backend: <http://localhost:8080/api/v1/actuator/health> (inside network)
-
-## Environment
-
-- Frontend dev proxy: `VITE_API_BASE=/api` (see `frontend/.env.development`)
-- Nginx runtime env: `BACKEND_ORIGIN` (defaults to `http://backend:8080`)
-
-## E2E smoke tests (Playwright)
-
-Run locally:
-
-```bash
-cd frontend
-npm run build && npm run test:e2e
-npm run test:e2e:report # optional
-```
-
-## Dev modes
-
-- Local dev (hot reload):
-  - Backend: `./mvnw spring-boot:run` in `backend`
-  - Frontend: `npm run dev` in `frontend` → <http://localhost:3001>
-  - API proxied via Vite `/api` → <http://localhost:8080>
-
-- Containerized dev:
-  - `docker compose up -d --build`
-  - Frontend → <http://localhost:3002>
-  - Backend (Compose network) → `http://backend:8080`
-  - Nginx proxy uses BACKEND_ORIGIN env (default `http://backend:8080`)
-
-## VS Code tasks
-
-Tasks are available under Terminal → Run Task:
-
-- dev:start backend — starts Spring Boot (scripted)
-- dev:start frontend — starts Vite dev server
-- dev:start all — runs both in parallel
-
-## CI
-
-CI builds:
-
-- Backend: Maven on Temurin 21
-- Frontend: Node 20 build + Playwright smoke tests
-- Triggers: push and PR to main
-
-## Contributing and Security
-
-- See [CONTRIBUTING.md](./CONTRIBUTING.md)
-- See [SECURITY.md](./SECURITY.md)
