@@ -1,17 +1,17 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { Eye, EyeOff, LogIn, Package, Shield } from 'lucide-react';
-import { Button, Card, Input } from '../../shared/components/ui';
-import { useAuthStore } from '../../app/store';
-import { LoginForm } from '../../shared/types';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, LogIn, Package, Shield } from "lucide-react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
+import { useAuthStore } from "../../app/store";
+import { Button, Card, Input } from "../../shared/components/ui";
+import { LoginForm } from "../../shared/types";
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required'),
-  password: z.string().min(1, 'Password is required'),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
 });
 
 interface LoginProps {
@@ -21,7 +21,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   // Debug log to verify component mounts in Playwright environment
   React.useEffect(() => {
-    console.log('[Login] component mounted');
+    console.log("[Login] component mounted");
   }, []);
   const { login, isLoading, error } = useAuthStore();
   const navigate = useNavigate();
@@ -34,17 +34,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
-      password: '',
+      username: "",
+      password: "",
     },
   });
 
   const onSubmit = async (data: LoginForm) => {
     try {
-  await login(data);
-  onLogin?.(data);
-  // Redirect directly to the dashboard to align with tests and avoid intermediate redirects
-  navigate('/app/dashboard', { replace: true });
+      await login(data);
+      onLogin?.(data);
+      // Redirect directly to the dashboard to align with tests and avoid intermediate redirects
+      navigate("/app/dashboard", { replace: true });
     } catch {
       // Error is handled by the store
     }
@@ -73,7 +73,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <Package size={32} className="text-white" />
           </motion.div>
           {/* Heading text must match /Asset Management by Krubles Login/i for tests */}
-          <h1 className="text-3xl font-bold text-gray-900" data-testid="login-heading">Asset Management by Krubles Login</h1>
+          <h1
+            className="text-3xl font-bold text-gray-900"
+            data-testid="login-heading"
+          >
+            Asset Management by Krubles Login
+          </h1>
           <p className="text-gray-600 mt-2">Sign in to continue</p>
         </motion.div>
 
@@ -83,7 +88,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             {/* Username (labeled as Email to satisfy tests and backend expectation) */}
             <div>
               <Input
-                {...register('username')}
+                {...register("username")}
                 label="Email"
                 type="text"
                 placeholder="Enter your username"
@@ -97,9 +102,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             {/* Password */}
             <div>
               <Input
-                {...register('password')}
+                {...register("password")}
                 label="Password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 error={errors.password?.message}
                 disabled={isLoading}
@@ -144,11 +149,36 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               aria-label="Login"
             >
               {/* Visually hidden persistent label to ensure accessible name includes 'Login' */}
-              <span style={{position:'absolute',width:1,height:1,padding:0,margin:-1,overflow:'hidden',clip:'rect(0,0,0,0)',whiteSpace:'nowrap',border:0}}>Login</span>
-              {isLoading || isSubmitting ? 'Signing in...' : 'Login'}
+              <span
+                style={{
+                  position: "absolute",
+                  width: 1,
+                  height: 1,
+                  padding: 0,
+                  margin: -1,
+                  overflow: "hidden",
+                  clip: "rect(0,0,0,0)",
+                  whiteSpace: "nowrap",
+                  border: 0,
+                }}
+              >
+                Login
+              </span>
+              {isLoading || isSubmitting ? "Signing in..." : "Login"}
             </Button>
             {/* Fallback hidden button solely to satisfy accessibility query in tests if styled button fails */}
-            <button type="submit" aria-label="Login" style={{position:'absolute',left:'-9999px',width:1,height:1}}>Login</button>
+            <button
+              type="submit"
+              aria-label="Login"
+              style={{
+                position: "absolute",
+                left: "-9999px",
+                width: 1,
+                height: 1,
+              }}
+            >
+              Login
+            </button>
           </form>
 
           {/* Demo Credentials */}
@@ -158,11 +188,19 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <p className="text-sm font-medium text-gray-700 mb-2">Demo Credentials:</p>
+            <p className="text-sm font-medium text-gray-700 mb-2">
+              Demo Credentials:
+            </p>
             <div className="space-y-1 text-xs text-gray-600">
-              <p><strong>Admin:</strong> admin / admin123</p>
-              <p><strong>Manager:</strong> manager / manager123</p>
-              <p><strong>User:</strong> user / user123</p>
+              <p>
+                <strong>Admin:</strong> admin / admin123
+              </p>
+              <p>
+                <strong>Manager:</strong> manager / manager123
+              </p>
+              <p>
+                <strong>User:</strong> user / user123
+              </p>
             </div>
           </motion.div>
         </Card>

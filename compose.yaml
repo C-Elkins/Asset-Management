@@ -1,4 +1,16 @@
 services:
+  db:
+    image: postgres:15-alpine
+    container_name: itam-postgres
+    environment:
+      POSTGRES_DB: asset_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   backend:
     build:
       context: ./backend
@@ -6,11 +18,13 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - JAVA_OPTS=-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080/api/v1/actuator/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 5
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/asset_management
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
 
   frontend:
     build:
@@ -21,5 +35,7 @@ services:
     ports:
       - "3001:8080"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
+
+volumes:
+  postgres_data:

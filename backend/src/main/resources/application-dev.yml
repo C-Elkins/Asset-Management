@@ -2,7 +2,7 @@ spring:
   datasource:
     # Use env vars if provided (Docker), otherwise fallback to H2 for local dev
     url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:testdb}
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER:org.h2.Driver}
+    # Let Spring Boot auto-detect the driver from the JDBC URL (H2 for local mem, PostgreSQL in Docker)
     username: ${SPRING_DATASOURCE_USERNAME:sa}
     password: ${SPRING_DATASOURCE_PASSWORD:}
   
@@ -88,13 +88,15 @@ logging:
 # Application-specific configuration
 app:
   cors:
-    allowed-origins: "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3005,http://127.0.0.1:3005,http://localhost:5173,http://127.0.0.1:5173"
+    allowed-origins: "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:3005,http://127.0.0.1:3005,http://localhost:5173,http://127.0.0.1:5173"
 
 # Development CORS settings (for WebConfig)
 cors:
   allowed-origins: 
     - "http://localhost:3000"
     - "http://127.0.0.1:3000"
+    - "http://localhost:3001"
+    - "http://127.0.0.1:3001"
     - "http://localhost:3005"      # Vite dev server (current)
     - "http://127.0.0.1:3005"      # Vite dev server (IP)
     - "http://localhost:5173"      # Vite dev server (alternate)

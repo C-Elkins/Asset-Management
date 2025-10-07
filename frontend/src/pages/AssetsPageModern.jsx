@@ -1,53 +1,86 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Laptop, Search, Filter, Download, Upload, Plus, 
-  RefreshCw, Grid, List, ChevronLeft, ChevronRight,
-  Package, CheckCircle, AlertCircle, Settings, Trash2,
-  Edit, Eye, MoreVertical
-} from 'lucide-react';
-import { assetService } from '../services/assetService.js';
-import { exportService } from '../services/exportService.js';
-import { AssetCard } from '../components/assets/AssetCard.jsx';
-import { AssetForm } from '../components/assets/AssetForm.jsx';
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Search,
+  Filter,
+  Download,
+  Upload,
+  Plus,
+  RefreshCw,
+  Grid,
+  List,
+  ChevronLeft,
+  ChevronRight,
+  Package,
+  CheckCircle,
+  AlertCircle,
+  Settings,
+  Trash2,
+  Edit,
+  Eye,
+  MoreVertical,
+  Brain,
+  TrendingUp,
+  Sparkles,
+  Zap,
+  Bell,
+} from "lucide-react";
+import { assetService } from "../services/assetService.js";
+import { exportService } from "../services/exportService.js";
+import { aiService } from "../services/aiService.js";
+import { AssetCard } from "../components/assets/AssetCard.jsx";
+import { SmartAssetForm } from "../components/assets/SmartAssetForm.jsx";
+import { useCustomization } from "../hooks/useCustomization";
 
 export const AssetsPageModern = () => {
   const navigate = useNavigate();
-  
+  const { terminology } = useCustomization();
+
   // State management
   const [assets, setAssets] = useState([]);
   const [allAssets, setAllAssets] = useState([]);
-    const { terminology } = useCustomization();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [selectedAssets, setSelectedAssets] = useState(new Set());
   const [showFilters, setShowFilters] = useState(false);
 
+  // AI Insights State
+  const [aiInsights, setAiInsights] = useState(null);
+  const [loadingInsights, setLoadingInsights] = useState(false);
+
   // Status options
   const statusOptions = [
-    { value: 'ALL', label: 'All Assets', color: 'slate', count: 0 },
-    { value: 'AVAILABLE', label: 'Available', color: 'emerald', count: 0 },
-    { value: 'ASSIGNED', label: 'Assigned', color: 'blue', count: 0 },
-    { value: 'IN_MAINTENANCE', label: 'In Maintenance', color: 'amber', count: 0 },
-    { value: 'RETIRED', label: 'Retired', color: 'gray', count: 0 },
-    { value: 'LOST', label: 'Lost', color: 'red', count: 0 },
-    { value: 'DAMAGED', label: 'Damaged', color: 'orange', count: 0 }
+    { value: "ALL", label: "All Assets", color: "slate", count: 0 },
+    { value: "AVAILABLE", label: "Available", color: "emerald", count: 0 },
+    { value: "ASSIGNED", label: "Assigned", color: "blue", count: 0 },
+    {
+      value: "IN_MAINTENANCE",
+      label: "In Maintenance",
+      color: "amber",
+      count: 0,
+    },
+    { value: "RETIRED", label: "Retired", color: "gray", count: 0 },
+    { value: "LOST", label: "Lost", color: "red", count: 0 },
+    { value: "DAMAGED", label: "Damaged", color: "orange", count: 0 },
   ];
 
   // Calculate metrics from assets
   const metrics = {
     total: allAssets.length,
-    available: allAssets.filter(a => a.status === 'AVAILABLE').length,
-    assigned: allAssets.filter(a => a.status === 'ASSIGNED').length,
-    maintenance: allAssets.filter(a => a.status === 'IN_MAINTENANCE').length,
-    value: allAssets.reduce((sum, a) => sum + (parseFloat(a.purchasePrice) || 0), 0)
+    available: allAssets.filter((a) => a.status === "AVAILABLE").length,
+    assigned: allAssets.filter((a) => a.status === "ASSIGNED").length,
+    maintenance: allAssets.filter((a) => a.status === "IN_MAINTENANCE").length,
+    value: allAssets.reduce(
+      (sum, a) => sum + (parseFloat(a.purchasePrice) || 0),
+      0,
+    ),
   };
 
   // Fetch assets
@@ -55,13 +88,13 @@ export const AssetsPageModern = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       let response;
       const params = { page: currentPage, size: 12 };
 
       if (searchTerm) {
         response = await assetService.search(searchTerm, params);
-      } else if (statusFilter && statusFilter !== 'ALL') {
+      } else if (statusFilter && statusFilter !== "ALL") {
         response = await assetService.getByStatus(statusFilter, params);
       } else {
         response = await assetService.list(params);
@@ -82,20 +115,24 @@ export const AssetsPageModern = () => {
       if (currentPage === 0) {
         try {
           const allResponse = await assetService.list({ size: 1000 });
-          const allData = Array.isArray(allResponse) ? allResponse : (allResponse.content || []);
+          const allData = Array.isArray(allResponse)
+            ? allResponse
+            : allResponse.content || [];
           setAllAssets(allData);
         } catch (err) {
-          console.warn('Could not fetch all assets:', err);
+          console.warn("Could not fetch all assets:", err);
         }
       }
     } catch (err) {
-      console.error('Failed to fetch assets:', err);
-      
+      console.error("Failed to fetch assets:", err);
+
       // Check if it's a 403 Forbidden error (expired token)
       if (err.response?.status === 403) {
-        setError('Your session has expired. Please log out and log back in to continue.');
+        setError(
+          "Your session has expired. Please log out and log back in to continue.",
+        );
       } else {
-        setError('Failed to load assets. Please try again.');
+        setError("Failed to load assets. Please try again.");
       }
       setAssets([]);
     } finally {
@@ -106,6 +143,28 @@ export const AssetsPageModern = () => {
   useEffect(() => {
     fetchAssets();
   }, [currentPage, statusFilter, fetchAssets]);
+
+  // Load AI Insights
+  const loadAIInsights = useCallback(async () => {
+    setLoadingInsights(true);
+    try {
+      const insights = await aiService.generateInsights({
+        status: statusFilter !== "ALL" ? statusFilter : undefined,
+        search: searchTerm || undefined,
+      });
+      setAiInsights(insights);
+    } catch (error) {
+      console.error("Failed to load AI insights:", error);
+    } finally {
+      setLoadingInsights(false);
+    }
+  }, [statusFilter, searchTerm]);
+
+  useEffect(() => {
+    if (allAssets.length > 0) {
+      loadAIInsights();
+    }
+  }, [allAssets.length]);
 
   // Debounced search
   useEffect(() => {
@@ -119,23 +178,25 @@ export const AssetsPageModern = () => {
   const handleStatusChange = (newStatus) => {
     setStatusFilter(newStatus);
     setCurrentPage(0);
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   const handleExportCSV = () => {
-    const assetsToExport = searchTerm || statusFilter !== 'ALL' ? assets : allAssets;
-    exportService.exportToCSV(assetsToExport, 'assets-export');
+    const assetsToExport =
+      searchTerm || statusFilter !== "ALL" ? assets : allAssets;
+    exportService.exportToCSV(assetsToExport, "assets-export");
   };
 
   const handleExportPDF = () => {
-    const assetsToExport = searchTerm || statusFilter !== 'ALL' ? assets : allAssets;
-    exportService.exportToPDF(assetsToExport, 'assets-report');
+    const assetsToExport =
+      searchTerm || statusFilter !== "ALL" ? assets : allAssets;
+    exportService.exportToPDF(assetsToExport, "assets-report");
   };
 
   return (
     <div className="assets-page-modern">
       {/* Hero Section */}
-      <motion.div 
+      <motion.div
         className="assets-hero"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -147,8 +208,12 @@ export const AssetsPageModern = () => {
               <Package className="w-6 h-6 text-white" strokeWidth={2.5} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Asset Management</h1>
-              <p className="text-sm text-slate-600">Track, manage, and optimize your organization's assets</p>
+              <h1 className="text-3xl font-bold text-slate-900">
+                Asset Management
+              </h1>
+              <p className="text-sm text-slate-600">
+                Track, manage, and optimize your organization's assets
+              </p>
             </div>
           </div>
         </div>
@@ -177,7 +242,7 @@ export const AssetsPageModern = () => {
 
           <motion.div className="metric-card" whileHover={{ y: -4 }}>
             <div className="metric-icon bg-gradient-to-br from-purple-500 to-purple-600">
-              <Laptop className="w-5 h-5 text-white" />
+              <Package className="w-5 h-5 text-white" />
             </div>
             <div className="metric-content">
               <p className="metric-label">Assigned</p>
@@ -195,7 +260,10 @@ export const AssetsPageModern = () => {
             </div>
           </motion.div>
 
-          <motion.div className="metric-card metric-card-wide" whileHover={{ y: -4 }}>
+          <motion.div
+            className="metric-card metric-card-wide"
+            whileHover={{ y: -4 }}
+          >
             <div className="metric-icon bg-gradient-to-br from-cyan-500 to-cyan-600">
               <Package className="w-5 h-5 text-white" />
             </div>
@@ -205,10 +273,61 @@ export const AssetsPageModern = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* AI Insights Panel */}
+        {aiInsights && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 bg-gradient-to-br from-purple-50 to-blue-50 border border-purple-200 rounded-2xl p-6"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-purple-600 rounded-xl">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-900">AI Insights</h3>
+                <p className="text-sm text-slate-600">
+                  Smart recommendations for your inventory
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {aiInsights.insights?.slice(0, 3).map((insight, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-white rounded-xl p-4 border border-purple-100"
+                >
+                  <div className="flex items-start gap-3">
+                    <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-slate-900 mb-1">
+                        {insight.title}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        {insight.description}
+                      </p>
+                      {insight.priority === "high" && (
+                        <span className="inline-flex items-center gap-1 mt-2 text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
+                          <Bell className="w-3 h-3" />
+                          High Priority
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </motion.div>
 
       {/* Filters and Actions Bar */}
-      <motion.div 
+      <motion.div
         className="assets-toolbar"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -219,7 +338,7 @@ export const AssetsPageModern = () => {
           <Search className="search-icon" />
           <input
             type="text"
-            placeholder={`Search ${(terminology.assets || 'assets').toLowerCase()} by name, serial number, or tag...`}
+            placeholder={`Search ${(terminology.assets || "assets").toLowerCase()} by name, serial number, or tag...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -228,9 +347,9 @@ export const AssetsPageModern = () => {
 
         {/* Actions */}
         <div className="toolbar-actions">
-          <button 
+          <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`toolbar-btn ${showFilters ? 'toolbar-btn-active' : ''}`}
+            className={`toolbar-btn ${showFilters ? "toolbar-btn-active" : ""}`}
           >
             <Filter className="w-4 h-4" />
             <span className="hidden md:inline">Filters</span>
@@ -238,8 +357,15 @@ export const AssetsPageModern = () => {
 
           <div className="toolbar-divider" />
 
-          <button onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')} className="toolbar-btn">
-            {viewMode === 'grid' ? <List className="w-4 h-4" /> : <Grid className="w-4 h-4" />}
+          <button
+            onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
+            className="toolbar-btn"
+          >
+            {viewMode === "grid" ? (
+              <List className="w-4 h-4" />
+            ) : (
+              <Grid className="w-4 h-4" />
+            )}
           </button>
 
           <button onClick={fetchAssets} className="toolbar-btn">
@@ -253,8 +379,8 @@ export const AssetsPageModern = () => {
             <span className="hidden md:inline">Export</span>
           </button>
 
-          <button 
-            onClick={() => setShowCreateForm(true)} 
+          <button
+            onClick={() => setShowCreateForm(true)}
             className="toolbar-btn toolbar-btn-primary"
           >
             <Plus className="w-4 h-4" />
@@ -266,20 +392,22 @@ export const AssetsPageModern = () => {
       {/* Status Filters */}
       <AnimatePresence>
         {showFilters && (
-          <motion.div 
+          <motion.div
             className="status-filters"
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
           >
             {statusOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleStatusChange(option.value)}
-                className={`status-filter-btn status-filter-${option.color} ${statusFilter === option.value ? 'active' : ''}`}
+                className={`status-filter-btn status-filter-${option.color} ${statusFilter === option.value ? "active" : ""}`}
               >
                 {option.label}
-                {statusFilter === option.value && <CheckCircle className="w-4 h-4 ml-2" />}
+                {statusFilter === option.value && (
+                  <CheckCircle className="w-4 h-4 ml-2" />
+                )}
               </button>
             ))}
           </motion.div>
@@ -296,12 +424,12 @@ export const AssetsPageModern = () => {
         <div className="assets-error">
           <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
           <p className="text-lg font-semibold text-slate-900 mb-2">{error}</p>
-          {error.includes('session has expired') ? (
-            <button 
-              onClick={() => { 
-                localStorage.removeItem('token'); 
-                window.location.href = '/login'; 
-              }} 
+          {error.includes("session has expired") ? (
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                window.location.href = "/login";
+              }}
               className="retry-btn"
             >
               Log Out & Sign In Again
@@ -315,14 +443,19 @@ export const AssetsPageModern = () => {
       ) : assets.length === 0 ? (
         <div className="assets-empty">
           <Package className="w-16 h-16 text-slate-300 mb-4" />
-          <p className="text-lg font-semibold text-slate-900 mb-2">No {terminology.assets || 'assets'} found</p>
-          <p className="text-sm text-slate-600 mb-4">
-            {searchTerm || statusFilter !== 'ALL' 
-              ? 'Try adjusting your filters or search term' 
-              : 'Get started by adding your first asset'}
+          <p className="text-lg font-semibold text-slate-900 mb-2">
+            No {terminology.assets || "assets"} found
           </p>
-          {!searchTerm && statusFilter === 'ALL' && (
-            <button onClick={() => setShowCreateForm(true)} className="add-first-asset-btn">
+          <p className="text-sm text-slate-600 mb-4">
+            {searchTerm || statusFilter !== "ALL"
+              ? "Try adjusting your filters or search term"
+              : "Get started by adding your first asset"}
+          </p>
+          {!searchTerm && statusFilter === "ALL" && (
+            <button
+              onClick={() => setShowCreateForm(true)}
+              className="add-first-asset-btn"
+            >
               <Plus className="w-5 h-5 mr-2" />
               Add Your First Asset
             </button>
@@ -330,8 +463,8 @@ export const AssetsPageModern = () => {
         </div>
       ) : (
         <>
-          <motion.div 
-            className={viewMode === 'grid' ? 'assets-grid' : 'assets-list'}
+          <motion.div
+            className={viewMode === "grid" ? "assets-grid" : "assets-list"}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
@@ -343,8 +476,8 @@ export const AssetsPageModern = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <AssetCard 
-                  asset={asset} 
+                <AssetCard
+                  asset={asset}
                   viewMode={viewMode}
                   onUpdate={fetchAssets}
                 />
@@ -355,20 +488,22 @@ export const AssetsPageModern = () => {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="assets-pagination">
-              <button 
-                onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
                 disabled={currentPage === 0}
                 className="pagination-btn"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              
+
               <span className="pagination-info">
                 Page {currentPage + 1} of {totalPages}
               </span>
-              
-              <button 
-                onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))
+                }
                 disabled={currentPage === totalPages - 1}
                 className="pagination-btn"
               >
@@ -396,8 +531,12 @@ export const AssetsPageModern = () => {
               exit={{ scale: 0.9, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <AssetForm 
-                onSave={() => { setShowCreateForm(false); fetchAssets(); }}
+              <SmartAssetForm
+                onSubmit={async (data) => {
+                  await assetService.create(data);
+                  setShowCreateForm(false);
+                  fetchAssets();
+                }}
                 onCancel={() => setShowCreateForm(false)}
               />
             </motion.div>

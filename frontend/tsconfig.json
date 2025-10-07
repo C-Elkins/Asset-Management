@@ -5,7 +5,7 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
-  "allowJs": false,
+    "allowJs": true,
     "checkJs": false,
     
     /* Bundler mode */
@@ -41,8 +41,6 @@
     "coverage",
     "test-results",
     "public",
-    "scripts",
-    "src/**/*.js",
-    "src/**/*.jsx"
+    "scripts"
   ]
 }
