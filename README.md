@@ -119,19 +119,19 @@ Chromebooks, projectors, lab equipment, furniture. Student device assignment tra
 - Value tracking over time
 
 ### 🔗 **11+ Integrations (All Built-In)**
-| Integration | Use Case |
-|-------------|----------|
-| **Stripe** | Subscription billing, payment links, usage-based pricing |
-| **Slack** | Real-time asset alerts and maintenance notifications |
-| **Google OAuth** | Single Sign-On for Google Workspace |
-| **Microsoft OAuth** | Azure AD / Entra ID enterprise SSO |
-| **Email** | Alerts, reports, password resets (SendGrid/AWS SES) |
-| **Excel** | Generate formatted .xlsx reports with styling |
-| **PDF** | Asset labels, reports, invoices |
-| **CSV** | Bulk import/export for data migration |
-| **Webhooks** | Custom integrations and automation |
-| **REST API** | Full programmatic access with OpenAPI docs |
-| **API Keys** | Secure programmatic access with rate limiting |
+| Integration         | Use Case                                                 |
+| ------------------- | -------------------------------------------------------- |
+| **Stripe**          | Subscription billing, payment links, usage-based pricing |
+| **Slack**           | Real-time asset alerts and maintenance notifications     |
+| **Google OAuth**    | Single Sign-On for Google Workspace                      |
+| **Microsoft OAuth** | Azure AD / Entra ID enterprise SSO                       |
+| **Email**           | Alerts, reports, password resets (SendGrid/AWS SES)      |
+| **Excel**           | Generate formatted .xlsx reports with styling            |
+| **PDF**             | Asset labels, reports, invoices                          |
+| **CSV**             | Bulk import/export for data migration                    |
+| **Webhooks**        | Custom integrations and automation                       |
+| **REST API**        | Full programmatic access with OpenAPI docs               |
+| **API Keys**        | Secure programmatic access with rate limiting            |
 
 ### 🤖 **AI-Powered Intelligence**
 - Auto-detects 30+ brands (Apple, Dell, HP, Lenovo, Microsoft, etc.)
@@ -185,8 +185,8 @@ npm install && npm run dev
 
 📸 **Screenshots**:
 
-| Dashboard | Asset Details | Reports |
-|-----------|---------------|---------|
+| Dashboard     | Asset Details | Reports       |
+| ------------- | ------------- | ------------- |
 | _Coming soon_ | _Coming soon_ | _Coming soon_ |
 
 📖 **Documentation**:
@@ -489,7 +489,7 @@ docker-compose -f docker-compose.prod.yml up -d
 - **Business**: $199/month - Up to 5,000 assets
 - **Enterprise**: Custom pricing - Unlimited assets, dedicated support
 
-📄 Full pricing details: [PRICING_BREAKDOWN.md](PRICING_BREAKDOWN.md)
+📄 Full pricing details: [PRICING_BREAKDOWN.md](docs/PRICING_BREAKDOWN.md)
 
 ---
 
@@ -509,7 +509,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 We take security seriously. If you discover a vulnerability:
 - 📧 Email: security@krubles.com
-- 🏆 Hall of Fame: [SECURITY_HALL_OF_FAME.md](SECURITY_HALL_OF_FAME.md)
+- 🏆 Hall of Fame: [SECURITY_HALL_OF_FAME.md](docs/SECURITY_HALL_OF_FAME.md)
 
 See [SECURITY.md](./SECURITY.md) for our security policy.
 
@@ -566,8 +566,8 @@ Detailed guides in the `/docs` folder:
 - [Multi-Tenant Guide](docs/MULTI_TENANT_GUIDE.md) - SaaS deployment guide
 - [OAuth Setup](docs/oauth-implementation-guide.md) - Google/Microsoft SSO
 - [Deployment Guide](docs/deployment-guide.md) - Production deployment
-- [Stripe Integration](README_STRIPE.md) - Billing setup
-- [Monitoring Setup](MONITORING-SETUP-GUIDE.md) - Observability stack
+- [Stripe Integration](docs/README_STRIPE.md) - Billing setup
+- [Monitoring Setup](docs/MONITORING-SETUP-GUIDE.md) - Observability stack
 - [Email Integration](docs/email-integration.md) - SMTP configuration
 - [Slack Integration](docs/slack-integration-guide.md) - Webhook setup
 

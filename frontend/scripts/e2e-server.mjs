@@ -58,7 +58,9 @@ api.get("/assets", (_req, res) => {
         status: "AVAILABLE",
         condition: "EXCELLENT",
         purchasePrice: 2800,
-        warrantyExpiry: new Date(Date.now() + 1000 * 60 * 60 * 24 * 180).toISOString(),
+        warrantyExpiry: new Date(
+          Date.now() + 1000 * 60 * 60 * 24 * 180,
+        ).toISOString(),
         category: { id: 10, name: "Computers" },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -78,15 +80,9 @@ api.get("/assets/statistics", (_req, res) => {
     assignedAssets: 0,
     maintenanceAssets: 0,
     totalValue: 2800,
-    statusBreakdown: [
-      { name: "AVAILABLE", value: 1, percentage: 100 },
-    ],
-    conditionBreakdown: [
-      { name: "EXCELLENT", value: 1, percentage: 100 },
-    ],
-    categoryBreakdown: [
-      { name: "Computers", value: 1, percentage: 100 },
-    ],
+    statusBreakdown: [{ name: "AVAILABLE", value: 1, percentage: 100 }],
+    conditionBreakdown: [{ name: "EXCELLENT", value: 1, percentage: 100 }],
+    categoryBreakdown: [{ name: "Computers", value: 1, percentage: 100 }],
     warrantyExpiring: [],
   });
 });

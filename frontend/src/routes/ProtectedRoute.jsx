@@ -22,17 +22,25 @@ export const ProtectedRoute = ({ children }) => {
   // Also treat persisted auth-store state as a valid signal
   let persistedAuthed = false;
   try {
-    const raw = localStorage.getItem('auth-store');
+    const raw = localStorage.getItem("auth-store");
     if (raw) {
       const data = JSON.parse(raw);
-      persistedAuthed = !!(data?.state?.isAuthenticated || data?.state?.accessToken);
+      persistedAuthed = !!(
+        data?.state?.isAuthenticated || data?.state?.accessToken
+      );
     }
-  } catch { /* ignore parse errors */ }
+  } catch {
+    /* ignore parse errors */
+  }
   // If we've successfully rendered the app shell once this session, treat as stabilized
   let stabilized = false;
   try {
-    stabilized = typeof sessionStorage !== 'undefined' && sessionStorage.getItem('AUTH_STABILIZED') === '1';
-  } catch { /* ignore */ }
+    stabilized =
+      typeof sessionStorage !== "undefined" &&
+      sessionStorage.getItem("AUTH_STABILIZED") === "1";
+  } catch {
+    /* ignore */
+  }
 
   if (process.env.NODE_ENV === "development") {
     console.debug("🛡️ [ProtectedRoute] Auth check:", {
