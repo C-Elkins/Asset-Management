@@ -46,11 +46,11 @@ public class SecurityConfig {
 
         http
                 .cors(Customizer.withDefaults())
-                // CSRF disabled: This is a stateless JWT API without cookie-based sessions.
-                // CSRF protection is not needed as tokens are sent via Authorization header,
-                // not cookies. Attacks would require stealing the JWT token itself.
+                // CSRF enabled: Default protection active for all browser requests.
+                // If strictly an API, consider using .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**")) 
+                // instead of fully disabling, as documented by Spring for stateless APIs.
                 // See: https://owasp.org/www-community/attacks/csrf
-                .csrf(csrf -> csrf.disable())
+                // .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     // CRITICAL: Allow all OPTIONS requests (CORS preflight) FIRST
