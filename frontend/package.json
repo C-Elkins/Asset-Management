@@ -35,7 +35,7 @@
     "date-fns": "^4.1.0",
     "dexie": "^4.0.8",
     "express-rate-limit": "^8.1.0",
-    "framer-motion": "^12.23.19",
+    "framer-motion": "^12.23.24",
     "lucide-react": "^0.544.0",
     "openai": "^4.67.3",
     "react": "^18.3.1",
