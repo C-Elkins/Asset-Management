@@ -1,0 +1,20 @@
+groups:
+  - name: app-health
+    rules:
+      - alert: BackendDown
+        expr: up{job="spring-boot-app"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend is down"
+          description: "Prometheus cannot scrape the Spring Boot backend /actuator/prometheus endpoint."
+
+      - alert: NodeExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node Exporter down"
+          description: "Node Exporter target is not up."

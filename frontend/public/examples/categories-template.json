@@ -1,0 +1,6 @@
+{
+  "categories": [
+    { "name": "Laptops", "description": "Portable computers", "colorCode": "#7C3AED", "icon": "laptop", "active": true, "sortOrder": 1 },
+    { "name": "Monitors", "description": "Display devices", "colorCode": "#2563EB", "icon": "desktop-computer", "active": true, "sortOrder": 2 }
+  ]
+}

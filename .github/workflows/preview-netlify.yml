@@ -1,0 +1,36 @@
+name: Frontend PR Preview (Netlify)
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  preview:
+    name: Build and deploy preview
+    runs-on: ubuntu-latest
+    # Add environment condition to ensure secrets are available
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install deps
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Netlify preview disabled
+        run: |
+          echo "::notice::Netlify preview deploy is disabled by default. Configure NETLIFY_AUTH_TOKEN and NETLIFY_SITE_ID as repository secrets and re-enable the deploy step."

@@ -1,0 +1,14 @@
+# Sentry configuration for Spring Boot
+# Replace <your-dsn-here> with your Sentry DSN
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${SENTRY_ENVIRONMENT:${SPRING_PROFILES_ACTIVE:dev}}
+  # Tune sampling in production to control cost
+  traces-sample-rate: ${SENTRY_TRACES_SAMPLE_RATE:0.2}
+  profiles-sample-rate: ${SENTRY_PROFILES_SAMPLE_RATE:0.1}
+  logging:
+    minimum-event-level: ERROR
+    minimum-breadcrumb-level: INFO
+  enable-tracing: true
+  send-default-pii: false
+  debug: false

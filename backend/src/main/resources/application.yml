@@ -1,0 +1,192 @@
+spring:
+  config:
+    import: optional:application-sentry.yml
+  profiles:
+    active: dev
+  
+  application:
+    name: Asset Management System
+    version: 1.0.0
+  
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+      file-size-threshold: 2KB
+
+  jpa:
+    hibernate:
+      ddl-auto: validate  # Changed from 'update' to 'validate' for production-ready schema management
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # OAuth2 configuration - only enabled when credentials are provided
+  # OAuth2 configuration is now handled programmatically in ConditionalOAuth2Config.java
+  # This allows OAuth2 to be completely optional for development while remaining production-ready
+  # To enable OAuth2 login, set these environment variables:
+  # GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+  
+  # Request size limits
+  max-http-header-size: 8KB
+
+# Stripe Configuration
+# REQUIRED: Set STRIPE_SECRET_KEY, STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET environment variables
+stripe:
+  api-key: ${STRIPE_SECRET_KEY}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+  price-ids:
+    free: ${STRIPE_FREE_PRICE_ID:price_free}
+    professional-monthly: ${STRIPE_PRO_MONTHLY_PRICE_ID:price_pro_monthly}
+    professional-annual: ${STRIPE_PRO_ANNUAL_PRICE_ID:price_pro_annual}
+    enterprise-monthly: ${STRIPE_ENTERPRISE_MONTHLY_PRICE_ID:price_enterprise_monthly}
+    enterprise-annual: ${STRIPE_ENTERPRISE_ANNUAL_PRICE_ID:price_enterprise_annual}
+    metered-assets: ${STRIPE_METERED_ASSETS_PRICE_ID:price_metered_assets}
+  plans:
+    free:
+      asset-limit: 50
+      user-limit: 3
+    professional:
+      asset-limit: 500
+      user-limit: 25
+    enterprise:
+      asset-limit: -1  # Unlimited
+      user-limit: -1    # Unlimited
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: it-asset-management
+      environment: ${SPRING_PROFILES_ACTIVE:dev}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    com.chaseelkins.assetmanagement: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.web.cors: DEBUG
+
+# JWT Configuration
+jwt:
+  # REQUIRED: Set JWT_SECRET environment variable (minimum 32 characters)
+  # Generate with: openssl rand -base64 64
+  secret: "${JWT_SECRET}"
+  # Legacy property (will be superseded by access-expiration if present)
+  expiration: 86400000 # 24 hours in milliseconds (fallback)
+  # New granular expirations
+  access-expiration: 900000      # 15 minutes
+  refresh-expiration: 604800000  # 7 days
+
+# API Documentation
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  info:
+    title: Asset Management System API
+    description: RESTful API for managing assets, users, and maintenance records
+    version: 1.0.0
+    contact:
+      name: Chase Elkins
+      email: chase@example.com
+
+# Custom Application Properties
+app:
+  name: Asset Management System
+  description: Full-stack application for asset tracking
+  version: 1.0.0
+  url: "${APP_URL:http://localhost:3001}"  # Frontend URL for email links
+  contact:
+    name: Chase Elkins
+    email: chase@example.com
+  
+  # CORS Configuration - Override in production with environment variable
+  cors:
+    allowed-origins: "http://localhost:3000,http://127.0.0.1:3000,http://localhost:3001,http://127.0.0.1:3001,http://localhost:5173,http://127.0.0.1:5173,http://localhost:3005,http://127.0.0.1:3005,http://localhost:3006,http://127.0.0.1:3006"
+  
+  # Request Size Limits
+  upload:
+    max-file-size: 10485760  # 10 MB in bytes
+  request:
+    max-body-size: 10485760  # 10 MB in bytes
+    max-header-size: 8192     # 8 KB in bytes
+
+# Slack Integration (Admin Dashboard Feature - Not Visible on Marketing Pages)
+slack:
+  webhook:
+    url: "${SLACK_WEBHOOK_URL:}"  # Set via environment variable
+  notifications:
+    enabled: "${SLACK_NOTIFICATIONS_ENABLED:false}"  # Set to true when webhook is configured
+
+# Microsoft Teams Integration (Admin Dashboard Feature)
+teams:
+  webhook:
+    url: "${TEAMS_WEBHOOK_URL:}"  # Set via environment variable
+  notifications:
+    enabled: "${TEAMS_NOTIFICATIONS_ENABLED:false}"  # Set to true when webhook is configured
+
+# Email Notifications
+email:
+  notifications:
+    enabled: "${EMAIL_NOTIFICATIONS_ENABLED:false}"  # Set to true when SMTP is configured
+  from: "${EMAIL_FROM:noreply@krubles.com}"
+
+spring.mail:
+  host: "${SMTP_HOST:localhost}"
+  port: "${SMTP_PORT:587}"
+  username: "${SMTP_USERNAME:}"
+  password: "${SMTP_PASSWORD:}"
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+
+# Scheduled Task Configuration
+scheduling:
+  maintenance-check:
+    cron: "0 0 8 * * *"  # Run daily at 8:00 AM
+  warranty-check:
+    cron: "0 30 8 * * *"  # Run daily at 8:30 AM
+  rate-limit-cleanup:
+    cron: "0 0 * * * *"  # Run every hour

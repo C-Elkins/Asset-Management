@@ -1,0 +1,59 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15
+    container_name: iam-postgres-dev
+    environment:
+      POSTGRES_DB: iam
+      POSTGRES_USER: iam
+      POSTGRES_PASSWORD: iam
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iam -d iam"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: maven:3.9-eclipse-temurin-17
+    container_name: iam-backend-dev
+    working_dir: /workspace/backend
+    command: mvn -q -Dspring-boot.run.profiles=dev spring-boot:run
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/iam
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      SPRING_DATASOURCE_USERNAME: iam
+      SPRING_DATASOURCE_PASSWORD: iam
+    volumes:
+      - ./backend:/workspace/backend
+      - m2_cache:/root/.m2
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    image: node:20-alpine
+    container_name: iam-frontend-dev
+    working_dir: /workspace/frontend
+    command: sh -c "npm ci && npm run dev -- --host --port 3000 --strictPort"
+    environment:
+      VITE_API_BASE: /api
+      VITE_PROXY_TARGET: http://backend:8080
+    volumes:
+      - ./frontend:/workspace/frontend
+      - node_modules_cache:/workspace/frontend/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data_dev:
+  m2_cache:
+  node_modules_cache:

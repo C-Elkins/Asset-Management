@@ -1,0 +1,27 @@
+route:
+  group_by: ['alertname', 'severity']
+  receiver: 'null'
+  routes:
+    - matchers:
+        - severity="critical"
+      receiver: 'pagerduty'
+    - matchers:
+        - severity="warning"
+      receiver: 'pagerduty'
+
+receivers:
+  - name: 'null'
+  - name: 'pagerduty'
+    pagerduty_configs:
+      - routing_key: ${PD_ROUTING_KEY}
+        severity: '{{ .CommonLabels.severity | default "error" }}'
+        send_resolved: true
+        description: '{{ template "pagerduty.default.description" . }}'
+        details:
+          alertname: '{{ .CommonLabels.alertname }}'
+          instance: '{{ .CommonLabels.instance }}'
+          summary: '{{ .CommonAnnotations.summary }}'
+          runbook: '{{ .CommonAnnotations.runbook_url }}'
+
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'

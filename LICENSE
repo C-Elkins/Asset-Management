@@ -1,0 +1,234 @@
+Proprietary Software License Agreement
+
+Copyright (c) 2024-2025 Krubles LLC. All Rights Reserved.
+
+KRUBLES ASSET MANAGEMENT SYSTEM
+Proprietary and Confidential
+
+================================================================================
+
+IMPORTANT: READ CAREFULLY BEFORE USING THIS SOFTWARE
+
+This License Agreement ("Agreement") is a legal agreement between you (either an 
+individual or a single entity, referred to as "Licensee") and Krubles LLC 
+("Licensor") for the Asset Management System software product, which includes 
+computer software and may include associated media, printed materials, and 
+"online" or electronic documentation ("Software").
+
+By installing, copying, downloading, accessing, or otherwise using the Software, 
+you agree to be bound by the terms of this Agreement. If you do not agree to the 
+terms of this Agreement, do not install, copy, download, access, or use the 
+Software.
+
+================================================================================
+
+1. GRANT OF LICENSE
+
+Subject to the terms and conditions of this Agreement, Licensor grants Licensee 
+a limited, non-exclusive, non-transferable, revocable license to:
+
+   a) View the source code for evaluation purposes only
+   b) Use the Software for internal business purposes only
+   c) Report bugs and security vulnerabilities to Licensor
+
+This license does NOT grant permission to:
+   - Modify, adapt, translate, or create derivative works
+   - Distribute, sublicense, lease, rent, loan, or transfer the Software
+   - Remove or alter any proprietary notices or labels
+   - Use the Software for commercial purposes without written authorization
+   - Reverse engineer, decompile, or disassemble the Software
+   - Use the Software to develop competing products or services
+
+================================================================================
+
+2. OWNERSHIP AND INTELLECTUAL PROPERTY RIGHTS
+
+The Software is licensed, not sold. Licensor retains all right, title, and 
+interest in and to the Software, including all intellectual property rights. 
+This includes but is not limited to:
+
+   - All source code, object code, and documentation
+   - All algorithms, methods, processes, and know-how
+   - All trademarks, service marks, logos, and trade names
+   - All patents, copyrights, trade secrets, and other proprietary rights
+
+The Software is protected by United States copyright laws and international 
+treaty provisions. Unauthorized reproduction or distribution of this Software, 
+or any portion of it, may result in severe civil and criminal penalties, and 
+will be prosecuted to the maximum extent possible under law.
+
+================================================================================
+
+3. RESTRICTIONS
+
+Licensee shall NOT:
+
+   a) Copy, modify, or distribute the Software or any portion thereof
+   b) Create derivative works based on the Software
+   c) Rent, lease, loan, sublicense, or transfer the Software
+   d) Use the Software to provide services to third parties
+   e) Remove, modify, or obscure any copyright, trademark, or other proprietary 
+      notices contained in the Software
+   f) Publicly display, perform, or distribute the Software
+   g) Use the Software in any manner that competes with Krubles LLC
+   h) Reverse engineer, decompile, or disassemble the Software
+   i) Use the Software for any illegal or unauthorized purpose
+   j) Extract, scrape, or otherwise obtain any data or content from the Software
+
+================================================================================
+
+4. CONFIDENTIALITY
+
+The Software contains valuable trade secrets and proprietary information of 
+Licensor. Licensee agrees to maintain the confidentiality of the Software and 
+not to disclose, publish, or disseminate any information about the Software's 
+architecture, design, implementation, or algorithms without prior written 
+consent from Licensor.
+
+================================================================================
+
+5. NO COMMERCIAL USE
+
+This Software is provided for evaluation, educational, and internal business 
+use only. Any commercial use, including but not limited to:
+
+   - Selling, licensing, or distributing the Software or modifications
+   - Using the Software to provide paid services or products
+   - Incorporating the Software into commercial applications
+   - Using the Software for competitive analysis or product development
+
+requires a separate Commercial License Agreement from Krubles LLC. Contact 
+sales@krubles.com for commercial licensing inquiries.
+
+================================================================================
+
+6. CONTRIBUTIONS AND FORKS
+
+While Licensee may report bugs and suggest improvements, all contributions, 
+submissions, or suggested modifications become the exclusive property of 
+Krubles LLC upon submission. By submitting any contribution, Licensee:
+
+   a) Assigns all rights, title, and interest to Licensor
+   b) Waives any moral rights or attribution requirements
+   c) Represents that the contribution is original work
+   d) Grants Licensor perpetual, irrevocable, worldwide license to use
+
+Forking or creating copies of the repository is NOT permitted without explicit 
+written authorization from Krubles LLC.
+
+================================================================================
+
+7. WARRANTY DISCLAIMER
+
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS 
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF 
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+LICENSOR DOES NOT WARRANT THAT:
+   - The Software will meet Licensee's requirements
+   - The Software will operate uninterrupted or error-free
+   - All defects will be corrected
+   - The Software is free from viruses or other harmful components
+
+LICENSEE ASSUMES ALL RISK ASSOCIATED WITH THE USE OF THE SOFTWARE.
+
+================================================================================
+
+8. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, 
+CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:
+
+   - Loss of profits, revenue, or business opportunities
+   - Loss of data or information
+   - Cost of procurement of substitute goods or services
+   - Business interruption or downtime
+   - Damage to reputation or goodwill
+
+ARISING OUT OF OR IN CONNECTION WITH THIS AGREEMENT OR THE USE OF THE SOFTWARE, 
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+LICENSOR'S TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT PAID BY LICENSEE FOR 
+THE SOFTWARE LICENSE, IF ANY.
+
+================================================================================
+
+9. TERMINATION
+
+This Agreement is effective until terminated. Licensor may terminate this 
+Agreement immediately without notice if Licensee fails to comply with any term 
+or condition. Upon termination, Licensee must:
+
+   a) Immediately cease all use of the Software
+   b) Destroy all copies of the Software in any form
+   c) Certify in writing the destruction of all copies
+   d) Return any confidential materials to Licensor
+
+Sections 2, 4, 7, 8, 10, and 11 shall survive termination of this Agreement.
+
+================================================================================
+
+10. GOVERNING LAW AND JURISDICTION
+
+This Agreement shall be governed by and construed in accordance with the laws 
+of the State of [Your State], United States of America, without regard to its 
+conflict of law provisions.
+
+Any legal action or proceeding arising under this Agreement shall be brought 
+exclusively in the federal or state courts located in [Your County], 
+[Your State], and the parties hereby consent to the personal jurisdiction 
+and venue therein.
+
+================================================================================
+
+11. GENERAL PROVISIONS
+
+   a) ENTIRE AGREEMENT: This Agreement constitutes the entire agreement between 
+      the parties and supersedes all prior agreements, understandings, and 
+      communications regarding the Software.
+
+   b) AMENDMENTS: This Agreement may only be amended by written instrument 
+      signed by both parties.
+
+   c) SEVERABILITY: If any provision is found invalid or unenforceable, the 
+      remaining provisions shall remain in full force and effect.
+
+   d) WAIVER: Failure to enforce any provision shall not constitute a waiver 
+      of future enforcement of that or any other provision.
+
+   e) ASSIGNMENT: Licensee may not assign this Agreement without prior written 
+      consent from Licensor.
+
+   f) EXPORT COMPLIANCE: Licensee agrees to comply with all applicable export 
+      laws and regulations.
+
+   g) INJUNCTIVE RELIEF: Licensee acknowledges that breach of this Agreement 
+      may cause irreparable harm for which monetary damages are inadequate, 
+      and Licensor is entitled to seek injunctive relief.
+
+================================================================================
+
+12. CONTACT INFORMATION
+
+For questions about this Agreement, licensing inquiries, or to request 
+permissions, please contact:
+
+Krubles LLC
+Email: legal@krubles.com
+Website: https://krubles.com
+GitHub: https://github.com/C-Elkins/IT-Asset-Management
+
+================================================================================
+
+ACKNOWLEDGMENT
+
+BY INSTALLING, COPYING, DOWNLOADING, ACCESSING, OR OTHERWISE USING THE SOFTWARE, 
+LICENSEE ACKNOWLEDGES THAT THEY HAVE READ THIS AGREEMENT, UNDERSTAND IT, AND 
+AGREE TO BE BOUND BY ITS TERMS AND CONDITIONS.
+
+IF YOU DO NOT AGREE TO THESE TERMS, DO NOT USE THE SOFTWARE.
+
+================================================================================
+
+Asset Management System by Krubles LLC
+Copyright (c) 2024-2025 Krubles LLC. All Rights Reserved.

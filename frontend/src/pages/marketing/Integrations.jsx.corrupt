@@ -1,0 +1,1235 @@
+import React from 'react';import React from 'react';import React fro        { name: 'API Keys & Rate Limiting', description: 'Secure API access with usage controls', status: 'available' }
+
+import MarketingLayout from '../../components/marketing/MarketingLayout.jsx';
+
+import Seo from '../../components/marketing/Seo.jsx';import MarketingLayout from '../../components/marketing/MarketingLayout.jsx';      ]
+
+
+
+export const Integrations = () => {import Seo from '../../components/marketing/Seo.jsx';    },
+
+  const categories = [
+
+    {    {
+
+      icon: '🔐',
+
+      title: 'Authentication & Security',export const Integrations = () => {      title: 'Identity Providers',t MarketingLayout from '../../components/marketing/MarketingLayout.jsx';
+
+      description: 'Enterprise-grade authentication and access control',
+
+      gradient: 'from-blue-500 to-indigo-600',  const categories = [import Seo from '../../components/marketing/Seo.jsx';
+
+      integrations: [
+
+        { name: 'Google OAuth 2.0', description: 'Single sign-on with Google Workspace', status: 'available' },    {
+
+        { name: 'Microsoft OAuth / Azure AD', description: 'Enterprise SSO with Microsoft 365', status: 'available' },
+
+        { name: 'JWT Authentication', description: 'Secure token-based auth', status: 'available' },      icon: '🔐',export const Integrations = () => {
+
+        { name: 'Multi-Factor Authentication (MFA)', description: 'Time-based one-time passwords', status: 'available' },
+
+        { name: 'API Keys & Rate Limiting', description: 'Secure API access with usage controls', status: 'available' }      title: 'Authentication & Security',  const categories = [
+
+      ]
+
+    },      description: 'Enterprise-grade authentication and access control',    {
+
+    {
+
+      icon: '📊',      gradient: 'from-blue-500 to-indigo-600',      title: 'Authentication & Security',
+
+      title: 'Data Import & Export',
+
+      description: 'Flexible data migration and reporting',      integrations: [      icon: '🔐',
+
+      gradient: 'from-emerald-500 to-teal-600',
+
+      integrations: [        { name: 'Google OAuth 2.0', description: 'Single sign-on with Google Workspace', status: 'available' },      gradient: 'from-blue-600 to-purple-600',
+
+        { name: 'CSV Import/Export', description: 'Bulk asset operations via CSV', status: 'available' },
+
+        { name: 'Excel Integration', description: 'Direct import from Excel files', status: 'available' },        { name: 'Microsoft OAuth / Azure AD', description: 'Enterprise SSO with Microsoft 365', status: 'available' },      status: 'available',
+
+        { name: 'Filtered Export', description: 'Export with search and filter criteria', status: 'available' }
+
+      ]        { name: 'JWT Authentication', description: 'Secure token-based auth', status: 'available' },      integrations: [
+
+    },
+
+    {        { name: 'Multi-Factor Authentication (MFA)', description: 'Time-based one-time passwords', status: 'available' },        { name: 'Google OAuth 2.0', description: 'Sign in with Google', status: 'available' },
+
+      icon: '🔔',
+
+      title: 'Notifications & Alerts',        { name: 'API Keys & Rate Limiting', description: 'Secure API access with usage controls', status: 'available' }        { name: 'Microsoft OAuth / Entra ID', description: 'Azure AD authentication', status: 'available' },
+
+      description: 'Stay informed about critical events',
+
+      gradient: 'from-yellow-500 to-amber-600',      ]        { name: 'JWT Authentication', description: 'Token-based auth', status: 'available' },
+
+      integrations: [
+
+        { name: 'Email Notifications', description: 'Asset alerts and reports via email', status: 'available' },    },        { name: 'Multi-Factor Authentication (MFA)', description: '6-digit TOTP codes', status: 'available' },
+
+        { name: 'Slack Integration', description: 'Real-time notifications in Slack', status: 'available' },
+
+        { name: 'Webhook Support', description: 'Push events to external systems', status: 'available' },    {        { name: 'API Keys & Rate Limiting', description: 'Secure API access with usage controls', status: 'available' }
+
+        { name: 'Microsoft Teams', description: 'Native Teams notifications', status: 'coming-soon' }
+
+      ]      icon: '📊',      ]
+
+    },
+
+    {      title: 'Data Import & Export',    },
+
+      icon: '🔌',
+
+      title: 'REST API',      description: 'Flexible data migration and reporting',      title: 'Authentication & Security',
+
+      description: 'Full programmatic access to all features',
+
+      gradient: 'from-purple-500 to-pink-600',      gradient: 'from-emerald-500 to-teal-600',      icon: '�',
+
+      integrations: [
+
+        { name: 'RESTful API', description: 'Complete API for all operations', status: 'available' },      integrations: [      gradient: 'from-blue-600 to-purple-600',
+
+        { name: 'OpenAPI Documentation', description: 'Interactive API docs with Swagger', status: 'available' },
+
+        { name: 'Scheduled Reports', description: 'Automated weekly/monthly reports', status: 'coming-soon' }        { name: 'CSV Import/Export', description: 'Bulk asset operations via CSV', status: 'available' },      status: 'available',
+
+      ]
+
+    },        { name: 'Excel Integration', description: 'Direct import from Excel files', status: 'available' },      integrations: [
+
+    {
+
+      icon: '🏢',        { name: 'Filtered Export', description: 'Export with search and filter criteria', status: 'available' }        { name: 'Google OAuth 2.0', description: 'Sign in with Google', status: 'available' },
+
+      title: 'Identity Providers',
+
+      description: 'Connect your enterprise identity systems',      ]        { name: 'Microsoft OAuth / Entra ID', description: 'Azure AD authentication', status: 'available' },
+
+      gradient: 'from-cyan-500 to-blue-600',
+
+      integrations: [    },        { name: 'JWT Authentication', description: 'Token-based auth', status: 'available' },
+
+        { name: 'SAML 2.0', description: 'Enterprise SSO via SAML', status: 'coming-soon' },
+
+        { name: 'LDAP / Active Directory', description: 'Integrate with on-premise AD', status: 'coming-soon' },    {        { name: 'Multi-Factor Authentication (MFA)', description: '6-digit TOTP codes', status: 'available' }
+
+        { name: 'Okta', description: 'Native Okta integration', status: 'coming-soon' }
+
+      ]      icon: '🔔',      ]
+
+    },
+
+    {      title: 'Notifications & Alerts',    },
+
+      icon: '🔧',
+
+      title: 'ITSM & Service Desk',      description: 'Stay informed about critical events',    {
+
+      description: 'Connect with your help desk and CMDB',
+
+      gradient: 'from-red-500 to-orange-600',      gradient: 'from-yellow-500 to-amber-600',      title: 'Identity Providers',
+
+      integrations: [
+
+        { name: 'Jira Integration', description: 'Sync assets with Jira Service Management', status: 'planned' },      integrations: [      icon: '🔑',
+
+        { name: 'ServiceNow', description: 'Two-way sync with ServiceNow CMDB', status: 'planned' },
+
+        { name: 'Freshservice', description: 'Asset sync with Freshservice', status: 'planned' }        { name: 'Email Notifications', description: 'Asset alerts and reports via email', status: 'available' },      gradient: 'from-blue-500 to-cyan-500',
+
+      ]
+
+    }        { name: 'Slack Integration', description: 'Real-time notifications in Slack', status: 'available' },      status: 'coming-soon',
+
+  ];
+
+        { name: 'Webhook Support', description: 'Push events to external systems', status: 'available' },      integrations: [
+
+  const timeline = [
+
+    {        { name: 'Microsoft Teams', description: 'Native Teams notifications', status: 'coming-soon' }        { name: 'Okta', description: 'SAML 2.0 & SCIM', status: 'planned' },
+
+      quarter: 'Q1 2025',
+
+      status: 'current',      ]        { name: 'Auth0', description: 'OIDC integration', status: 'planned' }
+
+      features: [
+
+        'Google OAuth 2.0 ✓',    },      ]
+
+        'Microsoft OAuth / Azure AD ✓',
+
+        'Scheduled Reports',    {    },
+
+        'Microsoft Teams Notifications'
+
+      ]      icon: '🔌',    {
+
+    },
+
+    {      title: 'REST API',      title: 'Help Desk & ITSM',
+
+      quarter: 'Q2 2025',
+
+      status: 'next',      description: 'Full programmatic access to all features',      icon: '🎫',
+
+      features: [
+
+        'SAML 2.0 Integration',      gradient: 'from-purple-500 to-pink-600',      gradient: 'from-blue-500 to-teal-500',
+
+        'Okta Native Support',
+
+        'Jira Service Management',      integrations: [      status: 'coming-soon',
+
+        'Advanced GraphQL API'
+
+      ]        { name: 'RESTful API', description: 'Complete API for all operations', status: 'available' },      integrations: [
+
+    },
+
+    {        { name: 'OpenAPI Documentation', description: 'Interactive API docs with Swagger', status: 'available' },        { name: 'ServiceNow', description: 'Asset sync & incident linking', status: 'planned' },
+
+      quarter: 'Q3 2025',
+
+      status: 'future',        { name: 'Scheduled Reports', description: 'Automated weekly/monthly reports', status: 'coming-soon' }        { name: 'Jira Service Management', description: 'Ticket integration', status: 'planned' },
+
+      features: [
+
+        'ServiceNow CMDB Sync',      ]        { name: 'Zendesk', description: 'Support ticket assets', status: 'planned' },
+
+        'LDAP/Active Directory',
+
+        'Freshservice Integration',    },        { name: 'Freshservice', description: 'CMDB sync', status: 'planned' }
+
+        'Custom Webhooks Builder'
+
+      ]    {      ]
+
+    }
+
+  ];      icon: '🏢',    },
+
+
+
+  const getStatusBadge = (status) => {      title: 'Identity Providers',    {
+
+    const styles = {
+
+      available: 'bg-green-100 text-green-800 border-green-200',      description: 'Connect your enterprise identity systems',      title: 'Data & Reporting',
+
+      'coming-soon': 'bg-blue-100 text-blue-800 border-blue-200',
+
+      planned: 'bg-gray-100 text-gray-700 border-gray-200'      gradient: 'from-cyan-500 to-blue-600',      icon: '📈',
+
+    };
+
+    const labels = {      integrations: [      gradient: 'from-green-500 to-emerald-500',
+
+      available: 'Available Now',
+
+      'coming-soon': 'Coming Soon',        { name: 'SAML 2.0', description: 'Enterprise SSO via SAML', status: 'coming-soon' },      status: 'available',
+
+      planned: 'Planned'
+
+    };        { name: 'LDAP / Active Directory', description: 'Integrate with on-premise AD', status: 'coming-soon' },      integrations: [
+
+    return (
+
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[status]}`}>        { name: 'Okta', description: 'Native Okta integration', status: 'coming-soon' }        { name: 'CSV Import/Export', description: 'Bulk data operations', status: 'available' },
+
+        {labels[status]}
+
+      </span>      ]        { name: 'Excel Import/Export', description: 'Direct .xlsx file support', status: 'available' },
+
+    );
+
+  };    },        { name: 'Enhanced Filtered Exports', description: 'Custom columns & filters', status: 'available' },
+
+
+
+  return (    {        { name: 'Power BI', description: 'Custom dashboards', status: 'planned' },
+
+    <MarketingLayout>
+
+      <Seo       icon: '🔧',        { name: 'Tableau', description: 'Visual analytics', status: 'planned' }
+
+        title="Integrations — KA by Krubles" 
+
+        description="11 live integrations including Google OAuth, Microsoft OAuth, JWT, MFA, Slack, Webhooks, CSV/Excel import, and more. Connect with the tools you already use."       title: 'ITSM & Service Desk',      ]
+
+      />
+
+            description: 'Connect with your help desk and CMDB',    },
+
+      <main className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #fafbfc 0%, #f0f4f8 100%)' }}>
+
+        {/* Animated gradient background */}      gradient: 'from-red-500 to-orange-600',    {
+
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-full blur-3xl animate-pulse" />      integrations: [      title: 'Developer Tools',
+
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-emerald-400/30 to-cyan-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+
+        </div>        { name: 'Jira Integration', description: 'Sync assets with Jira Service Management', status: 'planned' },      icon: '🛠️',
+
+
+
+        {/* Hero Section */}        { name: 'ServiceNow', description: 'Two-way sync with ServiceNow CMDB', status: 'planned' },      gradient: 'from-cyan-500 to-blue-500',
+
+        <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">
+
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-full px-4 py-2 mb-8 shadow-sm">        { name: 'Freshservice', description: 'Asset sync with Freshservice', status: 'planned' }      status: 'available',
+
+            <span className="text-2xl">🔗</span>
+
+            <span className="text-sm font-semibold" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>      ]      integrations: [
+
+              11 Integrations Live Today
+
+            </span>    }        { name: 'REST API', description: 'Full platform access', status: 'available' },
+
+          </div>
+
+  ];        { name: 'API Keys & Rate Limiting', description: 'Secure API access with usage controls', status: 'available' },
+
+          <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight">
+
+            <span style={{ background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 25%, #7c3aed 75%, #9333ea 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>        { name: 'Webhooks', description: 'Real-time event notifications', status: 'available' },
+
+              Integrations
+
+            </span>  const timeline = [        { name: 'Slack', description: 'Team notifications', status: 'available' },
+
+            <br />
+
+            <span className="text-gray-800">That Just Work</span>    {        { name: 'GitHub', description: 'Version control integration', status: 'planned' }
+
+          </h1>
+
+      quarter: 'Q1 2025',      ]
+
+          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed">
+
+            Connect with the tools your team already uses.       status: 'current',    },
+
+            <span className="font-semibold text-gray-800"> Google, Microsoft, Slack, and more.</span>
+
+          </p>      features: [    {
+
+        </section>
+
+        'Google OAuth 2.0 ✓',      title: 'Communication & Notifications',
+
+        {/* Integration Categories Grid */}
+
+        <section className="relative max-w-7xl mx-auto px-6 py-12">        'Microsoft OAuth / Azure AD ✓',      icon: '📧',
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+
+            {categories.map((category, idx) => (        'Scheduled Reports',      gradient: 'from-blue-500 to-emerald-500',
+
+              <div
+
+                key={idx}        'Microsoft Teams Notifications'      status: 'available',
+
+                className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1"
+
+              >      ]      integrations: [
+
+                <div className={`bg-gradient-to-br ${category.gradient} p-6 text-white`}>
+
+                  <div className="text-4xl mb-3">{category.icon}</div>    },        { name: 'Email Notifications', description: 'Automated alerts & reminders', status: 'available' },
+
+                  <h3 className="text-2xl font-bold mb-2">{category.title}</h3>
+
+                  <p className="text-white/90 text-sm">{category.description}</p>    {        { name: 'SMS Alerts', description: 'Critical event notifications', status: 'planned' },
+
+                </div>
+
+                <div className="p-6">      quarter: 'Q2 2025',        { name: 'Microsoft Teams', description: 'Team collaboration alerts', status: 'planned' },
+
+                  <div className="space-y-4">
+
+                    {category.integrations.map((integration, iIdx) => (      status: 'next',        { name: 'Push Notifications', description: 'Mobile app notifications', status: 'planned' }
+
+                      <div key={iIdx} className="border-l-4 border-gray-200 pl-4 hover:border-blue-500 transition-colors">
+
+                        <div className="flex items-start justify-between mb-1">      features: [      ]
+
+                          <h4 className="font-semibold text-gray-900">{integration.name}</h4>
+
+                          {getStatusBadge(integration.status)}        'SAML 2.0 Integration',    }
+
+                        </div>
+
+                        <p className="text-sm text-gray-600">{integration.description}</p>        'Okta Native Support',  ];
+
+                      </div>
+
+                    ))}        'Jira Service Management',
+
+                  </div>
+
+                </div>        'Advanced GraphQL API'  return (
+
+              </div>
+
+            ))}      ]    <MarketingLayout>
+
+          </div>
+
+        </section>    },      <Seo title="Integrations — KA by Krubles" description="Integrate with identity, CMDB, help desk, and spreadsheets." />
+
+
+
+        {/* Available Now Section */}    {      
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16">
+
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-10 border border-green-200 shadow-lg">      quarter: 'Q3 2025',      {/* Hero Section */}
+
+            <div className="flex items-center gap-3 mb-6">
+
+              <span className="text-4xl">✅</span>      status: 'future',      <div style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 100%)', position: 'relative', overflow: 'hidden' }}>
+
+              <h2 className="text-3xl font-black text-gray-900">Available Now</h2>
+
+            </div>      features: [        {/* Animated gradient blobs */}
+
+            <p className="text-lg text-gray-700 mb-6">
+
+              These integrations are production-ready and can be configured today:        'ServiceNow CMDB Sync',        <div 
+
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">        'LDAP/Active Directory',          className="absolute top-20 right-20 w-96 h-96 rounded-full opacity-30 animate-pulse"
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">
+
+                <span className="text-2xl">🔐</span>        'Freshservice Integration',          style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.4), transparent 70%)', filter: 'blur(60px)' }}
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">Google OAuth 2.0</div>        'Custom Webhooks Builder'        />
+
+                  <div className="text-sm text-gray-600">Google Workspace SSO</div>
+
+                </div>      ]        <div 
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">    }          className="absolute bottom-20 left-20 w-96 h-96 rounded-full opacity-30 animate-pulse"
+
+                <span className="text-2xl">🔐</span>
+
+                <div>  ];          style={{ background: 'radial-gradient(circle, rgba(16,185,129,0.4), transparent 70%)', filter: 'blur(60px)', animationDelay: '1s' }}
+
+                  <div className="font-semibold text-gray-900">Microsoft OAuth</div>
+
+                  <div className="text-sm text-gray-600">Azure AD / Microsoft 365</div>        />
+
+                </div>
+
+              </div>  const getStatusBadge = (status) => {        
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">
+
+                <span className="text-2xl">🔑</span>    const styles = {        <div className="max-w-6xl mx-auto px-6 py-20 text-center relative">
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">JWT Authentication</div>      available: 'bg-green-100 text-green-800 border-green-200',          {/* Badge */}
+
+                  <div className="text-sm text-gray-600">Token-based auth</div>
+
+                </div>      'coming-soon': 'bg-blue-100 text-blue-800 border-blue-200',          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-blue-200 shadow-sm mb-6">
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">      planned: 'bg-gray-100 text-gray-700 border-gray-200'            <span className="text-xl">🔌</span>
+
+                <span className="text-2xl">🔐</span>
+
+                <div>    };            <span className="text-sm font-semibold" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+
+                  <div className="font-semibold text-gray-900">Multi-Factor Auth (MFA)</div>
+
+                  <div className="text-sm text-gray-600">TOTP-based 2FA</div>    const labels = {              Connect everything — Growing integration library
+
+                </div>
+
+              </div>      available: 'Available Now',            </span>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">
+
+                <span className="text-2xl">📊</span>      'coming-soon': 'Coming Soon',          </div>
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">CSV / Excel Import</div>      planned: 'Planned'          
+
+                  <div className="text-sm text-gray-600">Bulk asset operations</div>
+
+                </div>    };          <h1 className="text-6xl font-black mb-6" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">    return (            Powerful Integrations
+
+                <span className="text-2xl">📧</span>
+
+                <div>      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${styles[status]}`}>          </h1>
+
+                  <div className="font-semibold text-gray-900">Email Notifications</div>
+
+                  <div className="text-sm text-gray-600">Asset alerts via email</div>        {labels[status]}          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+
+                </div>
+
+              </div>      </span>            Connect Krubles with your existing tools and workflows. API-first architecture for maximum flexibility.
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">
+
+                <span className="text-2xl">💬</span>    );          </p>
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">Slack Integration</div>  };          <a href="/contact" className="inline-block px-8 py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+
+                  <div className="text-sm text-gray-600">Real-time Slack alerts</div>
+
+                </div>            Talk to Founders
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">  return (          </a>
+
+                <span className="text-2xl">🔌</span>
+
+                <div>    <MarketingLayout>        </div>
+
+                  <div className="font-semibold text-gray-900">Webhooks</div>
+
+                  <div className="text-sm text-gray-600">Event-driven integrations</div>      <Seo       </div>
+
+                </div>
+
+              </div>        title="Integrations — KA by Krubles" 
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">
+
+                <span className="text-2xl">🔑</span>        description="11 live integrations including Google OAuth, Microsoft OAuth, JWT, MFA, Slack, Webhooks, CSV/Excel import, and more. Connect with the tools you already use."       {/* Integrations by Category */}
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">API Keys</div>      />      <main className="max-w-6xl mx-auto px-6 py-16">
+
+                  <div className="text-sm text-gray-600">Secure programmatic access</div>
+
+                </div>              <div className="space-y-16">
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">      <main className="relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #fafbfc 0%, #f0f4f8 100%)' }}>          {categories.map((category, catIdx) => (
+
+                <span className="text-2xl">🔌</span>
+
+                <div>        {/* Animated gradient background */}            <div key={catIdx}>
+
+                  <div className="font-semibold text-gray-900">REST API</div>
+
+                  <div className="text-sm text-gray-600">Full API access</div>        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">              <div className="flex items-center gap-3 mb-8">
+
+                </div>
+
+              </div>          <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-full blur-3xl animate-pulse" />                <span className="text-5xl">{category.icon}</span>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">
+
+                <span className="text-2xl">📤</span>          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-tr from-emerald-400/30 to-cyan-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />                <div className="flex-1">
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">Filtered Exports</div>        </div>                  <div className="flex items-center gap-3">
+
+                  <div className="text-sm text-gray-600">Advanced export options</div>
+
+                </div>                    <h2 
+
+              </div>
+
+            </div>        {/* Hero Section */}                      className="text-4xl font-black"
+
+          </div>
+
+        </section>        <section className="relative max-w-7xl mx-auto px-6 pt-20 pb-16 text-center">                      style={{ background: `linear-gradient(135deg, var(--tw-gradient-stops))`, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+
+
+
+        {/* Coming Soon Section */}          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-full px-4 py-2 mb-8 shadow-sm">                      data-gradient={category.gradient}
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16">
+
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-10 border border-blue-200 shadow-lg">            <span className="text-2xl">🔗</span>                    >
+
+            <div className="flex items-center gap-3 mb-6">
+
+              <span className="text-4xl">🚀</span>            <span className="text-sm font-semibold" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>                      <span className={`bg-gradient-to-r ${category.gradient} bg-clip-text text-transparent`}>
+
+              <h2 className="text-3xl font-black text-gray-900">Coming Soon</h2>
+
+            </div>              11 Integrations Live Today                        {category.title}
+
+            <p className="text-lg text-gray-700 mb-6">
+
+              Currently in development and coming in the next few releases:            </span>                      </span>
+
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">          </div>                    </h2>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">
+
+                <span className="text-2xl">📅</span>                    {category.status === 'coming-soon' && (
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">Scheduled Reports</div>          <h1 className="text-5xl md:text-6xl font-black mb-6 leading-tight">                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 border border-yellow-300">
+
+                  <div className="text-sm text-gray-600">Automated weekly/monthly reports</div>
+
+                </div>            <span style={{ background: 'linear-gradient(135deg, #1e40af 0%, #2563eb 25%, #7c3aed 75%, #9333ea 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>                        Coming Soon
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">              Integrations                      </span>
+
+                <span className="text-2xl">💼</span>
+
+                <div>            </span>                    )}
+
+                  <div className="font-semibold text-gray-900">Microsoft Teams</div>
+
+                  <div className="text-sm text-gray-600">Native Teams notifications</div>            <br />                    {category.status === 'available' && (
+
+                </div>
+
+              </div>            <span className="text-gray-800">That Just Work</span>                      <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 border border-green-300">
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">
+
+                <span className="text-2xl">🔐</span>          </h1>                        Available
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">SAML 2.0</div>                      </span>
+
+                  <div className="text-sm text-gray-600">Enterprise SSO standard</div>
+
+                </div>          <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed">                    )}
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">            Connect with the tools your team already uses.                   </div>
+
+                <span className="text-2xl">🏢</span>
+
+                <div>            <span className="font-semibold text-gray-800"> Google, Microsoft, Slack, and more.</span>                </div>
+
+                  <div className="font-semibold text-gray-900">Okta Integration</div>
+
+                  <div className="text-sm text-gray-600">Native Okta support</div>          </p>              </div>
+
+                </div>
+
+              </div>        </section>              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">
+
+                <span className="text-2xl">📁</span>                {category.integrations.map((integration, intIdx) => (
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">LDAP / Active Directory</div>        {/* Integration Categories Grid */}                  <div 
+
+                  <div className="text-sm text-gray-600">On-premise directory sync</div>
+
+                </div>        <section className="relative max-w-7xl mx-auto px-6 py-12">                    key={intIdx}
+
+              </div>
+
+            </div>          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">                    className={`group relative bg-white rounded-3xl p-8 border shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 overflow-hidden ${
+
+          </div>
+
+        </section>            {categories.map((category, idx) => (                      integration.status === 'available' ? 'border-green-300' : 'border-gray-200'
+
+
+
+        {/* Roadmap Timeline */}              <div                    }`}
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16">
+
+          <h2 className="text-4xl font-black text-gray-900 mb-4 text-center">Integration Roadmap</h2>                key={idx}                  >
+
+          <p className="text-lg text-gray-600 text-center mb-12">Our planned integration timeline for 2025</p>
+
+                          className="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-1"                    {/* Gradient overlay on hover */}
+
+          <div className="space-y-6">
+
+            {timeline.map((period, idx) => (              >                    <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
+
+              <div
+
+                key={idx}                <div className={`bg-gradient-to-br ${category.gradient} p-6 text-white`}>                    
+
+                className={`relative bg-white rounded-xl p-8 shadow-lg border-2 ${
+
+                  period.status === 'current' ? 'border-green-500' :                   <div className="text-4xl mb-3">{category.icon}</div>                    <div className="relative">
+
+                  period.status === 'next' ? 'border-blue-500' : 
+
+                  'border-gray-300'                  <h3 className="text-2xl font-bold mb-2">{category.title}</h3>                      <div className="flex items-start justify-between mb-2">
+
+                }`}
+
+              >                  <p className="text-white/90 text-sm">{category.description}</p>                        <h3 className="text-xl font-bold text-gray-900 flex-1">
+
+                <div className="flex items-center gap-4 mb-4">
+
+                  <span className={`px-4 py-2 rounded-full font-bold text-sm ${                </div>                          {integration.name}
+
+                    period.status === 'current' ? 'bg-green-500 text-white' :
+
+                    period.status === 'next' ? 'bg-blue-500 text-white' :                <div className="p-6">                        </h3>
+
+                    'bg-gray-300 text-gray-700'
+
+                  }`}>                  <div className="space-y-4">                        {integration.status === 'available' && (
+
+                    {period.quarter}
+
+                  </span>                    {category.integrations.map((integration, iIdx) => (                          <span className="px-2 py-1 rounded-lg text-xs font-bold bg-green-100 text-green-700 ml-2 flex-shrink-0">
+
+                  {period.status === 'current' && (
+
+                    <span className="text-sm font-semibold text-green-600">← Currently Shipping</span>                      <div key={iIdx} className="border-l-4 border-gray-200 pl-4 hover:border-blue-500 transition-colors">                            ✓ Ready
+
+                  )}
+
+                </div>                        <div className="flex items-start justify-between mb-1">                          </span>
+
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                  {period.features.map((feature, fIdx) => (                          <h4 className="font-semibold text-gray-900">{integration.name}</h4>                        )}
+
+                    <li key={fIdx} className="flex items-center gap-2 text-gray-700">
+
+                      <span className="text-blue-500">▸</span>                          {getStatusBadge(integration.status)}                        {integration.status === 'coming-soon' && (
+
+                      <span>{feature}</span>
+
+                    </li>                        </div>                          <span className="px-2 py-1 rounded-lg text-xs font-bold bg-yellow-100 text-yellow-700 ml-2 flex-shrink-0">
+
+                  ))}
+
+                </ul>                        <p className="text-sm text-gray-600">{integration.description}</p>                            Soon
+
+              </div>
+
+            ))}                      </div>                          </span>
+
+          </div>
+
+        </section>                    ))}                        )}
+
+
+
+        {/* Planned Integrations */}                  </div>                        {integration.status === 'planned' && (
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16">
+
+          <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-10 border border-gray-200 shadow-lg">                </div>                          <span className="px-2 py-1 rounded-lg text-xs font-bold bg-blue-100 text-blue-700 ml-2 flex-shrink-0">
+
+            <div className="flex items-center gap-3 mb-6">
+
+              <span className="text-4xl">📋</span>              </div>                            Planned
+
+              <h2 className="text-3xl font-black text-gray-900">Planned</h2>
+
+            </div>            ))}                          </span>
+
+            <p className="text-lg text-gray-700 mb-6">
+
+              On our roadmap for Q3 2025 and beyond:          </div>                        )}
+
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">        </section>                      </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+
+                <span className="text-2xl">🎫</span>                      <p className="text-gray-600">{integration.description}</p>
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">Jira Integration</div>        {/* Available Now Section */}                    </div>
+
+                  <div className="text-sm text-gray-600">Jira Service Management sync</div>
+
+                </div>        <section className="relative max-w-5xl mx-auto px-6 py-16">                  </div>
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-gray-200">          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-10 border border-green-200 shadow-lg">                ))}
+
+                <span className="text-2xl">🔧</span>
+
+                <div>            <div className="flex items-center gap-3 mb-6">              </div>
+
+                  <div className="font-semibold text-gray-900">ServiceNow</div>
+
+                  <div className="text-sm text-gray-600">CMDB two-way sync</div>              <span className="text-4xl">✅</span>            </div>
+
+                </div>
+
+              </div>              <h2 className="text-3xl font-black text-gray-900">Available Now</h2>          ))}
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+
+                <span className="text-2xl">💼</span>            </div>        </div>
+
+                <div>
+
+                  <div className="font-semibold text-gray-900">Freshservice</div>            <p className="text-lg text-gray-700 mb-6">
+
+                  <div className="text-sm text-gray-600">Asset sync with Freshservice</div>
+
+                </div>              These integrations are production-ready and can be configured today:        {/* Roadmap Section */}
+
+              </div>
+
+            </div>            </p>        <div className="mt-20 bg-white rounded-[32px] p-12 border border-gray-200 shadow-lg">
+
+          </div>
+
+        </section>            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">          <div className="text-center mb-10">
+
+
+
+        {/* CTA Section */}              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-200 mb-4">
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16 text-center">
+
+          <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl p-12 shadow-2xl text-white">                <span className="text-2xl">🔐</span>              <span className="text-xl">🗺️</span>
+
+            <h2 className="text-4xl font-black mb-4">Need a Custom Integration?</h2>
+
+            <p className="text-xl mb-8 text-blue-100">                <div>              <span className="text-sm font-semibold text-blue-600">Integration Roadmap</span>
+
+              We're always expanding our integration ecosystem. Let us know what you need.
+
+            </p>                  <div className="font-semibold text-gray-900">Google OAuth 2.0</div>            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+              <a                  <div className="text-sm text-gray-600">Google Workspace SSO</div>            <h2 className="text-4xl font-black mb-4" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+
+                href="/contact"
+
+                className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50 transition-colors shadow-lg"                </div>              Building Together
+
+              >
+
+                Request an Integration              </div>            </h2>
+
+              </a>
+
+              <a              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+
+                href="/docs/api"
+
+                className="inline-flex items-center justify-center px-8 py-4 bg-blue-800 text-white rounded-lg font-bold hover:bg-blue-900 transition-colors border-2 border-blue-400"                <span className="text-2xl">🔐</span>              As an early-stage startup, we're actively developing our integration ecosystem. Your feedback helps us prioritize what to build next.
+
+              >
+
+                View API Docs                <div>            </p>
+
+              </a>
+
+            </div>                  <div className="font-semibold text-gray-900">Microsoft OAuth</div>          </div>
+
+          </div>
+
+        </section>                  <div className="text-sm text-gray-600">Azure AD / Microsoft 365</div>
+
+      </main>
+
+    </MarketingLayout>                </div>          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+
+  );
+
+};              </div>            <div className="text-center">
+
+
+
+export default Integrations;              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-green-100 flex items-center justify-center border-2 border-green-300">
+
+
+                <span className="text-2xl">🔑</span>                <span className="text-3xl">✓</span>
+
+                <div>              </div>
+
+                  <div className="font-semibold text-gray-900">JWT Authentication</div>              <h3 className="font-bold text-xl mb-2 text-gray-900">Available Now</h3>
+
+                  <div className="text-sm text-gray-600">Token-based auth</div>              <ul className="text-sm text-gray-600 space-y-2">
+
+                </div>                <li>• REST API</li>
+
+              </div>                <li>• Google OAuth 2.0</li>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">                <li>• Microsoft OAuth / Entra ID</li>
+
+                <span className="text-2xl">🔐</span>                <li>• JWT Authentication</li>
+
+                <div>                <li>• API Keys & Rate Limiting</li>
+
+                  <div className="font-semibold text-gray-900">Multi-Factor Auth (MFA)</div>                <li>• CSV Import/Export</li>
+
+                  <div className="text-sm text-gray-600">TOTP-based 2FA</div>                <li>• Excel Import/Export</li>
+
+                </div>                <li>• Webhooks</li>
+
+              </div>                <li>• Slack Notifications</li>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">                <li>• Email Notifications</li>
+
+                <span className="text-2xl">📊</span>                <li>• Enhanced Filtered Exports</li>
+
+                <div>                <li>• OpenAPI Docs</li>
+
+                  <div className="font-semibold text-gray-900">CSV / Excel Import</div>              </ul>
+
+                  <div className="text-sm text-gray-600">Bulk asset operations</div>            </div>
+
+                </div>
+
+              </div>            <div className="text-center">
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-yellow-100 flex items-center justify-center border-2 border-yellow-300">
+
+                <span className="text-2xl">📧</span>                <span className="text-3xl">⏳</span>
+
+                <div>              </div>
+
+                  <div className="font-semibold text-gray-900">Email Notifications</div>              <h3 className="font-bold text-xl mb-2 text-gray-900">Coming Soon</h3>
+
+                  <div className="text-sm text-gray-600">Asset alerts via email</div>              <ul className="text-sm text-gray-600 space-y-2">
+
+                </div>                <li>• OAuth/SSO (Google, Microsoft)</li>
+
+              </div>                <li>• ServiceNow</li>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">                <li>• Jira Integration</li>
+
+                <span className="text-2xl">💬</span>              </ul>
+
+                <div>            </div>
+
+                  <div className="font-semibold text-gray-900">Slack Integration</div>
+
+                  <div className="text-sm text-gray-600">Real-time Slack alerts</div>            <div className="text-center">
+
+                </div>              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-100 flex items-center justify-center border-2 border-blue-300">
+
+              </div>                <span className="text-3xl">📋</span>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">              </div>
+
+                <span className="text-2xl">🔌</span>              <h3 className="font-bold text-xl mb-2 text-gray-900">Planned</h3>
+
+                <div>              <ul className="text-sm text-gray-600 space-y-2">
+
+                  <div className="font-semibold text-gray-900">Webhooks</div>                <li>• Jira Integration</li>
+
+                  <div className="text-sm text-gray-600">Event-driven integrations</div>                <li>• Power BI / Tableau</li>
+
+                </div>                <li>• Zendesk / Freshservice</li>
+
+              </div>                <li>• Okta / Auth0</li>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">              </ul>
+
+                <span className="text-2xl">🔑</span>            </div>
+
+                <div>          </div>
+
+                  <div className="font-semibold text-gray-900">API Keys</div>
+
+                  <div className="text-sm text-gray-600">Secure programmatic access</div>          <div className="mt-10 text-center">
+
+                </div>            <a 
+
+              </div>              href="/contact" 
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">              className="inline-block px-8 py-4 rounded-2xl font-bold text-lg bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+
+                <span className="text-2xl">🔌</span>            >
+
+                <div>              Request an Integration
+
+                  <div className="font-semibold text-gray-900">REST API</div>            </a>
+
+                  <div className="text-sm text-gray-600">Full API access</div>          </div>
+
+                </div>        </div>
+
+              </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-green-100">        {/* API Section */}
+
+                <span className="text-2xl">📤</span>        <div className="mt-20 relative overflow-hidden rounded-[32px] p-12 border border-blue-100" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%)' }}>
+
+                <div>          {/* Gradient blob */}
+
+                  <div className="font-semibold text-gray-900">Filtered Exports</div>          <div 
+
+                  <div className="text-sm text-gray-600">Advanced export options</div>            className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-20"
+
+                </div>            style={{ background: 'radial-gradient(circle, rgba(37,99,235,0.5), transparent 70%)', filter: 'blur(60px)' }}
+
+              </div>          />
+
+            </div>          
+
+          </div>          <div className="text-center mb-10 relative">
+
+        </section>            <h2 className="text-4xl font-black mb-4" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+
+              Build Your Own Integration
+
+        {/* Coming Soon Section */}            </h2>
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16">            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-10 border border-blue-200 shadow-lg">              Our comprehensive REST API gives you full control. Build custom integrations, automate workflows, and extend Krubles to fit your needs.
+
+            <div className="flex items-center gap-3 mb-6">            </p>
+
+              <span className="text-4xl">🚀</span>          </div>
+
+              <h2 className="text-3xl font-black text-gray-900">Coming Soon</h2>          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto relative">
+
+            </div>            <div className="bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+            <p className="text-lg text-gray-700 mb-6">              <div className="text-4xl mb-3">📚</div>
+
+              Currently in development and coming in the next few releases:              <h3 className="font-bold text-lg mb-2 text-gray-900">API Docs</h3>
+
+            </p>              <p className="text-sm text-gray-600">Complete reference & examples</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">            </div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">            <div className="bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+                <span className="text-2xl">📅</span>              <div className="text-4xl mb-3">🔔</div>
+
+                <div>              <h3 className="font-bold text-lg mb-2 text-gray-900">Webhooks</h3>
+
+                  <div className="font-semibold text-gray-900">Scheduled Reports</div>              <p className="text-sm text-gray-600">Real-time event notifications</p>
+
+                  <div className="text-sm text-gray-600">Automated weekly/monthly reports</div>            </div>
+
+                </div>            <div className="bg-white rounded-2xl p-8 text-center shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+
+              </div>              <div className="text-4xl mb-3">🛠️</div>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">              <h3 className="font-bold text-lg mb-2 text-gray-900">SDKs</h3>
+
+                <span className="text-2xl">💼</span>              <p className="text-sm text-gray-600">Python, Node.js, .NET & more</p>
+
+                <div>            </div>
+
+                  <div className="font-semibold text-gray-900">Microsoft Teams</div>          </div>
+
+                  <div className="text-sm text-gray-600">Native Teams notifications</div>        </div>
+
+                </div>
+
+              </div>        {/* CTA */}
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">        <div className="mt-20 relative overflow-hidden rounded-[32px] p-16 text-center" style={{ background: 'linear-gradient(135deg, #2563eb 0%, #10b981 100%)' }}>
+
+                <span className="text-2xl">🔐</span>          {/* Gradient blob */}
+
+                <div>          <div 
+
+                  <div className="font-semibold text-gray-900">SAML 2.0</div>            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full opacity-20"
+
+                  <div className="text-sm text-gray-600">Enterprise SSO standard</div>            style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.5), transparent 70%)', filter: 'blur(60px)' }}
+
+                </div>          />
+
+              </div>          
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">          <div className="relative">
+
+                <span className="text-2xl">🏢</span>            <h2 className="text-4xl font-black text-white mb-4">
+
+                <div>              🚀 Need a custom integration?
+
+                  <div className="font-semibold text-gray-900">Okta Integration</div>            </h2>
+
+                  <div className="text-sm text-gray-600">Native Okta support</div>            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+
+                </div>              We're building our integration library based on customer needs. Tell us what you need!
+
+              </div>            </p>
+
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-blue-100">            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+
+                <span className="text-2xl">📁</span>              <a 
+
+                <div>                href="/contact" 
+
+                  <div className="font-semibold text-gray-900">LDAP / Active Directory</div>                className="inline-block px-8 py-4 rounded-2xl font-bold text-lg bg-white text-blue-600 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+
+                  <div className="text-sm text-gray-600">On-premise directory sync</div>              >
+
+                </div>                Talk to Founders
+
+              </div>              </a>
+
+            </div>              <a 
+
+          </div>                href="/docs/api" 
+
+        </section>                className="inline-block px-8 py-4 rounded-2xl font-bold text-lg bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 hover:bg-white/20 transition-all duration-300"
+
+              >
+
+        {/* Roadmap Timeline */}                View API Docs
+
+        <section className="relative max-w-5xl mx-auto px-6 py-16">              </a>
+
+          <h2 className="text-4xl font-black text-gray-900 mb-4 text-center">Integration Roadmap</h2>            </div>
+
+          <p className="text-lg text-gray-600 text-center mb-12">Our planned integration timeline for 2025</p>          </div>
+
+                  </div>
+
+          <div className="space-y-6">      </main>
+
+            {timeline.map((period, idx) => (    </MarketingLayout>
+
+              <div  );
+
+                key={idx}};
+
+                className={`relative bg-white rounded-xl p-8 shadow-lg border-2 ${
+
+                  period.status === 'current' ? 'border-green-500' : export default Integrations;
+
+                  period.status === 'next' ? 'border-blue-500' : 
+                  'border-gray-300'
+                }`}
+              >
+                <div className="flex items-center gap-4 mb-4">
+                  <span className={`px-4 py-2 rounded-full font-bold text-sm ${
+                    period.status === 'current' ? 'bg-green-500 text-white' :
+                    period.status === 'next' ? 'bg-blue-500 text-white' :
+                    'bg-gray-300 text-gray-700'
+                  }`}>
+                    {period.quarter}
+                  </span>
+                  {period.status === 'current' && (
+                    <span className="text-sm font-semibold text-green-600">← Currently Shipping</span>
+                  )}
+                </div>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {period.features.map((feature, fIdx) => (
+                    <li key={fIdx} className="flex items-center gap-2 text-gray-700">
+                      <span className="text-blue-500">▸</span>
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Planned Integrations */}
+        <section className="relative max-w-5xl mx-auto px-6 py-16">
+          <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-10 border border-gray-200 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="text-4xl">📋</span>
+              <h2 className="text-3xl font-black text-gray-900">Planned</h2>
+            </div>
+            <p className="text-lg text-gray-700 mb-6">
+              On our roadmap for Q3 2025 and beyond:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <span className="text-2xl">🎫</span>
+                <div>
+                  <div className="font-semibold text-gray-900">Jira Integration</div>
+                  <div className="text-sm text-gray-600">Jira Service Management sync</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <span className="text-2xl">🔧</span>
+                <div>
+                  <div className="font-semibold text-gray-900">ServiceNow</div>
+                  <div className="text-sm text-gray-600">CMDB two-way sync</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+                <span className="text-2xl">💼</span>
+                <div>
+                  <div className="font-semibold text-gray-900">Freshservice</div>
+                  <div className="text-sm text-gray-600">Asset sync with Freshservice</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="relative max-w-5xl mx-auto px-6 py-16 text-center">
+          <div className="bg-gradient-to-br from-blue-600 to-purple-700 rounded-2xl p-12 shadow-2xl text-white">
+            <h2 className="text-4xl font-black mb-4">Need a Custom Integration?</h2>
+            <p className="text-xl mb-8 text-blue-100">
+              We're always expanding our integration ecosystem. Let us know what you need.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/contact"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50 transition-colors shadow-lg"
+              >
+                Request an Integration
+              </a>
+              <a
+                href="/docs/api"
+                className="inline-flex items-center justify-center px-8 py-4 bg-blue-800 text-white rounded-lg font-bold hover:bg-blue-900 transition-colors border-2 border-blue-400"
+              >
+                View API Docs
+              </a>
+            </div>
+          </div>
+        </section>
+      </main>
+    </MarketingLayout>
+  );
+};
+
+export default Integrations;

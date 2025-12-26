@@ -1,0 +1,31 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient id="iconBg" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" style="stop-color:#d1fae5;stop-opacity:1" />
+			<stop offset="100%" style="stop-color:#6ee7b7;stop-opacity:1" />
+		</linearGradient>
+		<linearGradient id="iconStem" x1="0%" y1="0%" x2="100%" y2="100%">
+			<stop offset="0%" style="stop-color:#6ee7b7;stop-opacity:1" />
+			<stop offset="50%" style="stop-color:#34d399;stop-opacity:1" />
+			<stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+		</linearGradient>
+		<linearGradient id="iconTop" x1="0%" y1="0%" x2="100%" y2="0%">
+			<stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+			<stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+		</linearGradient>
+		<linearGradient id="iconBottom" x1="0%" y1="100%" x2="100%" y2="0%">
+			<stop offset="0%" style="stop-color:#047857;stop-opacity:1" />
+			<stop offset="100%" style="stop-color:#10b981;stop-opacity:1" />
+		</linearGradient>
+	</defs>
+	<rect width="512" height="512" rx="100" fill="url(#iconBg)"/>
+	<circle cx="100" cy="100" r="60" fill="#ffffff" opacity="0.15"/>
+	<circle cx="412" cy="412" r="80" fill="#10b981" opacity="0.2"/>
+	<g transform="translate(136, 86) scale(1.1)">
+		<rect x="0" y="0" width="55" height="240" rx="27.5" fill="url(#iconStem)"/>
+		<path d="M 65 65 L 200 5 Q 220 -2 230 15 L 240 35 Q 245 50 230 58 L 80 115 Q 63 122 60 105 Z" fill="url(#iconTop)"/>
+		<path d="M 60 135 L 80 125 L 230 182 Q 245 190 240 205 L 230 225 Q 220 242 200 235 L 65 175 Q 55 170 60 155 Z" fill="url(#iconBottom)"/>
+		<circle cx="240" cy="25" r="20" fill="#10b981"/>
+		<circle cx="245" cy="215" r="24" fill="#059669"/>
+	</g>
+</svg>

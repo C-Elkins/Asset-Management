@@ -1,0 +1,21 @@
+{
+  "assets": [
+    {
+      "name": "MacBook Pro 14",
+      "assetTag": "LT-0001",
+      "brand": "Apple",
+      "model": "A2779",
+      "serialNumber": "C02XXX12345",
+      "purchasePrice": 2399.00,
+      "purchaseDate": "2024-02-12",
+      "vendor": "Apple",
+      "location": "HQ - 3rd Floor",
+      "status": "AVAILABLE",
+      "condition": "EXCELLENT",
+      "warrantyExpiry": "2026-02-12",
+      "nextMaintenance": "2025-02-12",
+      "notes": "Initial fleet purchase",
+      "categoryName": "Laptops"
+    }
+  ]
+}
