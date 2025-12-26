@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Management - Loading</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .splash-container {
+      text-align: center;
+      color: white;
+    }
+
+    .logo {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 48px;
+      opacity: 0.9;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      margin: 0 auto;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 24px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .dots {
+      display: inline-block;
+      width: 20px;
+      text-align: left;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
+    }
+
+    .dots::after {
+      content: '.';
+      animation: dots 1.5s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="splash-container">
+    <div class="logo">Krubles</div>
+    <div class="subtitle">Asset Management System</div>
+    <div class="spinner"></div>
+    <div class="loading-text">
+      Initializing<span class="dots"></span>
+    </div>
+  </div>
+</body>
+</html>
