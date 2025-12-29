@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Asset, Assignment, AssignmentInput } from '../types/api';
 import { Calendar, User, MapPin, CheckCircle, Clock, X } from 'lucide-react';
+import { StatusBadge, EmptyState } from './shared';
 
 interface CheckoutManagerProps {
   isOpen: boolean;
@@ -106,31 +107,21 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
     });
   };
 
-  const getStatusColor = (assignment: Assignment) => {
-    if (assignment.status === 'returned') return 'text-green-600 bg-green-50';
-    if (assignment.status === 'overdue') return 'text-red-600 bg-red-50';
-    return 'text-blue-600 bg-blue-50';
-  };
-
-  const getStatusLabel = (assignment: Assignment) => {
-    if (assignment.status === 'returned') return 'Returned';
-    if (assignment.status === 'overdue') return 'Overdue';
-    return 'Active';
-  };
+  // Status colors are now handled by the shared StatusBadge component
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
               {asset ? `Checkout/Check-in: ${asset.name}` : 'All Assignments'}
             </h2>
             {asset && (
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 Asset Tag: {asset.asset_tag} • Status: {asset.status}
                 {asset.is_tracked_inventory === 1 && (
                   <span> • Available: {asset.available_quantity}/{asset.total_quantity}</span>
@@ -138,7 +129,7 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
               </p>
             )}
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
             <X size={24} />
           </button>
         </div>
@@ -162,12 +153,12 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
 
           {/* Checkout Form */}
           {showCheckoutForm && asset && (
-            <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Checkout Asset</h3>
+            <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Checkout Asset</h3>
               <form onSubmit={handleCheckout} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Assigned To *
                     </label>
                     <input
@@ -175,40 +166,40 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
                       required
                       value={formData.assigned_to}
                       onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                       placeholder="Person or department name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Assigned By
                     </label>
                     <input
                       type="text"
                       value={formData.assigned_by}
                       onChange={(e) => setFormData({ ...formData, assigned_by: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                       placeholder="Your name"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Location
                     </label>
                     <input
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                       placeholder="Where is it going?"
                     />
                   </div>
 
                   {asset.is_tracked_inventory === 1 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Quantity *
                       </label>
                       <input
@@ -218,23 +209,23 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
                         required
                         value={formData.quantity}
                         onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 1 })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Available: {asset.available_quantity}
                       </p>
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Expected Return Date
                     </label>
                     <input
                       type="date"
                       value={formData.expected_return_at}
                       onChange={(e) => setFormData({ ...formData, expected_return_at: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                     />
                   </div>
                 </div>
@@ -263,7 +254,7 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowCheckoutForm(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     Cancel
                   </button>
@@ -274,40 +265,40 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
 
           {/* Assignments List */}
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
               {asset ? 'Assignment History' : 'All Active Assignments'}
             </h3>
 
             {loading && !showCheckoutForm ? (
-              <div className="text-center py-8 text-gray-500">Loading...</div>
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading...</div>
             ) : assignments.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No assignments found
-              </div>
+              <EmptyState
+                icon={<CheckCircle size={48} />}
+                title="No assignments found"
+                description="Check out an asset to create an assignment."
+              />
             ) : (
               <div className="space-y-3">
                 {assignments.map((assignment) => (
                   <div
                     key={assignment.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
                           <User size={16} className="text-gray-500" />
-                          <span className="font-medium text-gray-900">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
                             {assignment.assigned_to}
                           </span>
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(assignment)}`}>
-                            {getStatusLabel(assignment)}
-                          </span>
+                          <StatusBadge status={assignment.status} size="sm" />
                         </div>
                         {!asset && (
-                          <div className="text-sm text-gray-600 mb-1">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                             Asset: {(assignment as any).asset_name} ({(assignment as any).asset_tag})
                           </div>
                         )}
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400">
                           {assignment.location && (
                             <div className="flex items-center gap-1">
                               <MapPin size={14} />
@@ -332,17 +323,17 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
                           )}
                         </div>
                         {assignment.quantity && assignment.quantity > 1 && (
-                          <div className="text-sm text-gray-600 mt-1">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                             Quantity: {assignment.quantity}
                           </div>
                         )}
                         {assignment.checkout_notes && (
-                          <div className="text-sm text-gray-600 mt-2 p-2 bg-gray-100 rounded">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded">
                             {assignment.checkout_notes}
                           </div>
                         )}
                         {assignment.checkin_notes && (
-                          <div className="text-sm text-green-600 mt-2 p-2 bg-green-50 rounded">
+                          <div className="text-sm text-green-600 dark:text-green-400 mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded">
                             Check-in notes: {assignment.checkin_notes}
                           </div>
                         )}
@@ -364,8 +355,8 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             {assignments.length} {assignments.length === 1 ? 'assignment' : 'assignments'}
             {assignments.filter(a => a.status === 'active').length > 0 && (
               <span> • {assignments.filter(a => a.status === 'active').length} active</span>
@@ -373,7 +364,7 @@ export const CheckoutManager: React.FC<CheckoutManagerProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+            className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
           >
             Close
           </button>

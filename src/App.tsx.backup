@@ -1,0 +1,905 @@
+import { useState, useEffect } from 'react'
+import { Package, Settings, LayoutDashboard, Box, Star, LogOut, User as UserIcon } from 'lucide-react'
+import { CategoryManager } from './components/CategoryManager'
+import { AssetManager } from './components/AssetManager'
+import { RecentActivity } from './components/RecentActivity'
+import { SetupWizard } from './components/SetupWizard'
+import { LoginScreen } from './components/LoginScreen'
+import { UserManagement } from './components/UserManagement'
+import type { CategoryWithPreference, AssetStats, BusinessProfile, CategoryViewMode, User } from './types/api'
+
+type View = 'dashboard' | 'assets' | 'settings'
+
+function App() {
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [authChecking, setAuthChecking] = useState(true)
+  const [categories, setCategories] = useState<CategoryWithPreference[]>([])
+  const [filteredCategories, setFilteredCategories] = useState<CategoryWithPreference[]>([])
+  const [categoryViewMode, setCategoryViewMode] = useState<CategoryViewMode>('selected')
+  const [stats, setStats] = useState<AssetStats>({ total: 0, available: 0, assigned: 0, maintenance: 0 })
+  const [loading, setLoading] = useState(true)
+  const [currentView, setCurrentView] = useState<View>('dashboard')
+  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<number | null>(null)
+  const [showCategoryManager, setShowCategoryManager] = useState(false)
+  const [businessProfile, setBusinessProfile] = useState<BusinessProfile | null>(null)
+  const [showSetupWizard, setShowSetupWizard] = useState(false)
+  const [dbStats, setDbStats] = useState<{ databaseSizeMB: string; totalAssets: number; ftsRecords: number; totalIndexes: number } | null>(null)
+  const [showUserMenu, setShowUserMenu] = useState(false)
+  const [showLogin, setShowLogin] = useState(false)
+  const [activeSettingsTab, setActiveSettingsTab] = useState<'general' | 'categories' | 'users' | 'database' | 'data' | 'shortcuts' | 'about'>('general')
+
+  // Check for existing session on app load
+  useEffect(() => {
+    checkCurrentUser()
+  }, [])
+
+  // Load data after authentication check
+  useEffect(() => {
+    if (!authChecking) {
+      loadBusinessProfile()
+      loadCategoryViewMode()
+      loadCategories()
+      loadStats()
+    }
+  }, [authChecking])
+
+  const checkCurrentUser = async () => {
+    try {
+      const user = await window.api.getCurrentUser()
+      setCurrentUser(user)
+    } catch (error) {
+      console.error('Failed to check current user:', error)
+    } finally {
+      setAuthChecking(false)
+    }
+  }
+
+  const handleLoginSuccess = async () => {
+    await checkCurrentUser()
+  }
+
+  const handleLogout = async () => {
+    try {
+      await window.api.logout()
+      setCurrentUser(null)
+      setShowUserMenu(false)
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
+  // Filter categories when categories or view mode changes
+  useEffect(() => {
+    filterCategories()
+  }, [categories, categoryViewMode])
+
+  // Load database stats when viewing settings
+  useEffect(() => {
+    if (currentView === 'settings') {
+      loadDatabaseStats()
+    }
+  }, [currentView])
+
+  const loadCategoryViewMode = async () => {
+    try {
+      const mode = await window.api.getCategoryViewMode()
+      setCategoryViewMode(mode)
+    } catch (error) {
+      console.error('Failed to load category view mode:', error)
+    }
+  }
+
+  const filterCategories = async () => {
+    if (categoryViewMode === 'all') {
+      setFilteredCategories(categories)
+      return
+    }
+
+    try {
+      const preferences = await window.api.getUserCategoryPreferences()
+
+      const filtered = categories.filter(cat => {
+        const pref = preferences.find(p => p.category_id === cat.id)
+
+        if (categoryViewMode === 'favorites') {
+          return pref?.is_favorite === 1
+        } else { // 'selected'
+          return pref?.is_selected === 1
+        }
+      })
+
+      setFilteredCategories(filtered)
+    } catch (error) {
+      console.error('Failed to filter categories:', error)
+      setFilteredCategories(categories)
+    }
+  }
+
+  const handleCategoryViewModeChange = async (mode: CategoryViewMode) => {
+    try {
+      await window.api.setCategoryViewMode(mode)
+      setCategoryViewMode(mode)
+    } catch (error) {
+      console.error('Failed to update view mode:', error)
+    }
+  }
+
+  const loadBusinessProfile = async () => {
+    try {
+      const profile = await window.api.getBusinessProfile()
+      setBusinessProfile(profile)
+
+      // Show setup wizard if not completed
+      if (profile.setup_completed === 0) {
+        setShowSetupWizard(true)
+      }
+    } catch (error) {
+      console.error('Failed to load business profile:', error)
+    }
+  }
+
+  const handleSetupComplete = async () => {
+    setShowSetupWizard(false)
+    await loadBusinessProfile()
+    await loadCategories()
+    await loadStats()
+  }
+
+  // Refresh stats when switching to dashboard view
+  useEffect(() => {
+    if (currentView === 'dashboard') {
+      loadStats()
+    }
+  }, [currentView])
+
+  const loadCategories = async () => {
+    try {
+      const data = await window.api.getCategoriesWithPreferences()
+      setCategories(data)
+    } catch (error) {
+      console.error('Failed to load categories:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadStats = async () => {
+    try {
+      const data = await window.api.getAssetStats()
+      setStats(data)
+    } catch (error) {
+      console.error('Failed to load stats:', error)
+    }
+  }
+
+  const loadDatabaseStats = async () => {
+    try {
+      const result = await window.api.getDatabaseStats()
+      if (result.success && result.stats) {
+        setDbStats(result.stats)
+      }
+    } catch (error) {
+      console.error('Failed to load database stats:', error)
+    }
+  }
+
+  // Show loading state while checking authentication
+  if (authChecking) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const handleLoginClick = () => {
+    setShowLogin(true)
+  }
+
+  const handleLoginSuccessWrapper = async () => {
+    await handleLoginSuccess()
+    setShowLogin(false)
+  }
+
+  return (
+    <>
+      {/* Login Modal */}
+      {showLogin && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="relative max-w-md w-full">
+            <button
+              onClick={() => setShowLogin(false)}
+              className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors z-10"
+            >
+              <span className="text-gray-600 text-xl">&times;</span>
+            </button>
+            <LoginScreen onLoginSuccess={handleLoginSuccessWrapper} />
+          </div>
+        </div>
+      )}
+
+      {/* Main App */}
+      <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+        {/* Brand Header */}
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-sm">
+              K
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">Krubles</h1>
+              <p className="text-xs text-gray-500">Asset Management</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Navigation */}
+        <nav className="p-4 space-y-1">
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-3 mb-2">Menu</p>
+          <NavItem
+            icon={<LayoutDashboard size={20} />}
+            label="Dashboard"
+            active={currentView === 'dashboard'}
+            onClick={() => {
+              setCurrentView('dashboard')
+              setSelectedCategoryFilter(null)
+            }}
+          />
+          <NavItem
+            icon={<Box size={20} />}
+            label="All Assets"
+            badge={stats.total > 0 ? stats.total.toString() : undefined}
+            active={currentView === 'assets' && selectedCategoryFilter === null}
+            onClick={() => {
+              setCurrentView('assets')
+              setSelectedCategoryFilter(null)
+            }}
+          />
+          <NavItem
+            icon={<Settings size={20} />}
+            label="Settings"
+            active={currentView === 'settings'}
+            onClick={() => {
+              setCurrentView('settings')
+              setSelectedCategoryFilter(null)
+            }}
+          />
+        </nav>
+
+        {/* Categories Section - Scrollable */}
+        <div className="flex-1 overflow-hidden flex flex-col border-t border-gray-200">
+          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Categories</p>
+              <button
+                onClick={() => setShowCategoryManager(true)}
+                disabled={!currentUser}
+                className={`text-xs text-emerald-600 hover:text-emerald-700 font-medium ${!currentUser ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={!currentUser ? "Login Required" : "Manage Categories"}
+              >
+                + Manage
+              </button>
+            </div>
+
+            {/* Category View Mode - More Prominent */}
+            <select
+              value={categoryViewMode}
+              onChange={(e) => handleCategoryViewModeChange(e.target.value as CategoryViewMode)}
+              className="w-full px-2 py-1.5 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+            >
+              <option value="selected">📋 My Categories</option>
+              <option value="favorites">⭐ Favorites</option>
+              <option value="all">🗂️ All Categories</option>
+            </select>
+          </div>
+
+          {/* Scrollable Category List */}
+          <div className="flex-1 overflow-y-auto px-4 py-2">
+            <div className="space-y-1">
+              {filteredCategories.length === 0 ? (
+                <div className="px-3 py-8 text-center">
+                  <div className="text-gray-300 mb-3">
+                    <Package size={32} className="mx-auto" />
+                  </div>
+                  <p className="text-xs text-gray-500 mb-3">No categories available</p>
+                  <button
+                    onClick={() => setShowCategoryManager(true)}
+                    disabled={!currentUser}
+                    className={`text-xs px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-md hover:bg-emerald-100 font-medium ${!currentUser ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    title={!currentUser ? "Login Required" : "Add Categories"}
+                  >
+                    Add Categories
+                  </button>
+                </div>
+              ) : (
+                filteredCategories.map(category => (
+                  <div
+                    key={category.id}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-all group ${
+                      currentView === 'assets' && selectedCategoryFilter === category.id
+                        ? 'bg-emerald-100 text-emerald-700 font-medium shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <button
+                      onClick={() => {
+                        setCurrentView('assets')
+                        setSelectedCategoryFilter(category.id)
+                      }}
+                      className="flex items-center gap-2 flex-1 min-w-0 text-left"
+                      title={category.name}
+                    >
+                      <span className="text-lg flex-shrink-0" style={{ color: category.color_code }}>
+                        {category.icon}
+                      </span>
+                      <span className="flex-1 truncate">{category.name}</span>
+                    </button>
+                    <button
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        try {
+                          await window.api.updateCategoryPreference(category.id, {
+                            is_favorite: category.is_favorite ? 0 : 1
+                          })
+                          // Reload categories with preferences
+                          const updated = await window.api.getCategoriesWithPreferences()
+                          setCategories(updated)
+                        } catch (error) {
+                          console.error('Failed to toggle favorite:', error)
+                        }
+                      }}
+                      className={`flex-shrink-0 p-1 rounded transition-colors ${
+                        category.is_favorite
+                          ? 'text-yellow-500 hover:text-yellow-600'
+                          : 'text-gray-300 hover:text-yellow-500 opacity-0 group-hover:opacity-100'
+                      }`}
+                      title={category.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                    >
+                      {category.is_favorite ? <Star size={14} fill="currentColor" /> : <Star size={14} />}
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Footer - User Menu or Login Button */}
+        <div className="border-t border-gray-200 bg-gray-50">
+          <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500">
+            <span>{filteredCategories.length} categories</span>
+            <span className="text-gray-400">v1.0.0</span>
+          </div>
+          <div className="px-4 py-3 border-t border-gray-200 bg-white relative">
+            {currentUser ? (
+              <>
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="w-full flex items-center gap-3 hover:bg-gray-50 rounded-lg p-2 transition-colors"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    {currentUser.full_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="text-sm font-medium text-gray-900">{currentUser.full_name}</p>
+                    <p className="text-xs text-gray-500 capitalize">{currentUser.role}</p>
+                  </div>
+                  <UserIcon size={16} className="text-gray-400" />
+                </button>
+
+                {/* User Menu Dropdown */}
+                {showUserMenu && (
+                  <div className="absolute bottom-full left-4 right-4 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-sm font-medium text-gray-900">{currentUser.full_name}</p>
+                      <p className="text-xs text-gray-500">{currentUser.username}</p>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                    >
+                      <LogOut size={16} />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <button
+                onClick={handleLoginClick}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all font-medium shadow-sm"
+              >
+                <LogOut size={18} className="rotate-180" />
+                Sign In
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-auto">
+        <div className="p-8">
+          {currentView === 'dashboard' && (
+            <>
+              <h2 className="text-3xl font-bold text-gray-900 mb-6">Dashboard</h2>
+
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <StatsCard title="Total Assets" value={stats.total.toString()} icon="📦" color="bg-emerald-500" />
+                <StatsCard title="Available" value={stats.available.toString()} icon="✅" color="bg-green-500" />
+                <StatsCard title="Assigned" value={stats.assigned.toString()} icon="👤" color="bg-blue-500" />
+                <StatsCard title="Maintenance" value={stats.maintenance.toString()} icon="🔧" color="bg-orange-500" />
+              </div>
+
+              {/* Recent Activity */}
+              <RecentActivity limit={15} />
+            </>
+          )}
+
+          {currentView === 'assets' && (
+            <>
+              {/* Breadcrumb Navigation */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                  <button
+                    onClick={() => setCurrentView('dashboard')}
+                    className="hover:text-emerald-600 transition-colors"
+                  >
+                    Home
+                  </button>
+                  <span>/</span>
+                  <button
+                    onClick={() => setSelectedCategoryFilter(null)}
+                    className={selectedCategoryFilter ? 'hover:text-emerald-600 transition-colors' : 'text-gray-900 font-medium'}
+                  >
+                    Assets
+                  </button>
+                  {selectedCategoryFilter && (
+                    <>
+                      <span>/</span>
+                      <span className="text-gray-900 font-medium">
+                        {filteredCategories.find(c => c.id === selectedCategoryFilter)?.name || ''}
+                      </span>
+                    </>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {selectedCategoryFilter && (
+                      <span className="text-4xl">
+                        {filteredCategories.find(c => c.id === selectedCategoryFilter)?.icon || '📦'}
+                      </span>
+                    )}
+                    <h2 className="text-3xl font-bold text-gray-900">
+                      {selectedCategoryFilter
+                        ? `${filteredCategories.find(c => c.id === selectedCategoryFilter)?.name || ''}`
+                        : 'All Assets'}
+                    </h2>
+                  </div>
+                  {selectedCategoryFilter && (
+                    <button
+                      onClick={() => setSelectedCategoryFilter(null)}
+                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+                    >
+                      ← View All Assets
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <AssetManager
+                categories={filteredCategories}
+                onAssetChange={loadStats}
+                categoryFilter={selectedCategoryFilter}
+                currentUser={currentUser}
+              />
+            </>
+          )}
+
+          {currentView === 'settings' && (
+            <>
+              <div className="mb-6">
+                <div className="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                  <button
+                    onClick={() => setCurrentView('dashboard')}
+                    className="hover:text-emerald-600 transition-colors"
+                  >
+                    Home
+                  </button>
+                  <span>/</span>
+                  <span className="text-gray-900 font-medium">Settings</span>
+                </div>
+                <h2 className="text-3xl font-bold text-gray-900">Settings</h2>
+                <p className="text-gray-500 mt-1">Manage your application preferences and configuration</p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Main Settings Column */}
+                <div className="lg:col-span-2 space-y-6">
+                  {/* Business Profile Section */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 bg-gradient-to-r from-blue-50 to-blue-100 border-b border-blue-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                          🏢
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Business Profile</h3>
+                          <p className="text-sm text-gray-600">Your organization information</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      {businessProfile && (
+                        <div className="space-y-4 mb-4">
+                          <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Company Name</p>
+                              <p className="text-gray-900 font-medium">{businessProfile.company_name || 'Not set'}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                            <div>
+                              <p className="text-sm font-medium text-gray-500">Business Type</p>
+                              <p className="text-gray-900 font-medium capitalize">
+                                {businessProfile.business_type?.replace('-', ' / ') || 'Not set'}
+                              </p>
+                            </div>
+                          </div>
+                          {businessProfile.default_location && (
+                            <div className="flex items-center justify-between py-3">
+                              <div>
+                                <p className="text-sm font-medium text-gray-500">Default Location</p>
+                                <p className="text-gray-900 font-medium">{businessProfile.default_location}</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      <button
+                        onClick={() => {
+                          const confirmReset = window.confirm(
+                            'Re-running the Setup Wizard will reset your category selections.\n\n' +
+                              'Old unselected categories will be deactivated. This may affect:\n' +
+                              '• Assets assigned to deactivated categories\n' +
+                              '• Inventory tracking for those assets\n' +
+                              '• Reports and analytics\n\n' +
+                              'Are you sure you want to continue?'
+                          )
+                          if (confirmReset) {
+                            setShowSetupWizard(true)
+                          }
+                        }}
+                        className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      >
+                        🔄 Re-run Setup Wizard
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Category Management Section */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 bg-gradient-to-r from-emerald-50 to-emerald-100 border-b border-emerald-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center text-white">
+                          📂
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Category Management</h3>
+                          <p className="text-sm text-gray-600">Configure asset categories</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      {categories.length > 0 && (
+                        <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-sm text-gray-500">Total Categories</p>
+                              <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
+                            </div>
+                            <div className="text-4xl">📋</div>
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => setShowCategoryManager(true)}
+                        disabled={!currentUser}
+                        className={`w-full px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium ${!currentUser ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        title={!currentUser ? "Login Required" : "Manage Categories"}
+                      >
+                        ⚙️ Manage Categories
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Database Optimization Section */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 bg-gradient-to-r from-purple-50 to-purple-100 border-b border-purple-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-white">
+                          ⚡
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Database Optimization</h3>
+                          <p className="text-sm text-gray-600">Maintain performance and manage storage</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-100">
+                        <p className="text-sm text-gray-700 mb-2">
+                          Optimize your database to improve performance and reclaim unused space.
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          This process runs VACUUM and ANALYZE to compact the database and update query planner statistics.
+                        </p>
+                      </div>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const result = await window.api.optimizeDatabase()
+                            if (result.success) {
+                              alert(
+                                `Database optimized successfully!\n\n` +
+                                  `${result.message}\n` +
+                                  (result.sizeMB ? `Database size: ${result.sizeMB.toFixed(2)} MB` : '')
+                              )
+                            }
+                          } catch (error) {
+                            console.error('Database optimization failed:', error)
+                            alert('Failed to optimize database. Please try again.')
+                          }
+                        }}
+                        className="w-full px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                      >
+                        🚀 Optimize Database
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Data Management Section */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 bg-gradient-to-r from-orange-50 to-orange-100 border-b border-orange-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center text-white">
+                          💾
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Data Management</h3>
+                          <p className="text-sm text-gray-600">Import, export, and backup your data</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6 space-y-3">
+                      <div className="p-4 bg-orange-50 rounded-lg border border-orange-100">
+                        <p className="text-sm text-gray-700 mb-1 font-medium">Export Your Data</p>
+                        <p className="text-xs text-gray-500 mb-3">
+                          Download all your assets and categories in CSV format for backup or external analysis.
+                        </p>
+                        <button
+                          onClick={() => {
+                            alert('CSV Export feature coming soon!\n\nYou will be able to export:\n• All assets\n• Categories\n• Assignments\n• Activity logs')
+                          }}
+                          className="w-full px-4 py-2.5 bg-white border-2 border-orange-600 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-medium text-sm"
+                        >
+                          📊 Export to CSV
+                        </button>
+                      </div>
+
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <p className="text-sm text-gray-700 mb-1 font-medium">Import Data</p>
+                        <p className="text-xs text-gray-500 mb-3">
+                          Bulk import assets from CSV files with field mapping and validation.
+                        </p>
+                        <button
+                          onClick={() => {
+                            alert('CSV Import feature coming soon!\n\nYou will be able to:\n• Import multiple assets at once\n• Map CSV columns to fields\n• Validate data before import\n• Download import templates')
+                          }}
+                          className="w-full px-4 py-2.5 bg-white border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors font-medium text-sm"
+                        >
+                          📁 Import from CSV
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Keyboard Shortcuts Section */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-6 py-4 bg-gradient-to-r from-indigo-50 to-indigo-100 border-b border-indigo-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+                          ⌨️
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Keyboard Shortcuts</h3>
+                          <p className="text-sm text-gray-600">Power user productivity features</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-6">
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                          <span className="text-gray-600">New Asset</span>
+                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl+N</kbd>
+                        </div>
+                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Focus Search</span>
+                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl+F</kbd>
+                        </div>
+                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Edit Selected</span>
+                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Ctrl+E</kbd>
+                        </div>
+                        <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                          <span className="text-gray-600">Delete Selected</span>
+                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Delete</kbd>
+                        </div>
+                        <div className="flex items-center justify-between py-2">
+                          <span className="text-gray-600">Close Modal</span>
+                          <kbd className="px-2 py-1 bg-gray-100 border border-gray-300 rounded text-xs font-mono">Esc</kbd>
+                        </div>
+                      </div>
+                      <div className="mt-4 p-3 bg-indigo-50 rounded-lg">
+                        <p className="text-xs text-gray-600">
+                          💡 <span className="font-medium">Tip:</span> Most shortcuts are available when viewing the Assets page.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sidebar Info Column */}
+                <div className="space-y-6">
+                  {/* Quick Stats */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Stats</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm text-gray-600">Total Assets</span>
+                        <span className="text-lg font-bold text-gray-900">{stats.total}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span className="text-sm text-gray-600">Categories</span>
+                        <span className="text-lg font-bold text-gray-900">{categories.length}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Database Performance */}
+                  {dbStats && (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Database Info</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                          <span className="text-sm text-gray-600">Database Size</span>
+                          <span className="text-sm font-bold text-purple-700">{dbStats.databaseSizeMB} MB</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <span className="text-sm text-gray-600">FTS Records</span>
+                          <span className="text-sm font-bold text-gray-900">{dbStats.ftsRecords.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <span className="text-sm text-gray-600">Total Indexes</span>
+                          <span className="text-sm font-bold text-gray-900">{dbStats.totalIndexes}</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={loadDatabaseStats}
+                        className="mt-3 w-full px-3 py-2 text-xs bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors font-medium"
+                      >
+                        🔄 Refresh Stats
+                      </button>
+                    </div>
+                  )}
+
+                  {/* App Information */}
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">About</h3>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-500">Application</p>
+                        <p className="text-gray-900 font-medium">Krubles Asset Manager</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Version</p>
+                        <p className="text-gray-900 font-medium">1.0.0</p>
+                      </div>
+                      <div className="pt-3 border-t border-gray-200">
+                        <p className="text-xs text-gray-500">
+                          Built with modern web technologies for efficient asset tracking and management.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Category Manager Modal */}
+      <CategoryManager
+        isOpen={showCategoryManager}
+        onClose={() => setShowCategoryManager(false)}
+        onCategoryChange={loadCategories}
+        currentUser={currentUser}
+      />
+
+      {/* Setup Wizard */}
+      <SetupWizard
+        isOpen={showSetupWizard}
+        onComplete={handleSetupComplete}
+      />
+      </div>
+    </>
+  )
+}
+
+function NavItem({
+  icon,
+  label,
+  badge,
+  active = false,
+  onClick
+}: {
+  icon: React.ReactNode
+  label: string
+  badge?: string
+  active?: boolean
+  onClick?: () => void
+}) {
+  return (
+    <div
+      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-all ${
+        active
+          ? 'bg-emerald-50 text-emerald-600 font-medium shadow-sm'
+          : 'text-gray-600 hover:bg-gray-50'
+      }`}
+    >
+      {icon}
+      <span className="flex-1">{label}</span>
+      {badge && (
+        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+          active
+            ? 'bg-emerald-100 text-emerald-700'
+            : 'bg-gray-100 text-gray-600'
+        }`}>
+          {badge}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function StatsCard({ title, value, icon, color }: { title: string; value: string; icon: string; color: string }) {
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <p className="text-sm font-medium text-gray-500 mb-1">{title}</p>
+          <p className="text-3xl font-bold text-gray-900">{value}</p>
+        </div>
+        <div className={`${color} w-14 h-14 rounded-xl flex items-center justify-center text-2xl shadow-sm`}>
+          {icon}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default App

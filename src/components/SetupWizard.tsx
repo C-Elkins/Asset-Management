@@ -156,65 +156,57 @@ export const SetupWizard: React.FC<SetupWizardProps> = ({ isOpen, onComplete }) 
 
     setIsSubmitting(true);
     try {
-      // Get existing categories to avoid duplicates
-      const existingCategories = await window.api.getCategories();
-      const existingNames = new Set(existingCategories.map(c => c.name.toLowerCase()));
+      // Get ALL categories (including inactive) to properly handle re-runs
+      const allExistingCategories = await window.api.getAllCategories();
+      const existingNames = new Map(allExistingCategories.map(c => [c.name.toLowerCase(), c]));
 
-      // Create selected predefined categories
-      const predefinedCategoriesToCreate = selectedBusinessType.categories.filter((_, index) =>
+      // Collect all selected category names
+      const selectedPredefinedCategories = selectedBusinessType.categories.filter((_, index) =>
         selectedCategories.has(index)
       );
+      const allSelectedCategories = [...selectedPredefinedCategories, ...customCategories];
+      const selectedCategoryIds: number[] = [];
 
-      const createdCategoryIds: number[] = [];
+      // Process each selected category
+      for (const category of allSelectedCategories) {
+        const nameLower = category.name.toLowerCase();
+        const existing = existingNames.get(nameLower);
 
-      for (const category of predefinedCategoriesToCreate) {
-        if (!existingNames.has(category.name.toLowerCase())) {
+        if (existing) {
+          // Category exists - reactivate if inactive
+          if (existing.active === 0) {
+            try {
+              await window.api.reactivateCategory(existing.id);
+              console.log(`Reactivated category: ${category.name}`);
+            } catch (error) {
+              console.error(`Failed to reactivate category ${category.name}:`, error);
+            }
+          }
+          selectedCategoryIds.push(existing.id);
+        } else {
+          // Category doesn't exist - create it
           try {
             const created = await window.api.createCategory(category);
-            createdCategoryIds.push(created.id);
+            selectedCategoryIds.push(created.id);
+            console.log(`Created new category: ${category.name}`);
           } catch (error) {
             console.error(`Failed to create category ${category.name}:`, error);
           }
-        } else {
-          // Category already exists, get its ID
-          const existing = existingCategories.find(c => c.name.toLowerCase() === category.name.toLowerCase());
-          if (existing) {
-            createdCategoryIds.push(existing.id);
-          }
         }
       }
 
-      // Create custom categories
-      for (const category of customCategories) {
-        if (!existingNames.has(category.name.toLowerCase())) {
-          try {
-            const created = await window.api.createCategory(category);
-            createdCategoryIds.push(created.id);
-          } catch (error) {
-            console.error(`Failed to create custom category ${category.name}:`, error);
-          }
+      // Deactivate all categories that weren't selected
+      const allCategoryIds = allExistingCategories.map(c => c.id);
+      const unselectedIds = allCategoryIds.filter(id => !selectedCategoryIds.includes(id));
+
+      for (const categoryId of unselectedIds) {
+        try {
+          await window.api.deleteCategory(categoryId);
+          const cat = allExistingCategories.find(c => c.id === categoryId);
+          console.log(`Deactivated category: ${cat?.name || categoryId}`);
+        } catch (error) {
+          console.error(`Failed to deactivate category ${categoryId}:`, error);
         }
-      }
-
-      // Update category preferences (mark created categories as selected)
-      const preferences = createdCategoryIds.map(id => ({
-        category_id: id,
-        is_selected: 1,
-      }));
-
-      await window.api.bulkUpdateCategoryPreferences(preferences);
-
-      // Mark all other categories as not selected
-      const allCategories = await window.api.getCategories();
-      const allCategoryIds = allCategories.map(c => c.id);
-      const unselectedIds = allCategoryIds.filter(id => !createdCategoryIds.includes(id));
-      const unselectedPrefs = unselectedIds.map(id => ({
-        category_id: id,
-        is_selected: 0,
-      }));
-
-      if (unselectedPrefs.length > 0) {
-        await window.api.bulkUpdateCategoryPreferences(unselectedPrefs);
       }
 
       // Update business profile

@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Category, CategoryInput, CustomFieldDefinition, CustomFieldInput } from '../types/api';
+import { Category, CategoryInput, CustomFieldDefinition, CustomFieldInput, User } from '../types/api';
+import { showError, ErrorContext } from '../utils/errorHandler';
 
 interface CategoryManagerProps {
   isOpen: boolean;
   onClose: () => void;
   onCategoryChange: () => void;
+  currentUser?: User | null;
 }
 
-export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClose, onCategoryChange }) => {
+export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClose, onCategoryChange, currentUser }) => {
+  // Permission checks
+  const canDelete = currentUser?.role === 'admin';
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
@@ -63,7 +68,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
       onCategoryChange();
     } catch (error) {
       console.error('Failed to save category:', error);
-      alert('Failed to save category. Please try again.');
+      showError(error, ErrorContext.SAVE_CATEGORY);
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +97,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
       onCategoryChange();
     } catch (error) {
       console.error('Failed to delete category:', error);
-      alert('Failed to delete category. Please try again.');
+      showError(error, 'delete-category');
     }
   };
 
@@ -265,13 +270,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-xl font-semibold text-gray-800">Manage Categories</h2>
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Manage Categories</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
           >
             ×
           </button>
@@ -282,12 +287,12 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Form */}
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
                 {editingId ? 'Edit Category' : 'Add New Category'}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Name *
                   </label>
                   <input
@@ -295,26 +300,26 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Description
                   </label>
                   <textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                     rows={3}
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="icon" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="icon" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Icon (emoji or text)
                   </label>
                   <input
@@ -322,13 +327,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                     id="icon"
                     value={formData.icon}
                     onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                     placeholder="💻 or 🔧"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="color" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="color" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Color
                   </label>
                   <div className="flex gap-2">
@@ -337,13 +342,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                       id="color"
                       value={formData.color_code}
                       onChange={(e) => setFormData({ ...formData, color_code: e.target.value })}
-                      className="h-10 w-20 border border-gray-300 rounded cursor-pointer"
+                      className="h-10 w-20 border border-gray-300 dark:border-gray-600 rounded cursor-pointer dark:bg-gray-700"
                     />
                     <input
                       type="text"
                       value={formData.color_code}
                       onChange={(e) => setFormData({ ...formData, color_code: e.target.value })}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                     />
                   </div>
                 </div>
@@ -360,7 +365,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300"
                     >
                       Cancel
                     </button>
@@ -370,37 +375,37 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
               {/* Custom Fields Section */}
               {editingId && showCustomFields && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Custom Fields</h3>
-                  <p className="text-sm text-gray-600 mb-4">
+                <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Custom Fields</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                     Define custom fields that will appear when creating or editing assets in this category.
                   </p>
 
                   {/* Custom Field Form */}
-                  <form onSubmit={handleCustomFieldSubmit} className="space-y-3 mb-4 p-4 bg-gray-50 rounded-lg">
+                  <form onSubmit={handleCustomFieldSubmit} className="space-y-3 mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Field Name (internal) *
                         </label>
                         <input
                           type="text"
                           value={customFieldForm.field_name}
                           onChange={(e) => setCustomFieldForm({ ...customFieldForm, field_name: e.target.value })}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                           placeholder="e.g., vin_number"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Field Label (display) *
                         </label>
                         <input
                           type="text"
                           value={customFieldForm.field_label}
                           onChange={(e) => setCustomFieldForm({ ...customFieldForm, field_label: e.target.value })}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                           placeholder="e.g., VIN Number"
                           required
                         />
@@ -409,13 +414,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Field Type *
                         </label>
                         <select
                           value={customFieldForm.field_type}
                           onChange={(e) => setCustomFieldForm({ ...customFieldForm, field_type: e.target.value as any })}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                         >
                           <option value="text">Text</option>
                           <option value="number">Number</option>
@@ -426,13 +431,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Required
                         </label>
                         <select
                           value={customFieldForm.required}
                           onChange={(e) => setCustomFieldForm({ ...customFieldForm, required: parseInt(e.target.value) })}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                         >
                           <option value="0">No</option>
                           <option value="1">Yes</option>
@@ -442,14 +447,14 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
                     {customFieldForm.field_type === 'dropdown' && (
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                           Options (comma-separated)
                         </label>
                         <input
                           type="text"
                           value={customFieldForm.options}
                           onChange={(e) => setCustomFieldForm({ ...customFieldForm, options: e.target.value })}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-100"
                           placeholder="e.g., Option 1, Option 2, Option 3"
                         />
                       </div>
@@ -466,7 +471,7 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                         <button
                           type="button"
                           onClick={handleCancelCustomField}
-                          className="px-3 py-1.5 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                          className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 dark:text-gray-300"
                         >
                           Cancel
                         </button>
@@ -477,19 +482,19 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                   {/* Custom Fields List */}
                   <div className="space-y-2">
                     {customFields.length === 0 ? (
-                      <p className="text-xs text-gray-500 italic">No custom fields yet. Add one above!</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 italic">No custom fields yet. Add one above!</p>
                     ) : (
                       customFields.map((field) => (
                         <div
                           key={field.id}
-                          className="flex items-center gap-2 p-2 bg-white border border-gray-200 rounded text-sm"
+                          className="flex items-center gap-2 p-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-sm"
                         >
                           <div className="flex-1">
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-gray-900 dark:text-gray-100">
                               {field.field_label}
                               {field.required === 1 && <span className="text-red-500 ml-1">*</span>}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {field.field_name} • {field.field_type}
                               {field.options && ` • ${field.options}`}
                             </div>
@@ -503,7 +508,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                             </button>
                             <button
                               onClick={() => handleDeleteCustomField(field.id)}
-                              className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                              disabled={!canDelete}
+                              className={`px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded ${!canDelete ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              title={!canDelete ? (currentUser ? "Admin Only" : "Login Required") : "Delete Custom Field"}
                             >
                               Delete
                             </button>
@@ -519,11 +526,11 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
             {/* Category List */}
             <div>
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Existing Categories</h3>
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Existing Categories</h3>
                 <div className="flex gap-2">
                   <button
                     onClick={handleExportCSV}
-                    className="px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                    className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
                   >
                     Export CSV
                   </button>
@@ -532,20 +539,22 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
               {/* Bulk Actions Toolbar */}
               {selectedIds.size > 0 && (
-                <div className="mb-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center justify-between">
-                  <span className="text-sm font-medium text-emerald-900">
+                <div className="mb-3 p-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center justify-between">
+                  <span className="text-sm font-medium text-emerald-900 dark:text-emerald-400">
                     {selectedIds.size} selected
                   </span>
                   <div className="flex gap-2">
                     <button
                       onClick={deselectAll}
-                      className="px-3 py-1 text-sm text-gray-600 hover:text-gray-900"
+                      className="px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
                     >
                       Deselect All
                     </button>
                     <button
                       onClick={handleBulkDelete}
-                      className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                      disabled={!canDelete}
+                      className={`px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 ${!canDelete ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title={!canDelete ? (currentUser ? "Admin Only" : "Login Required") : "Delete Selected Categories"}
                     >
                       Delete Selected
                     </button>
@@ -555,8 +564,8 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
               {/* Select All Checkbox */}
               {categories.length > 0 && (
-                <div className="mb-2 pb-2 border-b border-gray-200">
-                  <label className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 cursor-pointer">
+                <div className="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+                  <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={categories.length > 0 && selectedIds.size === categories.length}
@@ -570,13 +579,13 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
 
               <div className="space-y-2">
                 {categories.length === 0 ? (
-                  <p className="text-gray-500 text-sm">No categories yet. Create one to get started!</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm">No categories yet. Create one to get started!</p>
                 ) : (
                   categories.map((category) => (
                     <div
                       key={category.id}
-                      className={`flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 ${
-                        selectedIds.has(category.id) ? 'border-emerald-500 bg-emerald-50' : 'border-gray-200'
+                      className={`flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                        selectedIds.has(category.id) ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-gray-200 dark:border-gray-700'
                       }`}
                     >
                       <input
@@ -592,9 +601,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                         {category.icon || '📁'}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate">{category.name}</h4>
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100 truncate">{category.name}</h4>
                         {category.description && (
-                          <p className="text-sm text-gray-500 truncate">{category.description}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{category.description}</p>
                         )}
                       </div>
                       <div className="flex gap-1">
@@ -606,7 +615,9 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
                         </button>
                         <button
                           onClick={() => handleDelete(category.id)}
-                          className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+                          disabled={!canDelete}
+                          className={`px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded ${!canDelete ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          title={!canDelete ? (currentUser ? "Admin Only" : "Login Required") : "Delete Category"}
                         >
                           Delete
                         </button>
@@ -620,14 +631,14 @@ export const CategoryManager: React.FC<CategoryManagerProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <div className="text-sm text-gray-600 dark:text-gray-400">
             {categories.length} {categories.length === 1 ? 'category' : 'categories'} total
             {selectedIds.size > 0 && ` • ${selectedIds.size} selected`}
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+            className="px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600"
           >
             Close
           </button>

@@ -10,6 +10,14 @@ export function setupAssetHandlers(): void {
     status?: string
     location?: string
     searchQuery?: string
+    condition?: string
+    brand?: string
+    model?: string
+    purchaseDateFrom?: string
+    purchaseDateTo?: string
+    priceMin?: number
+    priceMax?: number
+    warrantyExpiring?: boolean
   }, pagination?: {
     page: number
     pageSize: number
@@ -60,6 +68,47 @@ export function setupAssetHandlers(): void {
       params.push(filters.searchQuery)
     }
 
+    // Advanced filters
+    if (filters?.condition) {
+      whereConditions.push('a.condition = ?')
+      params.push(filters.condition)
+    }
+
+    if (filters?.brand) {
+      whereConditions.push('a.brand LIKE ?')
+      params.push(`%${filters.brand}%`)
+    }
+
+    if (filters?.model) {
+      whereConditions.push('a.model LIKE ?')
+      params.push(`%${filters.model}%`)
+    }
+
+    if (filters?.purchaseDateFrom) {
+      whereConditions.push('a.purchase_date >= ?')
+      params.push(filters.purchaseDateFrom)
+    }
+
+    if (filters?.purchaseDateTo) {
+      whereConditions.push('a.purchase_date <= ?')
+      params.push(filters.purchaseDateTo)
+    }
+
+    if (filters?.priceMin !== undefined) {
+      whereConditions.push('a.purchase_price >= ?')
+      params.push(filters.priceMin)
+    }
+
+    if (filters?.priceMax !== undefined) {
+      whereConditions.push('a.purchase_price <= ?')
+      params.push(filters.priceMax)
+    }
+
+    if (filters?.warrantyExpiring) {
+      // Show assets with warranty expiring in next 30 days
+      whereConditions.push(`a.warranty_expiry IS NOT NULL AND a.warranty_expiry <= date('now', '+30 days')`)
+    }
+
     const whereClause = whereConditions.join(' AND ')
 
     // Count total items (for pagination metadata)
@@ -72,15 +121,36 @@ export function setupAssetHandlers(): void {
     const totalItems = countResult.total
     const totalPages = Math.ceil(totalItems / pageSize)
 
-    // Fetch paginated data
+    // Fetch paginated data with counts
     const dataQuery = `
       SELECT
         a.*,
         c.name as category_name,
         c.color_code as category_color,
-        c.icon as category_icon
+        c.icon as category_icon,
+        COALESCE(lease_counts.count, 0) as lease_count,
+        COALESCE(insurance_counts.count, 0) as insurance_count,
+        COALESCE(reservation_counts.count, 0) as reservation_count
       FROM assets a
       LEFT JOIN categories c ON a.category_id = c.id
+      LEFT JOIN (
+        SELECT asset_id, COUNT(*) as count
+        FROM leases
+        WHERE status = 'active'
+        GROUP BY asset_id
+      ) lease_counts ON a.id = lease_counts.asset_id
+      LEFT JOIN (
+        SELECT asset_id, COUNT(*) as count
+        FROM insurance_policies
+        WHERE status = 'active'
+        GROUP BY asset_id
+      ) insurance_counts ON a.id = insurance_counts.asset_id
+      LEFT JOIN (
+        SELECT asset_id, COUNT(*) as count
+        FROM reservations
+        WHERE status IN ('pending', 'confirmed', 'active')
+        GROUP BY asset_id
+      ) reservation_counts ON a.id = reservation_counts.asset_id
       WHERE ${whereClause}
       ORDER BY a.${safeSortBy} ${safeSortOrder}
       LIMIT ? OFFSET ?
@@ -112,9 +182,33 @@ export function setupAssetHandlers(): void {
     const db = getDatabase()
 
     let query = `
-      SELECT a.*, c.name as category_name, c.color_code as category_color
+      SELECT
+        a.*,
+        c.name as category_name,
+        c.color_code as category_color,
+        COALESCE(lease_counts.count, 0) as lease_count,
+        COALESCE(insurance_counts.count, 0) as insurance_count,
+        COALESCE(reservation_counts.count, 0) as reservation_count
       FROM assets a
       LEFT JOIN categories c ON a.category_id = c.id
+      LEFT JOIN (
+        SELECT asset_id, COUNT(*) as count
+        FROM leases
+        WHERE status = 'active'
+        GROUP BY asset_id
+      ) lease_counts ON a.id = lease_counts.asset_id
+      LEFT JOIN (
+        SELECT asset_id, COUNT(*) as count
+        FROM insurance_policies
+        WHERE status = 'active'
+        GROUP BY asset_id
+      ) insurance_counts ON a.id = insurance_counts.asset_id
+      LEFT JOIN (
+        SELECT asset_id, COUNT(*) as count
+        FROM reservations
+        WHERE status IN ('pending', 'confirmed', 'active')
+        GROUP BY asset_id
+      ) reservation_counts ON a.id = reservation_counts.asset_id
       WHERE 1=1
     `
     const params: any[] = []
@@ -319,6 +413,28 @@ export function setupAssetHandlers(): void {
     return { success: true }
   })
 
+  // Bulk update assets
+  ipcMain.handle('bulk-update-assets', (_event, ids: number[], updates: any) => {
+    const db = getDatabase()
+
+    try {
+      db.transaction(() => {
+        const fields = Object.keys(updates).join(' = ?, ') + ' = ?'
+        const values = [...Object.values(updates)]
+
+        for (const id of ids) {
+          db.prepare(`UPDATE assets SET ${fields} WHERE id = ?`).run(...values, id)
+        }
+      })()
+
+      console.log(`Bulk updated ${ids.length} assets`)
+      return { success: true, count: ids.length }
+    } catch (error: any) {
+      console.error('Bulk update error:', error)
+      throw new Error(error.message || 'Failed to bulk update assets')
+    }
+  })
+
   // Bulk delete assets
   ipcMain.handle('bulk-delete-assets', (_event, ids: number[]) => {
     const db = getDatabase()
@@ -371,5 +487,76 @@ export function setupAssetHandlers(): void {
       WHERE location IS NOT NULL AND location != ''
       ORDER BY location
     `).all()
+  })
+
+  // Get child assets for a parent asset
+  ipcMain.handle('get-asset-children', (_event, parentId: number) => {
+    const db = getDatabase()
+    return db.prepare(`
+      SELECT a.*, c.name as category_name
+      FROM assets a
+      LEFT JOIN categories c ON a.category_id = c.id
+      WHERE a.parent_asset_id = ?
+      ORDER BY a.name ASC
+    `).all(parentId)
+  })
+
+  // Update asset parent relationship
+  ipcMain.handle('update-asset-parent', (_event, assetId: number, parentAssetId: number | null) => {
+    const db = getDatabase()
+
+    // Get asset info for logging
+    const asset = db.prepare('SELECT name FROM assets WHERE id = ?').get(assetId) as any
+
+    if (!asset) {
+      throw new Error('Asset not found')
+    }
+
+    // If setting a parent, validate it exists and prevent circular references
+    if (parentAssetId !== null) {
+      const parent = db.prepare('SELECT id, parent_asset_id FROM assets WHERE id = ?').get(parentAssetId) as any
+
+      if (!parent) {
+        throw new Error('Parent asset not found')
+      }
+
+      // Prevent setting self as parent
+      if (parentAssetId === assetId) {
+        throw new Error('Cannot set asset as its own parent')
+      }
+
+      // Prevent circular references (check if parent has this asset as its parent)
+      let currentParentId = parent.parent_asset_id
+      while (currentParentId !== null) {
+        if (currentParentId === assetId) {
+          throw new Error('Circular parent relationship detected')
+        }
+        const nextParent = db.prepare('SELECT parent_asset_id FROM assets WHERE id = ?').get(currentParentId) as any
+        currentParentId = nextParent?.parent_asset_id || null
+      }
+    }
+
+    db.prepare(`
+      UPDATE assets
+      SET parent_asset_id = ?
+      WHERE id = ?
+    `).run(parentAssetId, assetId)
+
+    // Log activity
+    const parentAsset = parentAssetId ? db.prepare('SELECT name FROM assets WHERE id = ?').get(parentAssetId) as any : null
+    const message = parentAssetId
+      ? `Set parent asset to: ${parentAsset?.name}`
+      : 'Removed parent asset relationship'
+
+    logActivity(
+      db,
+      'update',
+      'asset',
+      assetId,
+      asset.name,
+      message
+    )
+
+    return { success: true }
   })
 }

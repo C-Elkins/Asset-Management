@@ -34,6 +34,14 @@ export function setupActivityLogHandlers(): void {
 
     return { success: true }
   })
+
+  // Clear all activity logs
+  ipcMain.handle('clear-activity-log', () => {
+    const db = getDatabase()
+    db.prepare('DELETE FROM activity_log').run()
+    console.log('Activity log cleared')
+    return { success: true }
+  })
 }
 
 // Helper function to log activity (can be used by other IPC handlers)

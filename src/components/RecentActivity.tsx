@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ActivityLog } from '../types/api';
-import { Activity, Package, Edit, Trash2, LogOut, LogIn } from 'lucide-react';
+import { Activity, Package, Edit, Trash2, LogOut, LogIn, X } from 'lucide-react';
 
 interface RecentActivityProps {
   limit?: number;
@@ -29,6 +29,20 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({ limit = 10, clas
     }
   };
 
+  const handleClearAll = async () => {
+    if (!confirm('Are you sure you want to clear all activity history? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      await (window.api as any).clearActivityLog();
+      await loadActivity();
+    } catch (error) {
+      console.error('Failed to clear activity log:', error);
+      alert('Failed to clear activity log. Please try again.');
+    }
+  };
+
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'create':
@@ -49,17 +63,17 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({ limit = 10, clas
   const getActivityColor = (type: string) => {
     switch (type) {
       case 'create':
-        return 'bg-green-50 border-green-200';
+        return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
       case 'update':
-        return 'bg-blue-50 border-blue-200';
+        return 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
       case 'delete':
-        return 'bg-red-50 border-red-200';
+        return 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
       case 'checkout':
-        return 'bg-orange-50 border-orange-200';
+        return 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800';
       case 'checkin':
-        return 'bg-green-50 border-green-200';
+        return 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
     }
   };
 
@@ -101,25 +115,37 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({ limit = 10, clas
 
   if (loading) {
     return (
-      <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center gap-2">
           <Activity size={20} className="text-emerald-600" />
           Recent Activity
         </h3>
-        <div className="text-center py-8 text-gray-500">Loading activity...</div>
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">Loading activity...</div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
-      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-        <Activity size={20} className="text-emerald-600" />
-        Recent Activity
-      </h3>
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-2">
+          <Activity size={20} className="text-emerald-600" />
+          Recent Activity
+        </h3>
+        {activities.length > 0 && (
+          <button
+            onClick={handleClearAll}
+            className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+            title="Clear all activity"
+          >
+            <X size={16} />
+            Clear All
+          </button>
+        )}
+      </div>
 
       {activities.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
           No recent activity
         </div>
       ) : (
@@ -134,10 +160,10 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({ limit = 10, clas
                   {getActivityIcon(activity.activity_type)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">
+                  <p className="text-sm text-gray-900 dark:text-gray-100">
                     {activity.description}
                   </p>
-                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
+                  <div className="flex items-center gap-2 mt-1 text-xs text-gray-600 dark:text-gray-400">
                     <span className="font-medium">{getEntityTypeLabel(activity.entity_type)}</span>
                     {activity.entity_name && (
                       <>
@@ -153,7 +179,7 @@ export const RecentActivity: React.FC<RecentActivityProps> = ({ limit = 10, clas
                     )}
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 whitespace-nowrap">
+                <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
                   {formatTime(activity.created_at)}
                 </div>
               </div>
