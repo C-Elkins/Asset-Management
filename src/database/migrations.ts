@@ -644,18 +644,11 @@ export function runMigrations(db: Database.Database): void {
       CREATE INDEX idx_users_active ON users(is_active) WHERE is_active = 1;
     `)
 
-    // Create default admin user (username: admin, password: admin123)
-    // Password hash for 'admin123' using a simple hash (will be replaced with bcrypt in production)
-    const crypto = require('crypto')
-    const defaultPassword = 'admin123'
-    const passwordHash = crypto.createHash('sha256').update(defaultPassword).digest('hex')
+    // NOTE: No default admin user created
+    // The SetupWizard component will prompt for admin account creation on first launch
+    // This is more secure than having a hardcoded default password
 
-    db.prepare(`
-      INSERT INTO users (username, password_hash, full_name, role, is_active)
-      VALUES (?, ?, ?, ?, ?)
-    `).run('admin', passwordHash, 'Administrator', 'admin', 1)
-
-    console.log('users table created with default admin user (username: admin, password: admin123)')
+    console.log('users table created - admin account will be created through SetupWizard')
   }
 
   // Migration 14: Create attachments table for document uploads

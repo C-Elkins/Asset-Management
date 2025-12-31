@@ -1,23 +1,148 @@
 import { ipcMain } from 'electron';
 import { getDatabase } from '../database/db';
-import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
+import * as path from 'path';
+import { app } from 'electron';
 
-// In-memory session storage (simple implementation for desktop app)
+const SALT_ROUNDS = 12; // bcrypt work factor - higher = more secure but slower
+const MAX_LOGIN_ATTEMPTS = 5; // Maximum failed login attempts before lockout
+const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+const SESSION_FILE = path.join(app.getPath('userData'), 'session.json');
+
+// Rate limiting storage
+interface LoginAttempt {
+  count: number;
+  lastAttempt: number;
+  lockedUntil?: number;
+}
+
+const loginAttempts: Map<string, LoginAttempt> = new Map();
+
+// Session storage - will be persisted to disk
 let currentSession: { userId: number; username: string; role: string } | null = null;
 
 /**
- * Hash a password using SHA-256
- * Note: In production, use bcrypt or argon2 for better security
+ * Load session from disk (called on app startup)
  */
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex');
+function loadSession(): void {
+  try {
+    if (fs.existsSync(SESSION_FILE)) {
+      const data = fs.readFileSync(SESSION_FILE, 'utf8');
+      const session = JSON.parse(data);
+
+      // Validate session data
+      if (session && session.userId && session.username && session.role) {
+        currentSession = session;
+        console.log(`Session restored for user: ${session.username}`);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to load session:', error);
+    // Delete corrupted session file
+    if (fs.existsSync(SESSION_FILE)) {
+      fs.unlinkSync(SESSION_FILE);
+    }
+  }
 }
 
 /**
- * Verify password against stored hash
+ * Save session to disk
  */
-function verifyPassword(password: string, hash: string): boolean {
-  return hashPassword(password) === hash;
+function saveSession(): void {
+  try {
+    if (currentSession) {
+      fs.writeFileSync(SESSION_FILE, JSON.stringify(currentSession), {
+        encoding: 'utf8',
+        mode: 0o600 // Read/write for owner only
+      });
+    } else {
+      // Delete session file on logout
+      if (fs.existsSync(SESSION_FILE)) {
+        fs.unlinkSync(SESSION_FILE);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to save session:', error);
+  }
+}
+
+/**
+ * Hash a password using bcrypt
+ * Much more secure than SHA-256 - designed for password hashing
+ */
+async function hashPassword(password: string): Promise<string> {
+  return bcrypt.hash(password, SALT_ROUNDS);
+}
+
+/**
+ * Verify password against bcrypt hash
+ */
+async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  try {
+    return await bcrypt.compare(password, hash);
+  } catch (error) {
+    console.error('Password verification error:', error);
+    return false;
+  }
+}
+
+/**
+ * Check if user is rate limited
+ */
+function isRateLimited(username: string): { limited: boolean; remainingTime?: number } {
+  const attempt = loginAttempts.get(username);
+
+  if (!attempt) {
+    return { limited: false };
+  }
+
+  const now = Date.now();
+
+  // Check if user is currently locked out
+  if (attempt.lockedUntil && now < attempt.lockedUntil) {
+    const remainingTime = Math.ceil((attempt.lockedUntil - now) / 1000 / 60); // minutes
+    return { limited: true, remainingTime };
+  }
+
+  // Reset lockout if duration has passed
+  if (attempt.lockedUntil && now >= attempt.lockedUntil) {
+    loginAttempts.delete(username);
+    return { limited: false };
+  }
+
+  return { limited: false };
+}
+
+/**
+ * Record a failed login attempt
+ */
+function recordFailedAttempt(username: string): void {
+  const attempt = loginAttempts.get(username) || { count: 0, lastAttempt: 0 };
+  const now = Date.now();
+
+  // Reset count if last attempt was more than 15 minutes ago
+  if (now - attempt.lastAttempt > LOCKOUT_DURATION) {
+    attempt.count = 0;
+  }
+
+  attempt.count++;
+  attempt.lastAttempt = now;
+
+  // Lock account if max attempts reached
+  if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
+    attempt.lockedUntil = now + LOCKOUT_DURATION;
+    console.warn(`Account locked due to too many failed attempts: ${username}`);
+  }
+
+  loginAttempts.set(username, attempt);
+}
+
+/**
+ * Clear failed login attempts (on successful login)
+ */
+function clearFailedAttempts(username: string): void {
+  loginAttempts.delete(username);
 }
 
 /**
@@ -26,7 +151,10 @@ function verifyPassword(password: string, hash: string): boolean {
 export function setupAuthHandlers() {
   const db = getDatabase();
 
-  // Login
+  // Load persisted session on startup
+  loadSession();
+
+  // Login with rate limiting
   ipcMain.handle('auth:login', async (_, credentials: { username: string; password: string }) => {
     try {
       const { username, password } = credentials;
@@ -34,6 +162,12 @@ export function setupAuthHandlers() {
       // Validate input
       if (!username || !password) {
         throw new Error('Username and password are required');
+      }
+
+      // Check rate limiting
+      const rateLimitCheck = isRateLimited(username);
+      if (rateLimitCheck.limited) {
+        throw new Error(`Too many failed login attempts. Account locked for ${rateLimitCheck.remainingTime} more minutes.`);
       }
 
       // Find user
@@ -44,33 +178,40 @@ export function setupAuthHandlers() {
       `).get(username) as any;
 
       if (!user) {
+        recordFailedAttempt(username);
         throw new Error('Invalid username or password');
       }
 
-      // Verify password
-      if (!verifyPassword(password, user.password_hash)) {
+      // Verify password with bcrypt
+      const isValidPassword = await verifyPassword(password, user.password_hash);
+
+      if (!isValidPassword) {
+        recordFailedAttempt(username);
         throw new Error('Invalid username or password');
       }
+
+      // Clear failed attempts on successful login
+      clearFailedAttempts(username);
 
       // Update last login time
       db.prepare('UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = ?').run(user.id);
 
-      // Create session
+      // Create and persist session
       currentSession = {
         userId: user.id,
         username: user.username,
         role: user.role
       };
+      saveSession();
 
-      // Return user data (without password hash)
-      const { password_hash, ...userWithoutPassword } = user;
-
-      // Update last_login_at to current timestamp
+      // Get updated user data (without password hash)
       const updatedUser = db.prepare(`
         SELECT id, username, full_name, role, is_active, created_at, last_login_at, updated_at
         FROM users
         WHERE id = ?
       `).get(user.id);
+
+      console.log(`User logged in: ${username} (${user.role})`);
 
       return {
         user: updatedUser,
@@ -82,13 +223,18 @@ export function setupAuthHandlers() {
     }
   });
 
-  // Logout
+  // Logout with session cleanup
   ipcMain.handle('auth:logout', async () => {
+    const username = currentSession?.username;
     currentSession = null;
+    saveSession(); // Clear persisted session
+    if (username) {
+      console.log(`User logged out: ${username}`);
+    }
     return { success: true };
   });
 
-  // Get current user
+  // Get current user (with session validation)
   ipcMain.handle('auth:getCurrentUser', async () => {
     if (!currentSession) {
       return null;
@@ -101,22 +247,33 @@ export function setupAuthHandlers() {
         WHERE id = ? AND is_active = 1
       `).get(currentSession.userId);
 
-      return user || null;
+      // Invalidate session if user not found or inactive
+      if (!user) {
+        currentSession = null;
+        saveSession();
+        return null;
+      }
+
+      return user;
     } catch (error) {
       console.error('Get current user error:', error);
       return null;
     }
   });
 
-  // Create user (admin only)
+  // Create user with bcrypt password hashing (admin only, OR first user creation)
   ipcMain.handle('auth:createUser', async (_, userData: { username: string; password: string; full_name: string; role?: string }) => {
     try {
-      // Check if user is logged in and is admin
-      if (!currentSession || currentSession.role !== 'admin') {
+      // Check if any users exist (allow first user creation without auth)
+      const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
+      const isFirstUser = userCount.count === 0;
+
+      // Check if user is logged in and is admin (unless this is the first user)
+      if (!isFirstUser && (!currentSession || currentSession.role !== 'admin')) {
         throw new Error('Admin access required');
       }
 
-      const { username, password, full_name, role = 'user' } = userData;
+      const { username, password, full_name, role = isFirstUser ? 'admin' : 'user' } = userData;
 
       // Validate input
       if (!username || !password || !full_name) {
@@ -127,8 +284,8 @@ export function setupAuthHandlers() {
         throw new Error('Username must be at least 3 characters');
       }
 
-      if (password.length < 6) {
-        throw new Error('Password must be at least 6 characters');
+      if (password.length < 8) {
+        throw new Error('Password must be at least 8 characters');
       }
 
       if (role !== 'admin' && role !== 'user') {
@@ -141,8 +298,8 @@ export function setupAuthHandlers() {
         throw new Error('Username already exists');
       }
 
-      // Hash password
-      const passwordHash = hashPassword(password);
+      // Hash password with bcrypt
+      const passwordHash = await hashPassword(password);
 
       // Insert user
       const result = db.prepare(`
@@ -186,7 +343,7 @@ export function setupAuthHandlers() {
     }
   });
 
-  // Update user (admin only)
+  // Update user with bcrypt for password changes (admin only)
   ipcMain.handle('auth:updateUser', async (_, id: number, updates: { full_name?: string; role?: string; is_active?: number; password?: string }) => {
     try {
       // Check if user is logged in and is admin
@@ -216,11 +373,12 @@ export function setupAuthHandlers() {
       }
 
       if (updates.password !== undefined) {
-        if (updates.password.length < 6) {
-          throw new Error('Password must be at least 6 characters');
+        if (updates.password.length < 8) {
+          throw new Error('Password must be at least 8 characters');
         }
         updateParts.push('password_hash = ?');
-        values.push(hashPassword(updates.password));
+        const hashedPassword = await hashPassword(updates.password);
+        values.push(hashedPassword);
       }
 
       if (updateParts.length === 0) {
@@ -274,7 +432,7 @@ export function setupAuthHandlers() {
     }
   });
 
-  // Change password (any logged-in user)
+  // Change password with bcrypt (any logged-in user)
   ipcMain.handle('auth:changePassword', async (_, oldPassword: string, newPassword: string) => {
     try {
       // Check if user is logged in
@@ -283,8 +441,8 @@ export function setupAuthHandlers() {
       }
 
       // Validate new password
-      if (!newPassword || newPassword.length < 6) {
-        throw new Error('New password must be at least 6 characters');
+      if (!newPassword || newPassword.length < 8) {
+        throw new Error('New password must be at least 8 characters');
       }
 
       // Get current user
@@ -294,13 +452,16 @@ export function setupAuthHandlers() {
         throw new Error('User not found');
       }
 
-      // Verify old password
-      if (!verifyPassword(oldPassword, user.password_hash)) {
+      // Verify old password with bcrypt
+      const isValidPassword = await verifyPassword(oldPassword, user.password_hash);
+
+      if (!isValidPassword) {
         throw new Error('Current password is incorrect');
       }
 
-      // Update password
-      const newPasswordHash = hashPassword(newPassword);
+      // Hash new password with bcrypt
+      const newPasswordHash = await hashPassword(newPassword);
+
       db.prepare('UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
         .run(newPasswordHash, currentSession.userId);
 
